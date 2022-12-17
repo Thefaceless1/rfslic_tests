@@ -386,5 +386,6 @@ describe("Конструктор пролицензий", () => {
         expect(response.body.status).toBe("SUCCESS");
         expect(response.body.data).toEqual({});
         TestData.prolicense[0].stateId = 2;
+
     })
 })
