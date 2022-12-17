@@ -1,12 +1,14 @@
 import {jest, test, expect, describe, beforeAll} from "@jest/globals";
 import superagent from "superagent";
 import {RequestProp} from "./class/RequestProp";
-import {TestData, TCurrentSeason, TCriteriaFullInfo} from "./class/TestData";
+import {TestData, TCurrentSeason, TCriteriaFullInfo, TDocuments} from "./class/TestData";
 import {randomInt} from "crypto";
 
 
-jest.setTimeout(20000);
+
+
 describe("Создание тестовых данных", () => {
+    jest.setTimeout(20000);
 
     test("Загрузка файла на сервер", async () => {
 
@@ -72,8 +74,7 @@ describe("Создание тестовых данных", () => {
 describe("Конструктор пролицензий", () => {
 
     test("Создание проекта лицензии", async () => {
-        const response = await superagent.put(RequestProp.basicUrl + "/api/rest/prolicenses").
-        send({
+        const response = await superagent.put(RequestProp.basicUrl + "/api/rest/prolicenses").send({
                 "name": TestData.getRandomWord(),
                 "season": TestData.seasons[0].name,
                 "type": TestData.licTypes[0].name,
@@ -122,8 +123,7 @@ describe("Конструктор пролицензий", () => {
     })
 
     test("Изменение проекта лицензии", async () => {
-        const response = await superagent.put(RequestProp.basicUrl + "/api/rest/prolicenses/" + TestData.prolicense[0].id).
-        send({
+        const response = await superagent.put(RequestProp.basicUrl + "/api/rest/prolicenses/" + TestData.prolicense[0].id).send({
             "id": TestData.prolicense[0].id,
             "type": TestData.licTypes[1].name,
             "season": TestData.seasons[1].name,
@@ -176,151 +176,152 @@ describe("Конструктор пролицензий", () => {
         expect(response.body.data.documents.length).toBe(2);
         TestData.prolicense[0] = response.body.data;
     })
-    test("Создание группы критериев пролицензии",async () => {
-        for ( const i of TestData.criteriaGroups) {
-            const response = await superagent.put(RequestProp.basicUrl+"/api/rest/prolicenses/"+TestData.prolicense[0].id+"/criterias/groupExperts").
-            query(
+    test("Создание группы критериев пролицензии", async () => {
+        for (const i of TestData.criteriaGroups) {
+            const response = await superagent.put(RequestProp.basicUrl + "/api/rest/prolicenses/" + TestData.prolicense[0].id + "/criterias/groupExperts").query(
                 {
-                    groupId : i.id,
-                    experts :[0,1]
+                    groupId: i.id,
+                    experts: [0, 1, 2]
                 }
             );
-        expect(response.ok).toBeTruthy();
-        expect(response.status).toBe(200);
-        expect(response.body.status).toBe("SUCCESS");
-        expect(response.body.data).toEqual({});
-        TestData.criteriasFullInfo.push(
-            {
-            id:i.id,
-            name:i.name,
-            experts:[0,1],
-            criterias:[]
-        }
-        )
-        }
-    })
-    test("Создание критерия пролицензии",async () => {
-        for (const i of TestData.criteriasFullInfo) {
-            const response = await superagent.put(RequestProp.basicUrl+"/api/rest/prolicenses/"+TestData.prolicense[0].id+"/criterias").
-                send({
-                "groupId":i.id,
-                "number":String(randomInt(1,1000)),
-                "categoryId":TestData.rankCriteria[randomInt(0,TestData.rankCriteria.length-1)].id,
-                "name":TestData.getRandomWord(),
-                "description":TestData.getRandomWord(),
-                "isMulti":randomInt(-1,5),
-                "typeId":TestData.criteriaTypes[randomInt(0,TestData.criteriaTypes.length-1)].id,
-                "docSubmitDate":TestData.dateFuture,
-                "reviewDate":TestData.dateFuture,
-                "documents":[
-                    {
-                        "name":TestData.getRandomWord(),
-                        "docTypeId":TestData.docTypes[randomInt(0,TestData.docTypes.length-1)].id,
-                        "templates":[
-                            {
-                                "name": TestData.fileInfo[0][0],
-                                "storageId": TestData.fileInfo[0][1]
-                            },
-                            {
-                                "name": TestData.fileInfo[1][0],
-                                "storageId": TestData.fileInfo[1][1]
-                            },
-                            {
-                                "name": TestData.fileInfo[2][0],
-                                "storageId": TestData.fileInfo[2][1]
-                            }
-                            ]
-                    },
-                    {
-                        "name":TestData.getRandomWord(),
-                        "docTypeId":TestData.docTypes[randomInt(0,TestData.docTypes.length-1)].id,
-                        "templates":[
-                            {
-                                "name": TestData.fileInfo[2][0],
-                                "storageId": TestData.fileInfo[2][1]
-                            },
-                            {
-                                "name": TestData.fileInfo[1][0],
-                                "storageId": TestData.fileInfo[1][1]
-                            },
-                            {
-                                "name": TestData.fileInfo[0][0],
-                                "storageId": TestData.fileInfo[0][1]
-                            }
-                        ]
-                    }
-                ]
+            expect(response.ok).toBeTruthy();
+            expect(response.status).toBe(200);
+            expect(response.body.status).toBe("SUCCESS");
+            expect(response.body.data).toEqual({});
+            TestData.criteriasFullInfo.push(
+                {
+                    id: i.id,
+                    name: i.name,
+                    experts: [0, 1, 2],
+                    criterias: []
                 }
-                )
-        expect(response.ok).toBeTruthy();
-        expect(response.status).toBe(200);
-        expect(response.body.status).toBe("SUCCESS");
-        expect(response.body.data.groupId).toBe(i.id);
-        expect(response.body.data.docSubmitDate && response.body.data.reviewDate).toBe(TestData.dateFuture);
-        i.criterias.push(response.body.data);
+            )
         }
     })
-    test("Изменение критериев пролицензии",async () => {
+    test("Создание критерия пролицензии", async () => {
         for (const i of TestData.criteriasFullInfo) {
-            const response = await superagent.put(RequestProp.basicUrl+'/api/rest/prolicenses/criterias/'+i.criterias[0].id).
-            send({
-                "groupId":i.id,
-                "number":String(randomInt(1,1000)),
-                "categoryId":TestData.rankCriteria[randomInt(0,TestData.rankCriteria.length-1)].id,
-                "name":TestData.getRandomWord(),
-                "description":TestData.getRandomWord(),
-                "isMulti":randomInt(-1,5),
-                "typeId":TestData.criteriaTypes[randomInt(0,TestData.criteriaTypes.length-1)].id,
-                "docSubmitDate":TestData.dateFuture,
-                "reviewDate":TestData.dateFuture,
-                "documents":[
-                    i.criterias[0].documents[0],
-                    i.criterias[0].documents[1],
-                    {
-                        "name":TestData.getRandomWord(),
-                        "docTypeId":TestData.docTypes[randomInt(0,TestData.docTypes.length-1)].id,
-                        "templates":[
+            for (const n of TestData.criteriaTypes) {
+                const response = await superagent.put(RequestProp.basicUrl + "/api/rest/prolicenses/" + TestData.prolicense[0].id + "/criterias").
+                send({
+                        "groupId": i.id,
+                        "number": String(randomInt(1, 1000)),
+                        "categoryId": TestData.rankCriteria[randomInt(0, TestData.rankCriteria.length - 1)].id,
+                        "name": TestData.getRandomWord(),
+                        "description": TestData.getRandomWord(),
+                        "isMulti": randomInt(-1, 5),
+                        "typeId": n.id,
+                        "docSubmitDate": TestData.dateFuture,
+                        "reviewDate": TestData.dateFuture,
+                        "documents": [
                             {
-                                "name": TestData.fileInfo[2][0],
-                                "storageId": TestData.fileInfo[2][1]
+                                "name": TestData.getRandomWord(),
+                                "docTypeId": TestData.docTypes[randomInt(0, TestData.docTypes.length - 1)].id,
+                                "templates": [
+                                    {
+                                        "name": TestData.fileInfo[0][0],
+                                        "storageId": TestData.fileInfo[0][1]
+                                    },
+                                    {
+                                        "name": TestData.fileInfo[1][0],
+                                        "storageId": TestData.fileInfo[1][1]
+                                    },
+                                    {
+                                        "name": TestData.fileInfo[2][0],
+                                        "storageId": TestData.fileInfo[2][1]
+                                    }
+                                ]
                             },
                             {
-                                "name": TestData.fileInfo[1][0],
-                                "storageId": TestData.fileInfo[1][1]
-                            },
-                            {
-                                "name": TestData.fileInfo[0][0],
-                                "storageId": TestData.fileInfo[0][1]
+                                "name": TestData.getRandomWord(),
+                                "docTypeId": TestData.docTypes[randomInt(0, TestData.docTypes.length - 1)].id,
+                                "templates": [
+                                    {
+                                        "name": TestData.fileInfo[2][0],
+                                        "storageId": TestData.fileInfo[2][1]
+                                    },
+                                    {
+                                        "name": TestData.fileInfo[1][0],
+                                        "storageId": TestData.fileInfo[1][1]
+                                    },
+                                    {
+                                        "name": TestData.fileInfo[0][0],
+                                        "storageId": TestData.fileInfo[0][1]
+                                    }
+                                ]
                             }
                         ]
                     }
-                    ]
+                )
+                expect(response.ok).toBeTruthy();
+                expect(response.status).toBe(200);
+                expect(response.body.status).toBe("SUCCESS");
+                expect(response.body.data.groupId).toBe(i.id);
+                expect(response.body.data.docSubmitDate && response.body.data.reviewDate).toBe(TestData.dateFuture);
+                i.criterias.push(response.body.data);
             }
-            )
-        expect(response.ok).toBeTruthy();
-        expect(response.status).toBe(200);
-        expect(response.body.status).toBe("SUCCESS");
-        expect(response.body.data).toEqual({});
         }
     })
-    test("Получение полной информации о критериях пролицензии",async () => {
-        const response = await superagent.get(RequestProp.basicUrl+"/api/rest/prolicenses/"+TestData.prolicense[0].id+"/criterias");
+    test("Изменение критериев пролицензии", async () => {
+        for (const i of TestData.criteriasFullInfo) {
+            for (const n of i.criterias) {
+                const response = await superagent.put(RequestProp.basicUrl + '/api/rest/prolicenses/criterias/' + n.id).send({
+                        "groupId": i.id,
+                        "number": String(randomInt(1, 1000)),
+                        "categoryId": TestData.rankCriteria[randomInt(0, TestData.rankCriteria.length - 1)].id,
+                        "name": TestData.getRandomWord(),
+                        "description": TestData.getRandomWord(),
+                        "isMulti": randomInt(-1, 5),
+                        "typeId": TestData.criteriaTypes[randomInt(0, TestData.criteriaTypes.length - 1)].id,
+                        "docSubmitDate": TestData.dateFuture,
+                        "reviewDate": TestData.dateFuture,
+                        "documents": [
+                            n.documents[0],
+                            n.documents[1],
+                            {
+                                "name": TestData.getRandomWord(),
+                                "docTypeId": TestData.docTypes[randomInt(0, TestData.docTypes.length - 1)].id,
+                                "templates": [
+                                    {
+                                        "name": TestData.fileInfo[2][0],
+                                        "storageId": TestData.fileInfo[2][1]
+                                    },
+                                    {
+                                        "name": TestData.fileInfo[1][0],
+                                        "storageId": TestData.fileInfo[1][1]
+                                    },
+                                    {
+                                        "name": TestData.fileInfo[0][0],
+                                        "storageId": TestData.fileInfo[0][1]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                )
+                expect(response.ok).toBeTruthy();
+                expect(response.status).toBe(200);
+                expect(response.body.status).toBe("SUCCESS");
+                expect(response.body.data).toEqual({});
+            }
+        }
+    })
+    test("Получение полной информации о критериях пролицензии", async () => {
+        const response = await superagent.get(RequestProp.basicUrl + "/api/rest/prolicenses/" + TestData.prolicense[0].id + "/criterias");
         expect(response.ok).toBeTruthy();
         expect(response.status).toBe(200);
         expect(response.body.status).toBe("SUCCESS");
         expect(response.body.data.groups.length).toBeGreaterThan(0);
-        expect(response.body.data.groups.every((value : TCriteriaFullInfo) => value.criterias.length == 1)).toBeTruthy();
-        response.body.data.groups.forEach((value : TCriteriaFullInfo, index : number) =>{
+        expect(response.body.data.groups.every((value: TCriteriaFullInfo) => value.criterias.length == TestData.criteriaTypes.length)).toBeTruthy();
+        response.body.data.groups.forEach((value: TCriteriaFullInfo, index: number) => {
             expect(value.criterias).not.toBe(TestData.criteriasFullInfo[index].criterias);
             TestData.criteriasFullInfo[index].criterias = value.criterias;
         })
     })
-    test("Создание пролицензии по образцу",async () => {
-        const response = await superagent.put(RequestProp.basicUrl+"/api/rest/prolicenses/clone/"+TestData.prolicense[0].id).
-            send({
-            "type":TestData.criteriaTypes[randomInt(0,TestData.criteriaTypes.length-1)].name,
-            "season":TestData.seasons[0].name,
-            "name":TestData.getRandomWord()
+    test("Создание пролицензии по образцу", async () => {
+        const response = await superagent.put(RequestProp.basicUrl + "/api/rest/prolicenses/clone/" + TestData.prolicense[0].id).send({
+                "type": TestData.licTypes[randomInt(0, TestData.licTypes.length - 1)].name,
+                "season": TestData.seasons[0].name,
+                "name": TestData.getRandomWord()
             }
         )
         expect(response.ok).toBeTruthy();
@@ -328,12 +329,62 @@ describe("Конструктор пролицензий", () => {
         expect(response.body.status).toBe("SUCCESS");
         expect(response.body.data.id).not.toBe(TestData.prolicense[0].id);
         expect(
-            response.body.data.end  && response.body.data.requestEnd &&
+            response.body.data.end && response.body.data.requestEnd &&
             response.body.data.docSubmitDate && response.body.data.dueDate &&
             response.body.data.reviewDate && response.body.data.decisionDate
         ).toBe(TestData.dateFuture);
         expect(response.body.data.begin && response.body.data.requestBegin).toBe(TestData.dateNow);
         expect(response.body.data.stateId).toBe(1);
-        response.body.data.documents
+
+        response.body.data.documents.forEach((value : TDocuments, index : number) =>{
+        expect(value.name).toBe(TestData.prolicense[0].documents[index].name);
+        value.templates.forEach((value1, index1) => {
+            expect(value1.name).toBe(TestData.prolicense[0].documents[index].templates[index1].name);
+            expect(value1.storageId).toBe(TestData.prolicense[0].documents[index].templates[index1].storageId);
+        })
+    })
+        TestData.prolicense.push(response.body.data);
+
+    })
+    test("Удаление пролицензии", async () => {
+        const response = await superagent.delete(RequestProp.basicUrl + "/api/rest/prolicenses/" + TestData.prolicense[1].id);
+        expect(response.ok).toBeTruthy();
+        expect(response.status).toBe(200);
+        expect(response.body.status).toBe("SUCCESS");
+        TestData.prolicense.pop();
+        expect(TestData.prolicense.length).toBe(1);
+    })
+    test("Удаление критерия пролицензии", async () => {
+        for (const i of TestData.criteriasFullInfo) {
+            if (i.id % 2 == 0) {
+                for (const n of i.criterias) {
+                    const response = await superagent.delete(RequestProp.basicUrl + "/api/rest/prolicenses/criterias/" + n.id);
+                    expect(response.ok).toBeTruthy();
+                    expect(response.status).toBe(200);
+                    expect(response.body.status).toBe("SUCCESS");
+                }
+                i.criterias = [];
+            }
+        }
+    })
+    test("Удаление группы критериев", async () => {
+        for (let i = 0; i<TestData.criteriasFullInfo.length; i++) {
+            if (TestData.criteriasFullInfo[i].id % 2 == 0) {
+                const response = await superagent.delete(RequestProp.basicUrl + "/api/rest/prolicenses/" +
+                    TestData.prolicense[0].id + "/criterias/groups/" + TestData.criteriasFullInfo[i].id);
+                expect(response.ok).toBeTruthy();
+                expect(response.status).toBe(200);
+                expect(response.body.status).toBe("SUCCESS");
+                TestData.criteriasFullInfo.splice(i,1);
+            }
+        }
+    })
+    test("Публикация проекта лицензии",async () => {
+        const response = await superagent.put(RequestProp.basicUrl+"/api/rest/prolicenses/"+TestData.prolicense[0].id+"/publish");
+        expect(response.ok).toBeTruthy();
+        expect(response.status).toBe(200);
+        expect(response.body.status).toBe("SUCCESS");
+        expect(response.body.data).toEqual({});
+        TestData.prolicense[0].stateId = 2;
     })
 })
