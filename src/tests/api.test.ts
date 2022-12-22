@@ -12,7 +12,6 @@ describe("Получение данных из справочников", () => 
     jest.setTimeout(20000);
 
     test("Загрузка файла на сервер", async () => {
-
         for (const i of TestData.fileNames) {
             const response = await superagent.post(RequestProp.basicUrl + "/api/rest/uploadFile").
             set("Content-Type", "multipart/form-data; boundary=----WebKitFormBoundaryoI4AK63JZr8jUhAa").
@@ -22,10 +21,9 @@ describe("Получение данных из справочников", () => 
             expect(response.status).toBe(200);
             expect(response.body.status).toBe("SUCCESS");
             expect(response.body.data).toBeDefined();
-            //Записываем полученные id файлов  в свойство fileInfo
-            TestData.fileInfo.push([i, response.body.data]);
+            //Записываем полученные id  и наименования файлов в свойство files
+            TestData.addDataToFiles(i,response.body.data);
         }
-
     })
     test("Справочник сезонов", async () => {
         const response = await superagent.get(RequestProp.basicUrl + "/api/rest/seasons");
@@ -95,6 +93,31 @@ describe("Получение данных из справочников", () => 
         expect(response.body.data.length).toBeGreaterThan(0);
         //Записываем полученные значения справочника в свойство docStatus
         Catalogs.docStatus = response.body.data;
+    })
+    test("Сотрудники клуба",async () => {
+        const response = await superagent.get(RequestProp.basicUrl+"/api/rest/persons/findbyparams").
+        query(
+            {
+              pageNum : 0,
+              pageSize : 10
+            }
+            )
+        expect(response.ok).toBeTruthy();
+        expect(response.status).toBe(200);
+        expect(response.body.data.length).toBe(10);
+        Catalogs.clubWorkers = response.body.data;
+    })
+    test("Эксперты групп критериев",async () => {
+        const response = await superagent.get(RequestProp.basicUrl+"/api/rest/persons/withRights").
+        query(
+            {
+                rights : "request.checkExpert"
+            }
+        )
+        expect(response.ok).toBeTruthy();
+        expect(response.status).toBe(200);
+        expect(response.body.data.length).toBeGreaterThan(0);
+        Catalogs.critGrpExperts = response.body.data;
     })
 })
 
@@ -279,7 +302,7 @@ describe("Работа с заявками", () => {
         expect(response.body.data.state).toBe(License.getLicStatusById(response.body.data.stateId));
         expect(response.body.data.percent).toBe(0);
         expect(response.body.data.docState).toBe(License.getDocStatusById(response.body.data.docStateId));
-        License.license.push(response.body.data);
+        License.addResponseToLicense(0,response.body.data);
         //Проверяем статусы документов лицензии
         License.license[0].documents.forEach((value, index) => {
             expect(value.state).toBe(License.getDocStatusById(response.body.data.docStateId));
@@ -303,122 +326,29 @@ describe("Работа с заявками", () => {
     })
     test("Добавление документов и комментариев к документам вкладки 'Общая информация' ",async () => {
         const response = await superagent.put(RequestProp.basicUrl+"/api/rest/licenses/"+License.license[0].id).
-            send({
-            "id": License.license[0].id,
-            "proLicId": License.license[0].proLicId,
-            "type": License.license[0].type,
-            "season": License.license[0].season,
-            "name": License.license[0].name,
-            "begin": License.license[0].begin,
-            "end": License.license[0].end,
-            "clubId": License.license[0].clubId,
-            "requestBegin": License.license[0].requestBegin,
-            "requestEnd": License.license[0].requestEnd,
-            "docSubmitDate": License.license[0].docSubmitDate,
-            "dueDate": License.license[0].dueDate,
-            "reviewDate": License.license[0].reviewDate,
-            "decisionDate": License.license[0].decisionDate,
-            "percent": License.license[0].percent,
-            "stateId": License.license[0].stateId,
-            "state": License.license[0].state,
-            "docStateId": License.license[0].docStateId,
-            "docState": License.license[0].docState,
-            "documents": [
-                {
-                    "id": License.license[0].documents[0].id,
-                    "proDocId": License.license[0].documents[0].proDocId,
-                    "name": License.license[0].documents[0].name,
-                    "docTypeId": License.license[0].documents[0].docTypeId,
-                    "comment": TestData.commentValue,
-                    "reviewComment": null,
-                    "stateId": License.license[0].documents[0].stateId,
-                    "state": License.license[0].documents[0].state,
-                    "templates": License.license[0].documents[0].templates,
-                    "files": [
-                        {
-                            "name": TestData.fileInfo[0][0],
-                            "storageId": TestData.fileInfo[0][1]
-                        },
-                        {
-                            "name": TestData.fileInfo[1][0],
-                            "storageId": TestData.fileInfo[1][1]
-                        },
-                        {
-                            "name": TestData.fileInfo[2][0],
-                            "storageId": TestData.fileInfo[2][1]
-                        }
-                    ]
-                },
-                {
-                    "id": License.license[0].documents[1].id,
-                    "proDocId": License.license[0].documents[1].proDocId,
-                    "name": License.license[0].documents[1].name,
-                    "docTypeId": License.license[0].documents[1].docTypeId,
-                    "comment": TestData.commentValue,
-                    "reviewComment": null,
-                    "stateId": License.license[0].documents[1].stateId,
-                    "state": License.license[0].documents[1].state,
-                    "templates": License.license[0].documents[1].templates,
-                    "files": [
-                        {
-                            "name": TestData.fileInfo[0][0],
-                            "storageId": TestData.fileInfo[0][1]
-                        },
-                        {
-                            "name": TestData.fileInfo[1][0],
-                            "storageId": TestData.fileInfo[1][1]
-                        },
-                        {
-                            "name": TestData.fileInfo[2][0],
-                            "storageId": TestData.fileInfo[2][1]
-                        }
-                    ]
-                }
-            ],
-            "criteriaGroups": License.license[0].criteriaGroups
-        })
+            send(License.addCommentsAndDocuments());
         expect(response.ok).toBeTruthy();
         expect(response.status).toBe(200);
         expect(response.body.status).toBe("SUCCESS");
-        License.license[0] = response.body.data;
+        License.addResponseToLicense(0,response.body.data);
         //проверяем наличие добавленных документов и комментариев
         License.license[0].documents.forEach((value, index) => {
-            expect(value.comment).toBeTruthy();
-            expect(value.files.length).toBeGreaterThan(0);
+            expect(value.comment).toBe(TestData.commentValue);
+            expect(value.files.length).toBe(TestData.files.length);
         })
     })
-    test("Добавление сотрудников клуба к группе критериев", async () => {
+    test("Добавление сотрудников клуба и экспертов к группе критериев", async () => {
             const response = await superagent.put(RequestProp.basicUrl+"/api/rest/licenses/"+License.license[0].id).
-            send({
-                "id": License.license[0].id,
-                "proLicId": License.license[0].proLicId,
-                "type": License.license[0].type,
-                "season": License.license[0].season,
-                "name": License.license[0].name,
-                "begin": License.license[0].begin,
-                "end": License.license[0].end,
-                "clubId": License.license[0].clubId,
-                "requestBegin": License.license[0].requestBegin,
-                "requestEnd": License.license[0].requestEnd,
-                "docSubmitDate": License.license[0].docSubmitDate,
-                "dueDate": License.license[0].dueDate,
-                "reviewDate": License.license[0].reviewDate,
-                "decisionDate": License.license[0].decisionDate,
-                "percent": License.license[0].percent,
-                "stateId": License.license[0].stateId,
-                "state": License.license[0].state,
-                "docStateId": License.license[0].docStateId,
-                "docState": License.license[0].docState,
-                "documents": License.license[0].documents,
-                "criteriaGroups": License.addClubWorkersToCritGrp()
-            })
+            send(License.addClubWorkersToCritGrp());
         expect(response.ok).toBeTruthy();
         expect(response.status).toBe(200);
         expect(response.body.status).toBe("SUCCESS");
-        //Проверяем наличие добавленных сотрудников клубов для групп критериев
+        //Проверяем наличие добавленных сотрудников клубов и экспертов для групп критериев
         License.license[0].criteriaGroups.forEach((value, index) => {
             expect(value.experts).toEqual(response.body.data.criteriaGroups[index].experts);
+            expect(value.rfuExpert).toBe(response.body.data.criteriaGroups[index].rfuExpert);
         })
+        License.addResponseToLicense(0,response.body.data);
     })
     test("Добавление документов и комментариев для документов критериев", async () => {
         const response = await superagent.put(RequestProp.basicUrl+"/api/rest/licenses/"+License.license[0].id).
@@ -426,13 +356,55 @@ describe("Работа с заявками", () => {
         expect(response.ok).toBeTruthy();
         expect(response.status).toBe(200);
         expect(response.body.status).toBe("SUCCESS");
+        License.addResponseToLicense(0,response.body.data);
         //Проверяем наличие добавленных комментариев и документов для документов критериев
         License.license[0].criteriaGroups.forEach((value, index) => {
             value.criterias.forEach((value1,index1) => {
                 value1.documents.forEach((value2, index2) => {
                     const addedDocInfo = response.body.data.criteriaGroups[index].criterias[index1].documents[index2];
-                    expect(value2.comment).toBe(addedDocInfo.comment);
-                    expect(value2.files.length).toBe(addedDocInfo.files.length);
+                    expect(value2.comment).toBe(TestData.commentValue);
+                    expect(value2.files.length).toEqual(TestData.files.length);
+                })
+            })
+        })
+    })
+    test("Проставление статусов и комментариев для документов критериев",async () => {
+        const response = await superagent.put(RequestProp.basicUrl+"/api/rest/licenses/"+License.license[0].id).
+        send(License.addStatusToDocuments());
+        expect(response.ok).toBeTruthy();
+        expect(response.status).toBe(200);
+        expect(response.body.status).toBe("SUCCESS");
+        License.addResponseToLicense(0,response.body.data);
+        console.log(License.license[0].id)
+        //Проверяем проценты заполнения и статусы заявки, групп критериев, критериев
+        License.license[0].criteriaGroups.forEach((grp, index) => {
+            const grpPercent = grp.criterias.reduce((accum,value) =>accum+value.percent,0)/grp.criterias.length;
+            expect(Math.round(grp.percent)).toBe(Math.round(grpPercent));
+            if(grp.criterias.some(value => value.state == License.getDocStatusById(5))) {
+                expect(grp.state).toBe(License.getDocStatusById(5));
+            }
+            else if (grp.criterias.some(value => value.state == License.getDocStatusById(2))) {
+                expect(grp.state).toBe(License.getDocStatusById(2));
+            }
+            else if (grp.criterias.some(value => value.state == License.getDocStatusById(4))) {
+                expect(grp.state).toBe(License.getDocStatusById(4));
+            }
+            expect(grp.state).toBe(License.getDocStatusById(3));
+            grp.criterias.forEach((crit, index1) => {
+                const critPercent = crit.documents.filter(value => value.stateId != 2).length*100/crit.documents.length;
+                expect(Math.round(crit.percent)).toBe(Math.round(critPercent));
+                if(crit.documents.some(value => value.state == License.getDocStatusById(5))) {
+                    expect(crit.state).toBe(License.getDocStatusById(5));
+                }
+                else if (crit.documents.some(value => value.state == License.getDocStatusById(2))) {
+                    expect(crit.state).toBe(License.getDocStatusById(2));
+                }
+                else if (crit.documents.some(value => value.state == License.getDocStatusById(4))) {
+                    expect(crit.state).toBe(License.getDocStatusById(4));
+                }
+                    expect(crit.state).toBe(License.getDocStatusById(3));
+                crit.documents.forEach((doc, index2) => {
+                    expect(doc.state).toBe(License.getDocStatusById(doc.stateId));
                 })
             })
         })

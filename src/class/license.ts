@@ -1,6 +1,7 @@
-import {Catalogs} from "./catalogs";
+import {Catalogs, TClubWorkers} from "./catalogs";
 import {TestData} from "./test-data";
-import {Prolicense} from "./prolicense";
+import {Prolicense, TProlicense} from "./prolicense";
+import {randomInt} from "crypto";
 
 export class License {
     public static license : TLicense[] =[];
@@ -10,6 +11,16 @@ export class License {
             clubId : 0
         }
     }
+    public static addResponseToLicense (index : number,response : TLicense) : void {
+        this.license[index] = response;
+    }
+    public static addCommentsAndDocuments () : TLicense {
+        this.license[0].documents.forEach((value, index) => {
+            value.comment = TestData.commentValue;
+            value.files = TestData.files;
+        })
+        return this.license[0];
+    }
     public static getLicStatusById(stateId : number) : string {
         const result  = Catalogs.licStatus.find(value => value.id == stateId);
         return (result) ? result.name : "Статус по id не найден";
@@ -18,35 +29,34 @@ export class License {
         const result = Catalogs.docStatus.find(value => value.id == docStateId);
         return (result) ? result.name : "Статус по id не найден";
     }
-    public static addClubWorkersToCritGrp () {
-        License.license[0].criteriaGroups.forEach((value, index) => {
-            value.experts = [0,1,2];
+    public static addClubWorkersToCritGrp () : TLicense {
+        this.license[0].criteriaGroups.forEach((value, index) => {
+            value.experts = Catalogs.getClubWorkersId();
+            value.rfuExpert = Catalogs.critGrpExperts[0].id;
         })
-        return License.license[0].criteriaGroups;
+        return this.license[0];
     }
     public static addDocAndComToCritDoc () {
-        License.license[0].criteriaGroups.forEach((value, index) => {
+        this.license[0].criteriaGroups.forEach((value, index) => {
             value.criterias.forEach((value1, index1) => {
                 value1.documents.forEach((value2, index2) => {
                     value2.comment = TestData.commentValue;
-                    value2.files = [
-                        {
-                            name: TestData.fileInfo[0][0],
-                            storageId: TestData.fileInfo[0][1]
-                        },
-                        {
-                            name: TestData.fileInfo[1][0],
-                            storageId: TestData.fileInfo[1][1]
-                        },
-                        {
-                            name: TestData.fileInfo[2][0],
-                            storageId: TestData.fileInfo[2][1]
-                        }
-                    ]
+                    value2.files = TestData.files
                 })
             })
         })
-        return License.license[0];
+        return this.license[0];
+    }
+    public static addStatusToDocuments () : TLicense {
+        this.license[0].criteriaGroups.forEach((value, index) => {
+            value.criterias.forEach((value1, index1) => {
+                value1.documents.forEach((value2, index2) => {
+                    value2.reviewComment = TestData.commentValue;
+                    value2.stateId = Catalogs.docStatus[randomInt(1,5)].id;
+                })
+            })
+        })
+        return this.license[0];
     }
 }
 export type TCreateLicense = {
@@ -88,7 +98,7 @@ export type TLicense = {
             storageId: string
         }[],
         files : {
-            id: number,
+            id?: number,
             name: string,
             storageId: string
         }[]
@@ -102,6 +112,11 @@ export type TLicense = {
         experts : number[],
         rfuExpertChoice : number[],
         rfuExpert : number,
+        details : {
+            experts :TClubWorkers[],
+            rfuExpertChoice : TClubWorkers[],
+            rfuExpert : TClubWorkers
+        }
         criterias : {
             id: number,
             proCritId: number,

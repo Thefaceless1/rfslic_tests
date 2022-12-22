@@ -21,20 +21,7 @@ export class Prolicense {
                 {
                     name: TestData.getRandomWord(),
                     docTypeId: Catalogs.docTypes[0].id,
-                    templates: [
-                        {
-                            name: TestData.fileInfo[0][0],
-                            storageId: TestData.fileInfo[0][1]
-                        },
-                        {
-                            name: TestData.fileInfo[1][0],
-                            storageId: TestData.fileInfo[1][1]
-                        },
-                        {
-                            name: TestData.fileInfo[2][0],
-                            storageId: TestData.fileInfo[2][1]
-                        }
-                    ]
+                    templates: TestData.files
                 }
             ]
         }
@@ -48,20 +35,7 @@ export class Prolicense {
             {
             name: TestData.getRandomWord(),
             docTypeId: Catalogs.docTypes[0].id,
-            templates: [
-                {
-                    name: TestData.fileInfo[2][0],
-                    storageId: TestData.fileInfo[2][1]
-                },
-                {
-                    name: TestData.fileInfo[1][0],
-                    storageId: TestData.fileInfo[1][1]
-                },
-                {
-                    name: TestData.fileInfo[0][0],
-                    storageId: TestData.fileInfo[0][1]
-                }
-            ]
+            templates: TestData.files
         }
         )
     }

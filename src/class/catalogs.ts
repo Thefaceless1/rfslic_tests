@@ -7,6 +7,16 @@ export class Catalogs {
     public static criteriaTypes : TCriteriaTypes[] =[];
     public static licStatus : TLicAndDocStatus[] =[];
     public static docStatus : TLicAndDocStatus[] =[];
+    public static critGrpExperts : TClubWorkers[] =[];
+    public static clubWorkers : TClubWorkers[] =[];
+    public static getClubWorkersId () : number[] {
+        const clubWorkersId = this.clubWorkers.map(value => value.id);
+        return clubWorkersId;
+    }
+    public static getCritGrpExpertsId () : number[] {
+        const critGrpExpertsId = this.critGrpExperts.map(value => value.id);
+        return critGrpExpertsId;
+    }
 }
 export type TCurrentSeason = {
     id: number,
@@ -45,4 +55,16 @@ export type TLicAndDocStatus = {
     id: number,
     name: string,
     description: string
+}
+export type TClubWorkers = {
+    id: number,
+    rfsId : number,
+    fio : string,
+    firstName : string,
+    middleName : string,
+    lastName : string,
+    birthDate : string,
+    orgName : string,
+    position : string,
+    sportRole : string
 }

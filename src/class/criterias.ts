@@ -1,5 +1,5 @@
 import {TDocuments} from "./prolicense";
-import {Catalogs, TCriteriaTypes} from "./catalogs";
+import {Catalogs, TClubWorkers, TCriteriaTypes} from "./catalogs";
 import {randomInt} from "crypto";
 import {TestData} from "./test-data";
 
@@ -11,7 +11,10 @@ export class Criterias {
                 {
                 id : value.id,
                 name : value.name,
-                experts : [0, 1, 2],
+                experts : Catalogs.getCritGrpExpertsId(),
+                details : {
+                    experts : Catalogs.critGrpExperts
+                },
                 criterias : []
             }
             )
@@ -35,38 +38,12 @@ export class Criterias {
                             {
                                 name: TestData.getRandomWord(),
                                 docTypeId: Catalogs.docTypes[0].id,
-                                templates: [
-                                    {
-                                        name: TestData.fileInfo[0][0],
-                                        storageId: TestData.fileInfo[0][1]
-                                    },
-                                    {
-                                        name: TestData.fileInfo[1][0],
-                                        storageId: TestData.fileInfo[1][1]
-                                    },
-                                    {
-                                        name: TestData.fileInfo[2][0],
-                                        storageId: TestData.fileInfo[2][1]
-                                    }
-                                ]
+                                templates: TestData.files
                             },
                             {
                                 name: TestData.getRandomWord(),
                                 docTypeId: Catalogs.docTypes[0].id,
-                                templates: [
-                                    {
-                                        name: TestData.fileInfo[2][0],
-                                        storageId: TestData.fileInfo[2][1]
-                                    },
-                                    {
-                                        name: TestData.fileInfo[1][0],
-                                        storageId: TestData.fileInfo[1][1]
-                                    },
-                                    {
-                                        name: TestData.fileInfo[0][0],
-                                        storageId: TestData.fileInfo[0][1]
-                                    }
-                                ]
+                                templates: TestData.files
                             }
                         ]
                     }
@@ -86,20 +63,7 @@ export class Criterias {
                     {
                     name: TestData.getRandomWord(),
                     docTypeId: Catalogs.docTypes[randomInt(0, Catalogs.docTypes.length - 1)].id,
-                    templates: [
-                    {
-                        name: TestData.fileInfo[2][0],
-                        storageId: TestData.fileInfo[2][1]
-                    },
-                    {
-                        name: TestData.fileInfo[1][0],
-                        storageId: TestData.fileInfo[1][1]
-                    },
-                    {
-                        name: TestData.fileInfo[0][0],
-                        storageId: TestData.fileInfo[0][1]
-                    }
-                ]
+                    templates: TestData.files
                 }
                 )
             })
@@ -111,6 +75,9 @@ export type TCriterias = {
     id: number,
     name : string,
     experts : number[],
+    details : {
+        experts : TClubWorkers[]
+    }
     criterias : {
         id?: number,
         groupId: number,
