@@ -1,4 +1,4 @@
-import {Catalogs, TClubWorkers} from "./catalogs";
+import {Catalogs, TClubWorkers, TLicAndDocStatus} from "./catalogs";
 import {TestData} from "./test-data";
 import {Prolicense, TProlicense} from "./prolicense";
 import {randomInt} from "crypto";
@@ -21,18 +21,18 @@ export class License {
         })
         return this.license[0];
     }
-    public static getLicStatusById(stateId : number) : string {
-        const result  = Catalogs.licStatus.find(value => value.id == stateId);
+    public static getLicStatusById(stateId : number, licStatus : TLicAndDocStatus[]) : string {
+        const result  = licStatus.find(value => value.id == stateId);
         return (result) ? result.name : "Статус по id не найден";
     }
-    public static getDocStatusById(docStateId : number) : string {
-        const result = Catalogs.docStatus.find(value => value.id == docStateId);
+    public static getDocStatusById(docStateId : number, docStatus : TLicAndDocStatus[]) : string {
+        const result = docStatus.find(value => value.id == docStateId);
         return (result) ? result.name : "Статус по id не найден";
     }
-    public static addClubWorkersToCritGrp () : TLicense {
+    public static addClubWorkersToCritGrp (clubWorkers : TClubWorkers[],criGrpExperts : TClubWorkers[]) : TLicense {
         this.license[0].criteriaGroups.forEach((value, index) => {
-            value.experts = Catalogs.getClubWorkersId();
-            value.rfuExpert = Catalogs.critGrpExperts[0].id;
+            value.experts = Catalogs.getClubWorkersId(clubWorkers);
+            value.rfuExpert = criGrpExperts[0].id;
         })
         return this.license[0];
     }
@@ -47,12 +47,12 @@ export class License {
         })
         return this.license[0];
     }
-    public static addStatusToDocuments () : TLicense {
+    public static addStatusToDocuments (docStatus : TLicAndDocStatus[]) : TLicense {
         this.license[0].criteriaGroups.forEach((value, index) => {
             value.criterias.forEach((value1, index1) => {
                 value1.documents.forEach((value2, index2) => {
                     value2.reviewComment = TestData.commentValue;
-                    value2.stateId = Catalogs.docStatus[randomInt(1,5)].id;
+                    value2.stateId = docStatus[randomInt(0,5)].id;
                 })
             })
         })

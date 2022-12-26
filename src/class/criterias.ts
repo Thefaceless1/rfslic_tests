@@ -1,33 +1,33 @@
 import {TDocuments} from "./prolicense";
-import {Catalogs, TClubWorkers, TCriteriaTypes} from "./catalogs";
+import {Catalogs, TClubWorkers, TCriteriaGroups, TCriteriaTypes, TDocTypes, TRankCriteria} from "./catalogs";
 import {randomInt} from "crypto";
 import {TestData} from "./test-data";
 
 export class Criterias {
     public static criterias : TCriterias[] =[];
-    public static createCritGroups () : void {
-        Catalogs.criteriaGroups.forEach((value, index) => {
+    public static createCritGroups (critGroups : TCriteriaGroups[],critGrpExperts : TClubWorkers[] ) : void {
+        critGroups.forEach((value, index) => {
             this.criterias.push(
                 {
                 id : value.id,
                 name : value.name,
-                experts : Catalogs.getCritGrpExpertsId(),
+                experts : Catalogs.getCritGrpExpertsId(critGrpExperts),
                 details : {
-                    experts : Catalogs.critGrpExperts
+                    experts : critGrpExperts
                 },
                 criterias : []
             }
             )
         })
     }
-    public static createCriterias () : void {
+    public static createCriterias (criteriaTypes : TCriteriaTypes[],rankCriteria : TRankCriteria[],docTypes : TDocTypes[]) : void {
         this.criterias.forEach((value, index) => {
-            Catalogs.criteriaTypes.forEach((value1, index1) => {
+                criteriaTypes.forEach((value1, index1) => {
                 value.criterias.push(
                     {
                         groupId: value.id,
                         number: TestData.getRandomWord(),
-                        categoryId: Catalogs.rankCriteria[0].id,
+                        categoryId: rankCriteria[0].id,
                         name: TestData.getRandomWord(),
                         description: TestData.descValue,
                         isMulti: randomInt(-1, 5),
@@ -37,12 +37,12 @@ export class Criterias {
                         documents: [
                             {
                                 name: TestData.getRandomWord(),
-                                docTypeId: Catalogs.docTypes[0].id,
+                                docTypeId: docTypes[0].id,
                                 templates: TestData.files
                             },
                             {
                                 name: TestData.getRandomWord(),
-                                docTypeId: Catalogs.docTypes[0].id,
+                                docTypeId: docTypes[0].id,
                                 templates: TestData.files
                             }
                         ]
@@ -53,16 +53,16 @@ export class Criterias {
         }
         )
     }
-    public static changeCriterias () : void {
+    public static changeCriterias (rankCriteria : TRankCriteria[],docTypes : TDocTypes[]) : void {
         this.criterias.forEach((value, index) => {
             value.criterias.forEach((value1, index1) => {
                 value1.number = TestData.getRandomWord();
                 value1.name = TestData.getRandomWord();
-                value1.categoryId = Catalogs.rankCriteria[Catalogs.rankCriteria.length-1].id;
+                value1.categoryId = rankCriteria[rankCriteria.length-1].id;
                 value1.documents.push(
                     {
                     name: TestData.getRandomWord(),
-                    docTypeId: Catalogs.docTypes[randomInt(0, Catalogs.docTypes.length - 1)].id,
+                    docTypeId: docTypes[randomInt(0, docTypes.length - 1)].id,
                     templates: TestData.files
                 }
                 )

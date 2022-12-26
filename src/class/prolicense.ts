@@ -1,14 +1,14 @@
 import {TestData} from "./test-data";
-import {Catalogs} from "./catalogs";
+import {Catalogs, TCurrentSeason, TDocTypes, TLicTypes} from "./catalogs";
 
 export class Prolicense {
     public static prolicense : TProlicense[] = [];
-    public static createProlicense() : void {
+    public static createProlicense(season : TCurrentSeason[], licType : TLicTypes[], docType : TDocTypes[]) : void {
         Prolicense.prolicense.push(
             {
             name: TestData.getRandomWord(),
-            season: Catalogs.seasons[0].name,
-            type: Catalogs.licTypes[0].name,
+            season: season[0].name,
+            type: licType[0].name,
             requestBegin: TestData.dateNow,
             requestEnd: TestData.dateFuture,
             dueDate: TestData.dateFuture,
@@ -20,29 +20,29 @@ export class Prolicense {
             documents: [
                 {
                     name: TestData.getRandomWord(),
-                    docTypeId: Catalogs.docTypes[0].id,
+                    docTypeId: docType[0].id,
                     templates: TestData.files
                 }
             ]
         }
         )
     }
-    public static changeProlicense () {
+    public static changeProlicense (season : TCurrentSeason[], licType : TLicTypes[], docType : TDocTypes[]) {
         this.getProlicense(0).name = TestData.getRandomWord();
-        this.getProlicense(0).type = Catalogs.licTypes[1].name;
-        this.getProlicense(0).season = Catalogs.seasons[1].name;
+        this.getProlicense(0).type = licType[1].name;
+        this.getProlicense(0).season = season[1].name;
         this.getProlicense(0).documents.push(
             {
             name: TestData.getRandomWord(),
-            docTypeId: Catalogs.docTypes[0].id,
+            docTypeId: docType[0].id,
             templates: TestData.files
         }
         )
     }
-    public static createSampleProlicense () : TSampleLicense {
+    public static createSampleProlicense (season : TCurrentSeason[], licType : TLicTypes[]) : TSampleLicense {
         return {
-            type : Catalogs.licTypes[Catalogs.licTypes.length-1].name,
-            season : Catalogs.seasons[0].name,
+            type : licType[licType.length-1].name,
+            season : season[0].name,
             name : TestData.getRandomWord()
         }
     }
@@ -52,6 +52,7 @@ export class Prolicense {
     public static addResponseToProlicense (index : number,response : TProlicense) : void {
         this.prolicense[index] = response;
     }
+
 }
 
 export type TProlicense = {
