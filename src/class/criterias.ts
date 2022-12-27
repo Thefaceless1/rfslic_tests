@@ -1,13 +1,19 @@
-import {TDocuments} from "./prolicense";
+import {Prolicense, TDocuments, TProlicense} from "./prolicense";
 import {Catalogs, TClubWorkers, TCriteriaGroups, TCriteriaTypes, TDocTypes, TRankCriteria} from "./catalogs";
 import {randomInt} from "crypto";
 import {TestData} from "./test-data";
+import superagent from "superagent";
+import {RequestProp} from "./request-prop";
+import {expect} from "@jest/globals";
 
 export class Criterias {
-    public static criterias : TCriterias[] =[];
-    public static createCritGroups (critGroups : TCriteriaGroups[],critGrpExperts : TClubWorkers[] ) : void {
+    public  criterias : TCriterias[];
+    constructor() {
+        this.criterias =[]
+    }
+    public static createCritGroups (criterias : TCriterias[],critGroups : TCriteriaGroups[],critGrpExperts : TClubWorkers[] ) : void {
         critGroups.forEach((value, index) => {
-            this.criterias.push(
+            criterias.push(
                 {
                 id : value.id,
                 name : value.name,
@@ -20,8 +26,8 @@ export class Criterias {
             )
         })
     }
-    public static createCriterias (criteriaTypes : TCriteriaTypes[],rankCriteria : TRankCriteria[],docTypes : TDocTypes[]) : void {
-        this.criterias.forEach((value, index) => {
+    public static createCriterias (criterias : TCriterias[],criteriaTypes : TCriteriaTypes[],rankCriteria : TRankCriteria[],docTypes : TDocTypes[]) : void {
+        criterias.forEach((value, index) => {
                 criteriaTypes.forEach((value1, index1) => {
                 value.criterias.push(
                     {
@@ -30,7 +36,7 @@ export class Criterias {
                         categoryId: rankCriteria[0].id,
                         name: TestData.getRandomWord(),
                         description: TestData.descValue,
-                        isMulti: randomInt(-1, 5),
+                        isMulti: -1,
                         typeId: value1.id,
                         docSubmitDate: TestData.dateFuture,
                         reviewDate: TestData.dateFuture,
@@ -53,8 +59,8 @@ export class Criterias {
         }
         )
     }
-    public static changeCriterias (rankCriteria : TRankCriteria[],docTypes : TDocTypes[]) : void {
-        this.criterias.forEach((value, index) => {
+    public static changeCriterias (criterias : TCriterias[],rankCriteria : TRankCriteria[],docTypes : TDocTypes[]) : void {
+        criterias.forEach((value, index) => {
             value.criterias.forEach((value1, index1) => {
                 value1.number = TestData.getRandomWord();
                 value1.name = TestData.getRandomWord();
@@ -69,6 +75,32 @@ export class Criterias {
             })
         })
     }
+    public static async createTestCriterias (criterias : TCriterias[],prolicense : TProlicense[],
+                                             critGroups : TCriteriaGroups[],criGrpExperts : TClubWorkers[],
+                                             criteriaTypes : TCriteriaTypes[], rankCriteria : TRankCriteria[],
+                                             docTypes : TDocTypes[]) : Promise<void> {
+        //Создаем группы критериев
+        Criterias.createCritGroups(criterias,critGroups,criGrpExperts);
+        for (const i of criterias) {
+            const response = await superagent.put(RequestProp.basicUrl + "/api/rest/prolicenses/" + Prolicense.getProlicense(prolicense, 0).id + "/criterias/groupExperts").
+            query(
+                {
+                    groupId: i.id,
+                    experts: i.experts
+                }
+            );
+        }
+        //Создаем критерии
+        Criterias.createCriterias(criterias,criteriaTypes,rankCriteria,docTypes);
+        for(const i of criterias) {
+            for(let criteria of i.criterias) {
+                const index = i.criterias.indexOf(criteria);
+                const response = await superagent.put(RequestProp.basicUrl + "/api/rest/prolicenses/" + Prolicense.getProlicense(prolicense,0).id + "/criterias").
+                send(criteria);
+                i.criterias[index] = response.body.data;
+            }
+        }
+    }
 }
 
 export type TCriterias = {
@@ -78,7 +110,9 @@ export type TCriterias = {
     details : {
         experts : TClubWorkers[]
     }
-    criterias : {
+    criterias : TCriteria[]
+}
+export type TCriteria = {
         id?: number,
         groupId: number,
         number: string,
@@ -90,5 +124,4 @@ export type TCriterias = {
         isMulti: number,
         typeId: number,
         documents: TDocuments[]
-    }[]
 }

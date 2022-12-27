@@ -5,9 +5,9 @@ import {randomInt} from "crypto";
 
 export class License {
     public static license : TLicense[] =[];
-    public static createLicense () : TCreateLicense {
+    public static createLicense (prolicense : TProlicense[]) : TCreateLicense {
         return {
-            proLicId : Prolicense.getProlicense(0).id as number,
+            proLicId : Prolicense.getProlicense(prolicense,0).id as number,
             clubId : 0
         }
     }
@@ -21,9 +21,17 @@ export class License {
         })
         return this.license[0];
     }
-    public static getLicStatusById(stateId : number, licStatus : TLicAndDocStatus[]) : string {
-        const result  = licStatus.find(value => value.id == stateId);
-        return (result) ? result.name : "Статус по id не найден";
+    public static publishLicense () : TLicense {
+        this.license[0].stateId = 1;
+        this.license[0].state = "Новая";
+        return this.license[0];
+    }
+    public static getLicStatusById(stateId : number, licStatus : TLicAndDocStatus[]) : string | null {
+        if (!stateId) return null;
+        else {
+            const result  = licStatus.find(value => value.id == stateId);
+            return (result) ? result.name : "Статус по id не найден";
+        }
     }
     public static getDocStatusById(docStateId : number, docStatus : TLicAndDocStatus[]) : string {
         const result = docStatus.find(value => value.id == docStateId);
