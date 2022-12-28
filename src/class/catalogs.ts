@@ -1,6 +1,6 @@
-import {TestData} from "./test-data";
+import {TestData} from "../helpers/test-data";
 import superagent from "superagent";
-import {RequestProp} from "./request-prop";
+import {RequestProp} from "../helpers/request-prop";
 
 export class Catalogs {
     public  seasons: TCurrentSeason[];
@@ -26,48 +26,46 @@ export class Catalogs {
         this.clubWorkers =[]
     }
     public static getClubWorkersId (clubWorkers : TClubWorkers[]) : number[] {
+        /**
+         * Получаем id всех записей свойства clubWorkers (сотрудники клубов)
+         */
         const clubWorkersId = clubWorkers.map(value => value.id);
         return clubWorkersId;
     }
     public static getCritGrpExpertsId (critGrpExperts : TClubWorkers[]) : number[] {
+        /**
+         * Получаем id всех записей свойства critGrpExperts (Эксперты групп критерив)
+         */
         const critGrpExpertsId = critGrpExperts.map(value => value.id);
         return critGrpExpertsId;
     }
     public async fillCatalogsData () : Promise<void> {
+        /**
+         * Получаем данные из справочников и записываем их в свойства класса
+         */
         const api = new RequestProp();
-        //Загрузка файлов на сервер
         for (const i of TestData.fileNames) {
             const files = await superagent.post(RequestProp.basicUrl + api.upload.upload).
             set("Content-Type", "multipart/form-data; boundary=----WebKitFormBoundaryoI4AK63JZr8jUhAa").
             attach("file", RequestProp.fileDir + i);
             TestData.addDataToFiles(i,files.body.data);
         }
-        //Справочник сезонов
         const seasons = await superagent.get(RequestProp.basicUrl + api.constructors.seasons);
-        //Записываем полученные значения текущего сезона и последнего сезона справочника в свойство seasons
         this.seasons = seasons.body.data.filter((value: TCurrentSeason, index: number, arr: TCurrentSeason[]) => (value.current || index == arr.length - 1));
-        //Справочник групп критериев
         const groupCriterias = await superagent.get(RequestProp.basicUrl + api.constructors.critGroups);
         this.criteriaGroups = groupCriterias.body.data;
-        //Справочник Типы лицензий
         const licenseType = await superagent.get(RequestProp.basicUrl + api.constructors.licTypes);
         this.licTypes = licenseType.body.data;
-        //Справочник Типы документов
         const docTypes = await superagent.get(RequestProp.basicUrl + api.constructors.docTypes);
         this.docTypes = docTypes.body.data;
-        //Справочник Разряды для критериев
         const criteriaRanks = await superagent.get(RequestProp.basicUrl + api.constructors.rankCriterias);
         this.rankCriteria = criteriaRanks.body.data;
-        //Типы критериев
         const criteriaTypes = await superagent.get(RequestProp.basicUrl + api.constructors.criteriaTypes);
         this.criteriaTypes = criteriaTypes.body.data;
-        //Статусы заявки
         const requestStatus = await superagent.get(RequestProp.basicUrl + api.request.requestStatus);
         this.licStatus = requestStatus.body.data
-        //Статусы документов
         const docStatus = await superagent.get(RequestProp.basicUrl + api.request.docStatus);
         this.docStatus = docStatus.body.data;
-        //Сотрудники клуба
         const clubWorkers = await superagent.get(RequestProp.basicUrl+api.user.clubWorkers).
         query(
             {
@@ -76,7 +74,6 @@ export class Catalogs {
             }
         )
         this.clubWorkers = clubWorkers.body.data;
-        //Эксперты групп критериев
         const critGrpExperts = await superagent.get(RequestProp.basicUrl+api.user.critGrpExperts).
         query(
             {

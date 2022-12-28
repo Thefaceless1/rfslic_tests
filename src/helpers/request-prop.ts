@@ -1,8 +1,9 @@
-import {TProlicense} from "./prolicense";
+import {TProlicense} from "../class/prolicense";
+import {License} from "../class/license";
 
 export class RequestProp {
     public static readonly basicUrl : string = "https://rfs-lic-test-01.fors.ru";
-    public static readonly fileDir : string ="src/testfiles/";
+    public static readonly fileDir : string ="src/helpers/testfiles/";
     public constructors : TConstructor = {
         seasons : "/api/rest/seasons",
         critGroups : "/api/rest/prolicenses/criterias/groups",
@@ -34,9 +35,13 @@ export class RequestProp {
             this.constructors.publishProlicense = `/api/rest/prolicenses/${prolicense[0].id}/publish`;
             this.constructors.deleteCriteriasGrp = `/api/rest/prolicenses/${prolicense[0].id}/criterias/groups/`;
         }
-            else if (prolicense.length == 2) {
+            else  {
             this.constructors.deleteProlicense = `/api/rest/prolicenses/${prolicense[1].id}`
         }
+    }
+    public fillLicenseApi (licenseId : number) : void {
+            this.request.changeLicense = `/api/rest/licenses/${licenseId}`;
+            this.request.publishLicense = `${this.request.changeLicense}/publish`;
     }
 }
 export type TConstructor = {
@@ -62,7 +67,9 @@ export type TUpload = {
 export type TRequest = {
     requestStatus : string,
     docStatus : string,
-    createLicense : string
+    createLicense : string,
+    changeLicense? : string,
+    publishLicense? : string
 }
 export type TUser = {
     clubWorkers : string,

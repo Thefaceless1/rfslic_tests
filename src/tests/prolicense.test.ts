@@ -1,7 +1,7 @@
 import {jest, test, expect, describe, beforeAll, afterEach} from "@jest/globals";
 import superagent from "superagent";
-import {RequestProp} from "../class/request-prop";
-import {TestData} from "../class/test-data";
+import {RequestProp} from "../helpers/request-prop";
+import {TestData} from "../helpers/test-data";
 import {Catalogs,TCurrentSeason} from "../class/catalogs";
 import {Prolicense, TDocuments} from "../class/prolicense";
 import {Criterias, TCriterias} from "../class/criterias";
@@ -24,10 +24,10 @@ describe("Пролицензия", () => {
         expect(response.body.data.type).toBe(catalogs.licTypes[0].name);
         expect(response.body.data.season).toBe(catalogs.seasons[0].name);
         expect(response.body.data.stateId).toBe(1);
-        expect(response.body.data.begin && response.body.data.requestBegin).toBe(TestData.dateNow);
+        expect(response.body.data.begin && response.body.data.requestBegin).toBe(TestData.getTodayDate);
         expect(response.body.data.end && response.body.data.requestEnd &&
             response.body.data.docSubmitDate && response.body.data.dueDate &&
-            response.body.data.reviewDate && response.body.data.decisionDate).toBe(TestData.dateFuture);
+            response.body.data.reviewDate && response.body.data.decisionDate).toBe(TestData.getFutureDate);
 
         Prolicense.addResponseToProlicense(prolicense.prolicense,0,response.body.data);
     })
@@ -127,8 +127,8 @@ describe("Пролицензия", () => {
             response.body.data.end && response.body.data.requestEnd &&
             response.body.data.docSubmitDate && response.body.data.dueDate &&
             response.body.data.reviewDate && response.body.data.decisionDate
-        ).toBe(TestData.dateFuture);
-        expect(response.body.data.begin && response.body.data.requestBegin).toBe(TestData.dateNow);
+        ).toBe(TestData.getFutureDate);
+        expect(response.body.data.begin && response.body.data.requestBegin).toBe(TestData.getTodayDate);
         expect(response.body.data.stateId).toBe(1);
         response.body.data.documents.forEach((value : TDocuments, index : number) =>{
         expect(value.name).toBe(prolicense.prolicense[0].documents[index].name);

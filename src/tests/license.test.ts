@@ -1,7 +1,7 @@
-import {jest, test, expect, describe, beforeAll} from "@jest/globals";
+import {jest, test, expect, describe, beforeAll, beforeEach, afterEach} from "@jest/globals";
 import superagent from "superagent";
-import {RequestProp} from "../class/request-prop";
-import {TestData} from "../class/test-data";
+import {RequestProp} from "../helpers/request-prop";
+import {TestData} from "../helpers/test-data";
 import {Catalogs,TCurrentSeason} from "../class/catalogs";
 import {Prolicense, TDocuments} from "../class/prolicense";
 import {License} from "../class/license";
@@ -16,10 +16,11 @@ describe("Работа с заявками", () => {
     beforeAll(async () => {
         await catalogs.fillCatalogsData();
         await Prolicense.createTestProlicense(prolicense.prolicense,catalogs.seasons,catalogs.licTypes,catalogs.docTypes);
+        await api.fillProlicenseApi(prolicense.prolicense);
         await Criterias.createTestCriterias(
             criterias.criterias,prolicense.prolicense,
             catalogs.criteriaGroups,catalogs.critGrpExperts,
-            catalogs.criteriaTypes,catalogs.rankCriteria,catalogs.docTypes)
+            catalogs.criteriaTypes,catalogs.rankCriteria,catalogs.docTypes,api.constructors);
     })
     test("Создание заявки в статусе 'Черновик' ",async () => {
         const response = await superagent.put(RequestProp.basicUrl+api.request.createLicense).
@@ -32,6 +33,7 @@ describe("Работа с заявками", () => {
         expect(response.body.data.percent).toBe(0);
         expect(response.body.data.docState).toBe(License.getDocStatusById(response.body.data.docStateId,catalogs.docStatus));
         License.addResponseToLicense(0,response.body.data);
+        api.fillLicenseApi(License.license[0].id);
         //Проверяем статусы документов лицензии
         License.license[0].documents.forEach((value, index) => {
             expect(value.state).toBe(License.getDocStatusById(response.body.data.docStateId,catalogs.docStatus));
@@ -54,7 +56,7 @@ describe("Работа с заявками", () => {
         })
     })
     test("Добавление документов и комментариев на вкладке Общая информация",async () => {
-        const response = await superagent.put(RequestProp.basicUrl + "/api/rest/licenses/" + License.license[0].id).
+        const response = await superagent.put(RequestProp.basicUrl + api.request.changeLicense).
         send(License.addCommentsAndDocuments());
         expect(response.ok).toBeTruthy();
         expect(response.status).toBe(200);
@@ -67,7 +69,7 @@ describe("Работа с заявками", () => {
         })
     })
     test("Публикация лицензии", async () => {
-        const response = await superagent.put(RequestProp.basicUrl + "/api/rest/licenses/" + License.license[0].id + "/publish").
+        const response = await superagent.put(RequestProp.basicUrl + api.request.publishLicense).
         send(License.publishLicense());
         expect(response.ok).toBeTruthy();
         expect(response.status).toBe(200);
@@ -77,7 +79,7 @@ describe("Работа с заявками", () => {
         License.addResponseToLicense(0,response.body.data);
     })
     test("Добавление сотрудников клуба и экспертов к группе критериев", async () => {
-        const response = await superagent.put(RequestProp.basicUrl+"/api/rest/licenses/"+License.license[0].id).
+        const response = await superagent.put(RequestProp.basicUrl + api.request.changeLicense).
         send(License.addClubWorkersToCritGrp(catalogs.clubWorkers,catalogs.critGrpExperts));
         expect(response.ok).toBeTruthy();
         expect(response.status).toBe(200);
@@ -90,7 +92,7 @@ describe("Работа с заявками", () => {
         License.addResponseToLicense(0,response.body.data);
     })
     test("Добавление документов и комментариев для документов критериев", async () => {
-        const response = await superagent.put(RequestProp.basicUrl+"/api/rest/licenses/"+License.license[0].id).
+        const response = await superagent.put(RequestProp.basicUrl + api.request.changeLicense).
         send(License.addDocAndComToCritDoc());
         expect(response.ok).toBeTruthy();
         expect(response.status).toBe(200);
@@ -108,7 +110,7 @@ describe("Работа с заявками", () => {
         })
     })
     test("Проставление статусов и комментариев для документов критериев",async () => {
-        const response = await superagent.put(RequestProp.basicUrl+"/api/rest/licenses/"+License.license[0].id).
+        const response = await superagent.put(RequestProp.basicUrl + api.request.changeLicense).
         send(License.addStatusToDocuments(catalogs.docStatus));
         expect(response.ok).toBeTruthy();
         expect(response.status).toBe(200);

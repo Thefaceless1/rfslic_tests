@@ -1,7 +1,7 @@
-import {TestData} from "./test-data";
+import {TestData} from "../helpers/test-data";
 import {Catalogs, TCurrentSeason, TDocTypes, TLicTypes} from "./catalogs";
 import superagent from "superagent";
-import {RequestProp} from "./request-prop";
+import {RequestProp} from "../helpers/request-prop";
 
 export class Prolicense {
     public  prolicense : TProlicense[];
@@ -11,20 +11,20 @@ export class Prolicense {
     public static createProlicense(prolicense : TProlicense[],season : TCurrentSeason[], licType : TLicTypes[], docType : TDocTypes[]) : void {
         prolicense.push(
             {
-            name: TestData.getRandomWord(),
+            name: TestData.getRandomWord,
             season: season[0].name,
             type: licType[0].name,
-            requestBegin: TestData.dateNow,
-            requestEnd: TestData.dateFuture,
-            dueDate: TestData.dateFuture,
-            docSubmitDate: TestData.dateFuture,
-            reviewDate: TestData.dateFuture,
-            decisionDate: TestData.dateFuture,
-            begin: TestData.dateNow,
-            end: TestData.dateFuture,
+            requestBegin: TestData.getTodayDate,
+            requestEnd: TestData.getFutureDate,
+            dueDate: TestData.getFutureDate,
+            docSubmitDate: TestData.getFutureDate,
+            reviewDate: TestData.getFutureDate,
+            decisionDate: TestData.getFutureDate,
+            begin: TestData.getTodayDate,
+            end: TestData.getFutureDate,
             documents: [
                 {
-                    name: TestData.getRandomWord(),
+                    name: TestData.getRandomWord,
                     docTypeId: docType[0].id,
                     templates: TestData.files
                 }
@@ -33,12 +33,12 @@ export class Prolicense {
         )
     }
     public static changeProlicense (prolicense : TProlicense[],season : TCurrentSeason[], licType : TLicTypes[], docType : TDocTypes[]) {
-        this.getProlicense(prolicense,0).name = TestData.getRandomWord();
+        this.getProlicense(prolicense,0).name = TestData.getRandomWord;
         this.getProlicense(prolicense,0).type = licType[1].name;
         this.getProlicense(prolicense,0).season = season[1].name;
         this.getProlicense(prolicense,0).documents.push(
             {
-            name: TestData.getRandomWord(),
+            name: TestData.getRandomWord,
             docTypeId: docType[0].id,
             templates: TestData.files
         }
@@ -48,7 +48,7 @@ export class Prolicense {
         return {
             type : licType[licType.length-1].name,
             season : season[0].name,
-            name : TestData.getRandomWord()
+            name : TestData.getRandomWord
         }
     }
     public static getProlicense (prolicense : TProlicense[], index : number) : TProlicense {

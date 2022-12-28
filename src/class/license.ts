@@ -1,5 +1,5 @@
 import {Catalogs, TClubWorkers, TLicAndDocStatus} from "./catalogs";
-import {TestData} from "./test-data";
+import {TestData} from "../helpers/test-data";
 import {Prolicense, TProlicense} from "./prolicense";
 import {randomInt} from "crypto";
 
@@ -137,6 +137,7 @@ export type TLicense = {
             orderNum: number,
             docSubmitDate: string,
             reviewDate: string,
+            external : string,
             externalId: number,
             comment: string,
             percent: number,
@@ -149,7 +150,11 @@ export type TLicense = {
                 docTypeId: number,
                 comment: string,
                 reviewComment: string,
-                externalId : number,
+                externalIds : number[],
+                externals : {
+                    ofi : string,
+                    user : TClubWorkers
+                }[]
                 stateId: number,
                 state: string,
                 templates: {
