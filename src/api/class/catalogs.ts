@@ -1,6 +1,6 @@
-import {TestData} from "../helpers/test-data";
 import superagent from "superagent";
-import {RequestProp} from "../helpers/request-prop";
+import {Api} from "../helpers/api";
+
 
 export class Catalogs {
     public  seasons: TSeasons[];
@@ -30,63 +30,55 @@ export class Catalogs {
     /**
      * id всех записей свойства clubWorkers (сотрудники клубов)
      */
-    public static getClubWorkersId (clubWorkers : TClubWorkers[]) : number[] {
-        const clubWorkersId = clubWorkers.map(value => value.id);
-        return clubWorkersId;
+    public get clubWorkersId () : number[] {
+        return this.clubWorkers.map(value => value.id);
     }
     /**
      * id всех записей свойства critGrpExperts (Эксперты групп критерив)
      */
-    public static getCritGrpExpertsId (critGrpExperts : TClubWorkers[]) : number[] {
-        const critGrpExpertsId = critGrpExperts.map(value => value.id);
-        return critGrpExpertsId;
+    public get critGrpExpertsId () : number[] {
+        return this.critGrpExperts.map(value => value.id);
     }
     /**
      * id всех возможных типов документов для типа критерия : Документы
      */
-    public static getDocTypesForCrit (docTypes : TDocTypes[]) : TDocTypes[] {
-        return docTypes.filter(value => (value.id != 3 && value.id != 4 && value.id != 7 && value.id != 10));
+    public get docTypesForCrit () : TDocTypes[] {
+        return this.docTypes.filter(value => (value.id != 3 && value.id != 4 && value.id != 7 && value.id != 10));
     }
     /**
      * id всех записей свойства ofi
      */
-    public static getOfiId (ofi : TOfi[]) {
-        return ofi.map(value => value.id);
+    public get ofiId () {
+        return this.ofi.map(value => value.id);
     }
     /**
-     * Получаем данные из справочников и записываем их в свойства
+     * Получаем данные из справочников и записываем их в свойства объектов класса
      */
     public async fillCatalogsData () : Promise<void> {
-        const api = new RequestProp();
-        for (const i of TestData.fileNames) {
-            const files = await superagent.post(RequestProp.basicUrl + api.upload.upload).
-            set("Content-Type", "multipart/form-data; boundary=----WebKitFormBoundaryoI4AK63JZr8jUhAa").
-            attach("file", RequestProp.fileDir + i);
-            TestData.addDataToFiles(i,files.body.data);
-        }
-        const seasons = await superagent.get(RequestProp.basicUrl + api.constructors.seasons);
+        const api = new Api();
+        const seasons = await superagent.get(api.basicUrl + api.constructors.seasons);
         this.seasons = seasons.body.data;
-        const groupCriterias = await superagent.get(RequestProp.basicUrl + api.constructors.critGroups);
+        const groupCriterias = await superagent.get(api.basicUrl + api.constructors.critGroups);
         this.criteriaGroups = groupCriterias.body.data;
-        const licenseType = await superagent.get(RequestProp.basicUrl + api.constructors.licTypes);
+        const licenseType = await superagent.get(api.basicUrl + api.constructors.licTypes);
         this.licTypes = licenseType.body.data;
-        const docTypes = await superagent.get(RequestProp.basicUrl + api.constructors.docTypes);
+        const docTypes = await superagent.get(api.basicUrl + api.constructors.docTypes);
         this.docTypes = docTypes.body.data;
-        const criteriaRanks = await superagent.get(RequestProp.basicUrl + api.constructors.rankCriterias);
+        const criteriaRanks = await superagent.get(api.basicUrl + api.constructors.rankCriterias);
         this.rankCriteria = criteriaRanks.body.data;
-        const criteriaTypes = await superagent.get(RequestProp.basicUrl + api.constructors.criteriaTypes);
+        const criteriaTypes = await superagent.get(api.basicUrl + api.constructors.criteriaTypes);
         this.criteriaTypes = criteriaTypes.body.data;
-        const requestStatus = await superagent.get(RequestProp.basicUrl + api.request.requestStatus);
+        const requestStatus = await superagent.get(api.basicUrl + api.request.requestStatus);
         this.licStatus = requestStatus.body.data
-        const docStatus = await superagent.get(RequestProp.basicUrl + api.request.docStatus);
+        const docStatus = await superagent.get(api.basicUrl + api.request.docStatus);
         this.docStatus = docStatus.body.data;
-        const clubWorkers = await superagent.get(RequestProp.basicUrl+api.user.clubWorkers).
+        const clubWorkers = await superagent.get(api.basicUrl+api.user.clubWorkers).
         query({pageNum : 0, pageSize : 10});
         this.clubWorkers = clubWorkers.body.data;
-        const critGrpExperts = await superagent.get(RequestProp.basicUrl+api.user.critGrpExperts).
+        const critGrpExperts = await superagent.get(api.basicUrl+api.user.critGrpExperts).
         query({rights : "request.checkExpert"});
         this.critGrpExperts = critGrpExperts.body.data;
-        const ofi = await superagent.get(RequestProp.basicUrl + api.infraObject.ofi).
+        const ofi = await superagent.get(api.basicUrl + api.infraObject.ofi).
         query({pageNum : 0, pageSize : 10});
         this.ofi = ofi.body.data;
     }

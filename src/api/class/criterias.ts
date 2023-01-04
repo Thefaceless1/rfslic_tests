@@ -3,58 +3,58 @@ import {Catalogs, TClubWorkers, TCriteriaGroups, TCriteriaTypes, TDocTypes, TRan
 import {randomInt} from "crypto";
 import {TestData} from "../helpers/test-data";
 import superagent from "superagent";
-import {RequestProp, TConstructor} from "../helpers/request-prop";
-import {expect} from "@jest/globals";
+import {Api, TConstructor} from "../helpers/api";
 
 export class Criterias {
-    public  criterias : TCriterias[];
+    public  criterias : TCriterias[]
+    public catalogs = new Catalogs()
     constructor() {
         this.criterias =[]
     }
-    public static createCritGroups (criterias : TCriterias[],critGroups : TCriteriaGroups[],critGrpExperts : TClubWorkers[] ) : void {
-        critGroups.forEach((value, index) => {
-            criterias.push(
+    public createCritGroups () : void {
+        this.catalogs.criteriaGroups.forEach((value) => {
+            this.criterias.push(
                 {
                 id : value.id,
                 name : value.name,
-                experts : Catalogs.getCritGrpExpertsId(critGrpExperts),
+                experts : this.catalogs.critGrpExpertsId,
                 details : {
-                    experts : critGrpExperts
+                    experts : this.catalogs.critGrpExperts
                 },
                 criterias : []
             }
             )
         })
     }
-    public static createCriterias (criterias : TCriterias[],criteriaTypes : TCriteriaTypes[],rankCriteria : TRankCriteria[],docTypes : TDocTypes[]) : void {
-        criterias.forEach((value, index) => {
-                criteriaTypes.forEach((value1, index1) => {
-                const randomDocNumber : number = TestData.getRandomIntForDocs(Catalogs.getDocTypesForCrit(docTypes));
-                value.criterias.push(
+    public createCriterias () : void {
+        this.criterias.forEach((criteriaGroup) => {
+                this.catalogs.criteriaTypes.forEach((criteria) => {
+                const randomDocNumber : number = TestData.randomIntForDocs(this.catalogs.docTypesForCrit);
+                criteriaGroup.criterias.push(
                     {
-                        groupId: value.id,
-                        number: TestData.getRandomWord,
-                        categoryId: rankCriteria[0].id,
-                        name: TestData.getRandomWord,
+                        groupId: criteriaGroup.id,
+                        number: TestData.randomWord,
+                        categoryId: this.catalogs.rankCriteria[0].id,
+                        name: TestData.randomWord,
                         description: TestData.descValue,
-                        isMulti: TestData.getRandomIntForMulti,
-                        typeId: criteriaTypes[0].id,
-                        docSubmitDate: TestData.getFutureDate,
-                        reviewDate: TestData.getFutureDate,
+                        isMulti: TestData.randomIntForMulti,
+                        typeId: this.catalogs.criteriaTypes[0].id,
+                        docSubmitDate: TestData.futureDate,
+                        reviewDate: TestData.futureDate,
                         documents: [
                             {
-                                name: TestData.getRandomWord,
-                                docTypeId: Catalogs.getDocTypesForCrit(docTypes)[randomDocNumber].id,
+                                name: TestData.randomWord,
+                                docTypeId: this.catalogs.docTypesForCrit[randomDocNumber].id,
                                 templates: (randomDocNumber >= 2 && randomDocNumber !=4) ? [] : TestData.files
                             },
                             {
-                                name: TestData.getRandomWord,
-                                docTypeId: Catalogs.getDocTypesForCrit(docTypes)[randomDocNumber].id,
+                                name: TestData.randomWord,
+                                docTypeId: this.catalogs.docTypesForCrit[randomDocNumber].id,
                                 templates: (randomDocNumber >= 2 && randomDocNumber !=4) ? [] : TestData.files
                             },
                             {
-                                name: TestData.getRandomWord,
-                                docTypeId: Catalogs.getDocTypesForCrit(docTypes)[randomDocNumber].id,
+                                name: TestData.randomWord,
+                                docTypeId: this.catalogs.docTypesForCrit[randomDocNumber].id,
                                 templates: (randomDocNumber >= 2 && randomDocNumber !=4) ? [] : TestData.files
                             }
                         ]
@@ -65,46 +65,39 @@ export class Criterias {
         }
         )
     }
-    public static changeCriterias (criterias : TCriterias[],rankCriteria : TRankCriteria[],docTypes : TDocTypes[]) : void {
-        criterias.forEach((value, index) => {
-            value.criterias.forEach((value1, index1) => {
-                const randomDocNumber : number = TestData.getRandomIntForDocs(Catalogs.getDocTypesForCrit(docTypes));
-                value1.number = TestData.getRandomWord;
-                value1.name = TestData.getRandomWord;
-                value1.categoryId = rankCriteria[rankCriteria.length-1].id;
-                value1.documents.push(
+    public changeCriterias () : void {
+        this.criterias.forEach((criteriaGroup) => {
+            criteriaGroup.criterias.forEach((criteria) => {
+                const randomDocNumber : number = TestData.randomIntForDocs(this.catalogs.docTypesForCrit);
+                criteria.number = TestData.randomWord;
+                criteria.name = TestData.randomWord;
+                criteria.categoryId = this.catalogs.rankCriteria[1].id;
+                criteria.documents.push(
                     {
-                    name: TestData.getRandomWord,
-                    docTypeId: Catalogs.getDocTypesForCrit(docTypes)[randomDocNumber].id,
+                    name: TestData.randomWord,
+                    docTypeId: this.catalogs.docTypesForCrit[randomDocNumber].id,
                     templates: (randomDocNumber >= 2 && randomDocNumber !=4) ? [] : TestData.files
                 }
                 )
             })
         })
     }
-    public static async createTestCriterias (criterias : TCriterias[],prolicense : TProlicense[],
-                                             critGroups : TCriteriaGroups[],criGrpExperts : TClubWorkers[],
-                                             criteriaTypes : TCriteriaTypes[], rankCriteria : TRankCriteria[],
-                                             docTypes : TDocTypes[], api : TConstructor) : Promise<void> {
+    public async createTestCriterias (api : Api) : Promise<void> {
+        //prolicense : TProlicense[],
         //Создаем группы критериев
-        Criterias.createCritGroups(criterias,critGroups,criGrpExperts);
-        for (const i of criterias) {
-            const response = await superagent.put(RequestProp.basicUrl + api.createCriteriaGrp).
-            query(
-                {
-                    groupId: i.id,
-                    experts: i.experts
-                }
-            );
+        this.createCritGroups();
+        for (const i of this.criterias) {
+            await superagent.put(api.basicUrl + api.constructors.createCriteriaGrp).
+            query({groupId: i.id, experts: i.experts});
         }
         //Создаем критерии
-        Criterias.createCriterias(criterias,criteriaTypes,rankCriteria,docTypes);
-        for(const i of criterias) {
-            for(let criteria of i.criterias) {
-                const index = i.criterias.indexOf(criteria);
-                const response = await superagent.put(RequestProp.basicUrl + api.createCriterias).
+        this.createCriterias();
+        for(const criteriaGroup of this.criterias) {
+            for(let criteria of criteriaGroup.criterias) {
+                const index = criteriaGroup.criterias.indexOf(criteria);
+                const response = await superagent.put(api.basicUrl + api.constructors.createCriterias).
                 send(criteria);
-                i.criterias[index] = response.body.data;
+                criteriaGroup.criterias[index] = response.body.data;
             }
         }
     }

@@ -1,9 +1,7 @@
 import {TProlicense} from "../class/prolicense";
-import {License} from "../class/license";
 
-export class RequestProp {
-    public static readonly basicUrl : string = "https://rfs-lic-test-01.fors.ru";
-    public static readonly fileDir : string ="src/api/helpers/testfiles/";
+export class Api {
+    public readonly basicUrl : string = "https://rfs-lic-test-01.fors.ru";
     public constructors : TConstructor = {
         seasons : "/api/rest/seasons",
         critGroups : "/api/rest/prolicenses/criterias/groups",

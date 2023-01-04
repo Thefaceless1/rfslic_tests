@@ -1,116 +1,109 @@
 import {jest, test, expect, describe, beforeAll, beforeEach, afterEach} from "@jest/globals";
 import superagent from "superagent";
-import {RequestProp} from "../helpers/request-prop";
 import {TestData} from "../helpers/test-data";
-import {Catalogs,TCurrentSeason} from "../class/catalogs";
 import {Prolicense, TDocuments} from "../class/prolicense";
 import {License} from "../class/license";
 import {Criterias, TCriterias} from "../class/criterias";
+import {Api} from "../helpers/api";
 jest.setTimeout(120000);
 
 describe("Работа с заявками", () => {
-    const catalogs = new Catalogs();
+    const license = new License();
     const prolicense = new Prolicense();
     const criterias = new Criterias();
-    const api = new RequestProp();
+    const api = new Api();
     beforeAll(async () => {
-        await catalogs.fillCatalogsData();
-        await Prolicense.createTestProlicense(prolicense.prolicense,catalogs.seasons,catalogs.licTypes,catalogs.docTypes);
+        await TestData.uploadFiles();
+        await license.catalogs.fillCatalogsData();
+        await prolicense.catalogs.fillCatalogsData();
+        await criterias.catalogs.fillCatalogsData();
+        await prolicense.createTestProlicense();
         await api.fillProlicenseApi(prolicense.prolicense);
-        await Criterias.createTestCriterias(
-            criterias.criterias,prolicense.prolicense,
-            catalogs.criteriaGroups,catalogs.critGrpExperts,
-            catalogs.criteriaTypes,catalogs.rankCriteria,catalogs.docTypes,api.constructors);
+        await criterias.createTestCriterias(api);
     })
     test("Создание заявки в статусе 'Черновик' ",async () => {
-        const response = await superagent.put(RequestProp.basicUrl+api.request.createLicense).
-        send(License.createLicense(prolicense.prolicense));
-        expect(response.ok).toBeTruthy();
-        expect(response.status).toBe(200);
+        const response = await superagent.put(api.basicUrl+api.request.createLicense).
+        send(license.createLicense(prolicense.prolicense));
+        expect(response.statusCode).toBe(200);
         expect(response.body.status).toBe("SUCCESS");
         expect(response.body.data.proLicId).toBe(prolicense.prolicense[0].id);
-        expect(response.body.data.state).toBe(License.getLicStatusById(response.body.data.stateId,catalogs.licStatus));
+        expect(response.body.data.state).toBe(license.licStatusById(response.body.data.stateId));
         expect(response.body.data.percent).toBe(0);
-        expect(response.body.data.docState).toBe(License.getDocStatusById(response.body.data.docStateId,catalogs.docStatus));
-        License.addResponseToLicense(0,response.body.data);
-        api.fillLicenseApi(License.license[0].id);
-        //Проверяем статусы документов лицензии
-        License.license[0].documents.forEach((value, index) => {
-            expect(value.state).toBe(License.getDocStatusById(response.body.data.docStateId,catalogs.docStatus));
-            expect(value.proDocId).toBe(prolicense.prolicense[0].documents[index].id);
+        expect(response.body.data.docState).toBe(license.docStatusById(response.body.data.docStateId));
+        license.addRespToLic(0,response.body.data);
+        api.fillLicenseApi(license.license[0].id);
+        license.license[0].documents.forEach((document, index) => {
+        //Проверяем статусы и id документов лицензии
+            expect(document.state).toBe(license.docStatusById(response.body.data.docStateId));
+            expect(document.proDocId).toBe(prolicense.prolicense[0].documents[index].id);
         })
         //Проверяем статусы и проценты заполнения групп критериев
-        License.license[0].criteriaGroups.forEach((value, index) => {
-            expect(value.groupId).toBe(criterias.criterias[index].id);
-            expect(value.state).toBe(License.getDocStatusById(value.stateId,catalogs.docStatus));
-            expect(value.percent).toBe(0.0);
+        license.license[0].criteriaGroups.forEach((criteriaGroup, index) => {
+            expect(criteriaGroup.groupId).toBe(criterias.criterias[index].id);
+            expect(criteriaGroup.state).toBe(license.docStatusById(criteriaGroup.stateId));
+            expect(criteriaGroup.percent).toBe(0.0);
             //Проверяем статусы и проценты заполнения критериев
-            value.criterias.forEach((value1, index1) => {
-                expect(value1.state).toBe(License.getDocStatusById(value1.stateId,catalogs.docStatus));
-                expect(value1.percent).toBe(0.0);
+            criteriaGroup.criterias.forEach((criteria) => {
+                expect(criteria.state).toBe(license.docStatusById(criteria.stateId));
+                expect(criteria.percent).toBe(0.0);
                 //Проверяем статусы документов критериев
-                value1.documents.forEach(value2 => {
-                    expect(value2.state).toBe(License.getDocStatusById(value2.stateId,catalogs.docStatus));
+                criteria.documents.forEach(document => {
+                    expect(document.state).toBe(license.docStatusById(document.stateId));
                 })
             })
         })
     })
     test("Добавление документов и комментариев на вкладке Общая информация",async () => {
-        const response = await superagent.put(RequestProp.basicUrl + api.request.changeLicense).
-        send(License.addCommentsAndDocuments());
-        expect(response.ok).toBeTruthy();
-        expect(response.status).toBe(200);
+        const response = await superagent.put(api.basicUrl + api.request.changeLicense).
+        send(license.addCommentsAndDocuments());
+        expect(response.statusCode).toBe(200);
         expect(response.body.status).toBe("SUCCESS");
-        License.addResponseToLicense(0,response.body.data);
+        license.addRespToLic(0,response.body.data);
         //проверяем наличие добавленных документов и комментариев
-        License.license[0].documents.forEach((value, index) => {
-            expect(value.comment).toBe(TestData.commentValue);
-            expect(value.files.length).toBe(TestData.files.length);
+        license.license[0].documents.forEach((document) => {
+            expect(document.comment).toBe(TestData.commentValue);
+            expect(document.files.length).toBe(TestData.files.length);
         })
     })
     test("Публикация лицензии", async () => {
-        const response = await superagent.put(RequestProp.basicUrl + api.request.publishLicense).
-        send(License.publishLicense());
-        expect(response.ok).toBeTruthy();
-        expect(response.status).toBe(200);
+        const response = await superagent.put(api.basicUrl + api.request.publishLicense).
+        send(license.publishLicense());
+        expect(response.statusCode).toBe(200);
         expect(response.body.status).toBe("SUCCESS");
-        expect(response.body.data.state).toBe(License.license[0].state);
-        expect(response.body.data.stateId).toBe(License.license[0].stateId);
-        License.addResponseToLicense(0,response.body.data);
+        expect(response.body.data.state).toBe(license.license[0].state);
+        expect(response.body.data.stateId).toBe(license.license[0].stateId);
+        license.addRespToLic(0,response.body.data);
     })
     test("Добавление сотрудников клуба и экспертов к группе критериев", async () => {
-        const response = await superagent.put(RequestProp.basicUrl + api.request.changeLicense).
-        send(License.addClubWorkersToCritGrp(catalogs.clubWorkers,catalogs.critGrpExperts));
-        expect(response.ok).toBeTruthy();
+        const response = await superagent.put(api.basicUrl + api.request.changeLicense).
+        send(license.addClubWorkersToCritGrp());
         expect(response.status).toBe(200);
         expect(response.body.status).toBe("SUCCESS");
         //Проверяем наличие добавленных сотрудников клубов и экспертов для групп критериев
-        License.license[0].criteriaGroups.forEach((value, index) => {
-            expect(value.experts).toEqual(response.body.data.criteriaGroups[index].experts);
-            expect(value.rfuExpert).toBe(response.body.data.criteriaGroups[index].rfuExpert);
+        license.license[0].criteriaGroups.forEach((criteriaGroup, index) => {
+            expect(criteriaGroup.experts).toEqual(response.body.data.criteriaGroups[index].experts);
+            expect(criteriaGroup.rfuExpert).toBe(response.body.data.criteriaGroups[index].rfuExpert);
         })
-        License.addResponseToLicense(0,response.body.data);
+        license.addRespToLic(0,response.body.data);
     })
     test("Добавление документов, сотрудников клуба и комментариев для документов критериев", async () => {
-        const response = await superagent.put(RequestProp.basicUrl + api.request.changeLicense).
-        send(License.addDataToCritDoc(catalogs.clubWorkers,catalogs.ofi));
-        expect(response.ok).toBeTruthy();
-        expect(response.status).toBe(200);
+        const response = await superagent.put(api.basicUrl + api.request.changeLicense).
+        send(license.addDataToCritDoc());
+        expect(response.statusCode).toBe(200);
         expect(response.body.status).toBe("SUCCESS");
-        License.addResponseToLicense(0,response.body.data);
-        //Проверяем наличие добавленных комментариев и документов для документов критериев
-        License.license[0].criteriaGroups.forEach((critGrp, index) => {
-            critGrp.criterias.forEach((criterias,index1) => {
-                criterias.documents.forEach((documents, index2) => {
-                    /**
-                     * Проверяем значения добавленных комментариев
-                     * Проверяем , если тип документа = Файл или Документ клуба то массив файлов документа должен быть заполнен,
-                     * иначе должен быть пуст
-                     */
-                    expect(documents.comment).toBe(TestData.commentValue);
-                    switch (documents.docTypeId <= 2 || documents.docTypeId == 8) {
-                        case true : expect(documents.files.length).toEqual(TestData.files.length); break;
-                        default : expect(documents.files.length).toEqual(0);
+        license.addRespToLic(0,response.body.data);
+        /**
+         * Проверяем значения добавленных комментариев
+         * Проверяем , если тип документа = Файл или Документ клуба то массив файлов документа должен быть заполнен,
+         * иначе должен быть пуст
+         */
+        license.license[0].criteriaGroups.forEach((criteriaGroup) => {
+            criteriaGroup.criterias.forEach((criteria) => {
+                criteria.documents.forEach((document) => {
+                    expect(document.comment).toBe(TestData.commentValue);
+                    switch (document.docTypeId <= 2 || document.docTypeId == 8) {
+                        case true : expect(document.files.length).toEqual(TestData.files.length); break;
+                        default : expect(document.files.length).toEqual(0);
                     }
                 })
             })
@@ -118,47 +111,48 @@ describe("Работа с заявками", () => {
         console.log(prolicense.prolicense[0].name)
     })
     test("Проставление статусов и комментариев для документов критериев",async () => {
-        const response = await superagent.put(RequestProp.basicUrl + api.request.changeLicense).
-        send(License.addStatusToDocuments(catalogs.docStatus));
-        expect(response.ok).toBeTruthy();
-        expect(response.status).toBe(200);
+        const response = await superagent.put(api.basicUrl + api.request.changeLicense).
+        send(license.addStatusToDocuments());
+        expect(response.statusCode).toBe(200);
         expect(response.body.status).toBe("SUCCESS");
-        License.addResponseToLicense(0,response.body.data);
-        //Проверяем проценты заполнения и статусы заявки, групп критериев, критериев
-        License.license[0].criteriaGroups.forEach((grp, index) => {
-            const grpPercent = grp.criterias.reduce((accum,value) =>accum+value.percent,0)/grp.criterias.length;
-            expect(Math.round(grp.percent)).toBe(Math.round(grpPercent));
-            if(grp.criterias.every(value => value.state == License.getDocStatusById(1,catalogs.docStatus))) {
-                expect(grp.state).toBe(License.getDocStatusById(1,catalogs.docStatus));
+        license.addRespToLic(0,response.body.data);
+        /**
+         * Проверяем проценты заполнения и статусы заявки, групп критериев, критериев
+         */
+        license.license[0].criteriaGroups.forEach((criteriaGroup) => {
+            const grpPercent = criteriaGroup.criterias.reduce((accum,value) =>accum+value.percent,0)/criteriaGroup.criterias.length;
+            expect(Math.round(criteriaGroup.percent)).toBe(Math.round(grpPercent));
+            if(criteriaGroup.criterias.every(value => value.state == license.docStatusById(1))) {
+                expect(criteriaGroup.state).toBe(license.docStatusById(1));
             }
-            else if (grp.criterias.some(value => value.state == License.getDocStatusById(5,catalogs.docStatus))) {
-                expect(grp.state).toBe(License.getDocStatusById(5,catalogs.docStatus));
+            else if (criteriaGroup.criterias.some(value => value.state == license.docStatusById(5))) {
+                expect(criteriaGroup.state).toBe(license.docStatusById(5));
             }
-            else if (grp.criterias.some(value => value.state == License.getDocStatusById(2,catalogs.docStatus))) {
-                expect(grp.state).toBe(License.getDocStatusById(2,catalogs.docStatus));
+            else if (criteriaGroup.criterias.some(value => value.state == license.docStatusById(2))) {
+                expect(criteriaGroup.state).toBe(license.docStatusById(2));
             }
-            else if (grp.criterias.some(value => value.state == License.getDocStatusById(4,catalogs.docStatus))) {
-                expect(grp.state).toBe(License.getDocStatusById(4,catalogs.docStatus));
+            else if (criteriaGroup.criterias.some(value => value.state == license.docStatusById(4))) {
+                expect(criteriaGroup.state).toBe(license.docStatusById(4));
             }
-            expect(grp.state).toBe(License.getDocStatusById(3,catalogs.docStatus));
-            grp.criterias.forEach((crit, index1) => {
-                const critPercent = crit.documents.filter(value => value.stateId != 2).length*100/crit.documents.length;
-                expect(Math.round(crit.percent)).toBe(Math.round(critPercent));
-                if (crit.documents.every(value => value.state == License.getDocStatusById(1,catalogs.docStatus))){
-                    expect(crit.state).toBe(License.getDocStatusById(1,catalogs.docStatus));
+            expect(criteriaGroup.state).toBe(license.docStatusById(3));
+            criteriaGroup.criterias.forEach((criteria) => {
+                const critPercent = criteria.documents.filter(value => value.stateId != 2).length*100/criteria.documents.length;
+                expect(Math.round(criteria.percent)).toBe(Math.round(critPercent));
+                if (criteria.documents.every(value => value.state == license.docStatusById(1))){
+                    expect(criteria.state).toBe(license.docStatusById(1));
                 }
-                else if (crit.documents.some(value => value.state == License.getDocStatusById(5,catalogs.docStatus))) {
-                    expect(crit.state).toBe(License.getDocStatusById(5,catalogs.docStatus));
+                else if (criteria.documents.some(value => value.state == license.docStatusById(5))) {
+                    expect(criteria.state).toBe(license.docStatusById(5));
                 }
-                else if (crit.documents.some(value => value.state == License.getDocStatusById(2,catalogs.docStatus))) {
-                    expect(crit.state).toBe(License.getDocStatusById(2,catalogs.docStatus));
+                else if (criteria.documents.some(value => value.state == license.docStatusById(2))) {
+                    expect(criteria.state).toBe(license.docStatusById(2));
                 }
-                else if (crit.documents.some(value => value.state == License.getDocStatusById(4,catalogs.docStatus))) {
-                    expect(crit.state).toBe(License.getDocStatusById(4,catalogs.docStatus));
+                else if (criteria.documents.some(value => value.state == license.docStatusById(4))) {
+                    expect(criteria.state).toBe(license.docStatusById(4));
                 }
-                expect(crit.state).toBe(License.getDocStatusById(3,catalogs.docStatus));
-                crit.documents.forEach((doc, index2) => {
-                    expect(doc.state).toBe(License.getDocStatusById(doc.stateId,catalogs.docStatus));
+                expect(criteria.state).toBe(license.docStatusById(3));
+                criteria.documents.forEach((document, index2) => {
+                    expect(document.state).toBe(license.docStatusById(document.stateId));
                 })
             })
         })

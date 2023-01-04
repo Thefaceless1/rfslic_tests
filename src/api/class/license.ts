@@ -4,72 +4,102 @@ import {Prolicense, TProlicense} from "./prolicense";
 import {randomInt} from "crypto";
 
 export class License {
-    public static license : TLicense[] =[];
-    public static createLicense (prolicense : TProlicense[]) : TCreateLicense {
+    public license : TLicense[]
+    public catalogs = new Catalogs()
+    constructor() {
+        this.license = []
+    }
+    /**
+     * Создание заявки на получение лицензии
+     */
+    public createLicense (prolicense : TProlicense[]) : TCreateLicense {
         return {
-            proLicId : Prolicense.getProlicense(prolicense,0).id as number,
+            proLicId : prolicense[0].id as number,
             clubId : 0
         }
     }
-    public static addResponseToLicense (index : number,response : TLicense) : void {
+    /**
+     * Добавление тела ответа от сервера в свойство license объекта класса
+     */
+    public addRespToLic(index : number,response : TLicense) : void {
         this.license[index] = response;
     }
-    public static addCommentsAndDocuments () : TLicense {
-        this.license[0].documents.forEach((value, index) => {
-            value.comment = TestData.commentValue;
-            value.files = TestData.files;
+    /**
+     * Добавление документов и комментариев для заявки
+     */
+    public addCommentsAndDocuments () : TLicense {
+        this.license[0].documents.forEach((document) => {
+            document.comment = TestData.commentValue;
+            document.files = TestData.files;
         })
         return this.license[0];
     }
-    public static publishLicense () : TLicense {
+    /**
+     * Публикация заявки
+     */
+    public publishLicense () : TLicense {
         this.license[0].stateId = 1;
         this.license[0].state = "Новая";
         return this.license[0];
     }
-    public static getLicStatusById(stateId : number, licStatus : TLicAndDocStatus[]) : string | null {
+    /**
+     * Получение наименования статуса заявки по id статуса
+     */
+    public licStatusById(stateId : number) : string | null {
         if (!stateId) return null;
         else {
-            const result  = licStatus.find(value => value.id == stateId);
+            const result  = this.catalogs.licStatus.find(value => value.id == stateId);
             return (result) ? result.name : "Статус по id не найден";
         }
     }
-    public static getDocStatusById(docStateId : number, docStatus : TLicAndDocStatus[]) : string {
-        const result = docStatus.find(value => value.id == docStateId);
+    /**
+     * Получение наименования статуса документа по id статуса
+     */
+    public docStatusById(docStateId : number) : string {
+        const result = this.catalogs.docStatus.find(value => value.id == docStateId);
         return (result) ? result.name : "Статус по id не найден";
     }
-    public static addClubWorkersToCritGrp (clubWorkers : TClubWorkers[],criGrpExperts : TClubWorkers[]) : TLicense {
+    /**
+     * Добавление экспертов групп критериев и сотрудников клуба для группы критериев
+     */
+    public addClubWorkersToCritGrp () : TLicense {
         this.license[0].criteriaGroups.forEach((value, index) => {
-            value.experts = Catalogs.getClubWorkersId(clubWorkers);
-            value.rfuExpert = criGrpExperts[0].id;
+            value.experts = this.catalogs.clubWorkersId;
+            value.rfuExpert = this.catalogs.critGrpExperts[0].id;
         })
         return this.license[0];
     }
-    public static addDataToCritDoc (clubWorkers : TClubWorkers[], ofi : TOfi[]) {
-        this.license[0].criteriaGroups.forEach((critGrp, index) => {
-            critGrp.criterias.forEach((criterias, index1) => {
-                criterias.documents.forEach((documents, index2) => {
-                    /**
-                     * Для документов критериев добавляем :
-                     * 1. Комментарии
-                     * 2. Если Тип документа = Файл или Документ клуба, то добавляем файлы
-                     * 3. Если Тип документа = Список участников, то добавляем участников
-                     * 4. Если тип документа = ОФИ, то добавляем офи
-                     */
+    /**
+     * Добавление для документов критериев :
+     * 1. Комментарии
+     * 2. Если Тип документа = Файл или Документ клуба, то добавляем файлы
+     * 3. Если Тип документа = Список участников, то добавляем участников
+     * 4. Если тип документа = ОФИ, то добавляем офи
+     */
+    public addDataToCritDoc () {
+        this.license[0].criteriaGroups.forEach((critGrp) => {
+            critGrp.criterias.forEach((criterias) => {
+                criterias.documents.forEach((documents) => {
                     documents.comment = TestData.commentValue;
                     documents.files = (documents.docTypeId <= 2 || documents.docTypeId == 8) ? TestData.files : [];
-                    if (documents.docTypeId == 5) documents.externalIds = Catalogs.getClubWorkersId(clubWorkers);
-                    if (documents.docTypeId == 6) documents.externalIds = Catalogs.getOfiId(ofi);
+                    if (documents.docTypeId == 5) documents.externalIds = this.catalogs.clubWorkersId;
+                    if (documents.docTypeId == 6) documents.externalIds = this.catalogs.ofiId;
                 })
             })
         })
         return this.license[0];
     }
-    public static addStatusToDocuments (docStatus : TLicAndDocStatus[]) : TLicense {
-        this.license[0].criteriaGroups.forEach((value, index) => {
-            value.criterias.forEach((value1, index1) => {
-                value1.documents.forEach((value2, index2) => {
-                    value2.reviewComment = TestData.commentValue;
-                    value2.stateId = docStatus[randomInt(0,5)].id;
+    /**
+     * Добавление для  документов критериев :
+     * 1.Комментарии
+     * 2.Случайный статус
+     */
+    public addStatusToDocuments () : TLicense {
+        this.license[0].criteriaGroups.forEach((criteriaGroup) => {
+            criteriaGroup.criterias.forEach((criteria) => {
+                criteria.documents.forEach((document) => {
+                    document.reviewComment = TestData.commentValue;
+                    document.stateId = this.catalogs.docStatus[randomInt(0,5)].id;
                 })
             })
         })
