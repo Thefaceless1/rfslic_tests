@@ -1,14 +1,22 @@
 import {TestData} from "../helpers/test-data";
-import {Catalogs, TCurrentSeason, TDocTypes, TLicTypes} from "./catalogs";
+import {Catalogs, TSeasons, TDocTypes, TLicTypes} from "./catalogs";
 import superagent from "superagent";
 import {RequestProp} from "../helpers/request-prop";
 
 export class Prolicense {
     public  prolicense : TProlicense[];
+    public catalogs = new Catalogs();
     constructor() {
         this.prolicense =[]
     }
-    public static createProlicense(prolicense : TProlicense[],season : TCurrentSeason[], licType : TLicTypes[], docType : TDocTypes[]) : void {
+    public static createProlicense(prolicense : TProlicense[],season : TSeasons[], licType : TLicTypes[], docType : TDocTypes[]) : void {
+        const docArray : TDocuments[] = [...Array(5)].fill(
+            {
+            name: TestData.getRandomWord,
+            docTypeId: docType[0].id,
+            templates: TestData.files
+        }
+        )
         prolicense.push(
             {
             name: TestData.getRandomWord,
@@ -22,17 +30,11 @@ export class Prolicense {
             decisionDate: TestData.getFutureDate,
             begin: TestData.getTodayDate,
             end: TestData.getFutureDate,
-            documents: [
-                {
-                    name: TestData.getRandomWord,
-                    docTypeId: docType[0].id,
-                    templates: TestData.files
-                }
-            ]
+            documents: docArray
         }
         )
     }
-    public static changeProlicense (prolicense : TProlicense[],season : TCurrentSeason[], licType : TLicTypes[], docType : TDocTypes[]) {
+    public static changeProlicense (prolicense : TProlicense[],season : TSeasons[], licType : TLicTypes[], docType : TDocTypes[]) {
         this.getProlicense(prolicense,0).name = TestData.getRandomWord;
         this.getProlicense(prolicense,0).type = licType[1].name;
         this.getProlicense(prolicense,0).season = season[1].name;
@@ -44,7 +46,7 @@ export class Prolicense {
         }
         )
     }
-    public static createSampleProlicense (season : TCurrentSeason[], licType : TLicTypes[]) : TSampleLicense {
+    public static createSampleProlicense (season : TSeasons[], licType : TLicTypes[]) : TSampleLicense {
         return {
             type : licType[licType.length-1].name,
             season : season[0].name,
@@ -57,7 +59,7 @@ export class Prolicense {
     public static addResponseToProlicense (prolicense : TProlicense[],index : number,response : TProlicense) : void {
         prolicense[index] = response;
     }
-    public static async createTestProlicense (prolicense : TProlicense[],seasons : TCurrentSeason[],licTypes : TLicTypes[],docTypes : TDocTypes[]) : Promise<void> {
+    public static async createTestProlicense (prolicense : TProlicense[],seasons : TSeasons[],licTypes : TLicTypes[],docTypes : TDocTypes[]) : Promise<void> {
         const api = new RequestProp();
         this.createProlicense(prolicense,seasons,licTypes,docTypes);
         //Создаем пролицензию и записываем ответ в свойство prolicense

@@ -3,7 +3,7 @@ import {License} from "../class/license";
 
 export class RequestProp {
     public static readonly basicUrl : string = "https://rfs-lic-test-01.fors.ru";
-    public static readonly fileDir : string ="src/helpers/testfiles/";
+    public static readonly fileDir : string ="src/api/helpers/testfiles/";
     public constructors : TConstructor = {
         seasons : "/api/rest/seasons",
         critGroups : "/api/rest/prolicenses/criterias/groups",
@@ -22,9 +22,12 @@ export class RequestProp {
     public upload : TUpload = {
         upload : "/api/rest/uploadFile"
     }
-    public  user : TUser ={
+    public user : TUser = {
         clubWorkers : "/api/rest/persons/findbyparams",
         critGrpExperts : "/api/rest/persons/withRights"
+    }
+    public infraObject : TInfraObject  = {
+        ofi : "/api/rest/objects/findbyparams"
     }
     public fillProlicenseApi (prolicense : TProlicense[]) : void {
         if (prolicense.length == 1) {
@@ -33,6 +36,7 @@ export class RequestProp {
             this.constructors.createCriterias = `${this.constructors.changeProlicense}/criterias`;
             this.constructors.cloneProlicense = `/api/rest/prolicenses/clone/${prolicense[0].id}`;
             this.constructors.publishProlicense = `/api/rest/prolicenses/${prolicense[0].id}/publish`;
+            this.constructors.unpublishProlicense = `/api/rest/prolicenses/${prolicense[0].id}/unpublish`
             this.constructors.deleteCriteriasGrp = `/api/rest/prolicenses/${prolicense[0].id}/criterias/groups/`;
         }
             else  {
@@ -59,6 +63,7 @@ export type TConstructor = {
     cloneProlicense? : string
     deleteProlicense? : string
     publishProlicense? : string
+    unpublishProlicense? : string
     deleteCriteriasGrp? : string
 }
 export type TUpload = {
@@ -74,5 +79,8 @@ export type TRequest = {
 export type TUser = {
     clubWorkers : string,
     critGrpExperts : string
+}
+export type TInfraObject = {
+    ofi : string
 }
 

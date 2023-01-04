@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import {RequestProp} from "./request-prop";
 import {randomInt} from "crypto";
-import {Catalogs} from "../class/catalogs";
+import {Catalogs, TDocTypes} from "../class/catalogs";
 
 export class TestData {
     public static files: TFiles[] = [];
@@ -34,6 +34,9 @@ export class TestData {
     public static get getRandomIntForMulti () : number {
         const randomNumb : number = randomInt(-1,6);
         return (randomNumb >- 1 && randomNumb <= 1) ? this.getRandomIntForMulti : randomNumb;
+    }
+    public static getRandomIntForDocs (docTypes : TDocTypes[]) : number {
+        return randomInt(0,docTypes.length);
     }
 }
 export type TFiles = {

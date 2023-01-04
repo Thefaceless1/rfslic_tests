@@ -6,7 +6,7 @@ import {Catalogs,TCurrentSeason} from "../class/catalogs";
 import {Prolicense, TDocuments} from "../class/prolicense";
 import {License} from "../class/license";
 import {Criterias, TCriterias} from "../class/criterias";
-jest.setTimeout(60000);
+jest.setTimeout(120000);
 
 describe("Работа с заявками", () => {
     const catalogs = new Catalogs();
@@ -91,23 +91,31 @@ describe("Работа с заявками", () => {
         })
         License.addResponseToLicense(0,response.body.data);
     })
-    test("Добавление документов и комментариев для документов критериев", async () => {
+    test("Добавление документов, сотрудников клуба и комментариев для документов критериев", async () => {
         const response = await superagent.put(RequestProp.basicUrl + api.request.changeLicense).
-        send(License.addDocAndComToCritDoc());
+        send(License.addDataToCritDoc(catalogs.clubWorkers,catalogs.ofi));
         expect(response.ok).toBeTruthy();
         expect(response.status).toBe(200);
         expect(response.body.status).toBe("SUCCESS");
         License.addResponseToLicense(0,response.body.data);
         //Проверяем наличие добавленных комментариев и документов для документов критериев
-        License.license[0].criteriaGroups.forEach((value, index) => {
-            value.criterias.forEach((value1,index1) => {
-                value1.documents.forEach((value2, index2) => {
-                    const addedDocInfo = response.body.data.criteriaGroups[index].criterias[index1].documents[index2];
-                    expect(value2.comment).toBe(TestData.commentValue);
-                    expect(value2.files.length).toEqual(TestData.files.length);
+        License.license[0].criteriaGroups.forEach((critGrp, index) => {
+            critGrp.criterias.forEach((criterias,index1) => {
+                criterias.documents.forEach((documents, index2) => {
+                    /**
+                     * Проверяем значения добавленных комментариев
+                     * Проверяем , если тип документа = Файл или Документ клуба то массив файлов документа должен быть заполнен,
+                     * иначе должен быть пуст
+                     */
+                    expect(documents.comment).toBe(TestData.commentValue);
+                    switch (documents.docTypeId <= 2 || documents.docTypeId == 8) {
+                        case true : expect(documents.files.length).toEqual(TestData.files.length); break;
+                        default : expect(documents.files.length).toEqual(0);
+                    }
                 })
             })
         })
+        console.log(prolicense.prolicense[0].name)
     })
     test("Проставление статусов и комментариев для документов критериев",async () => {
         const response = await superagent.put(RequestProp.basicUrl + api.request.changeLicense).

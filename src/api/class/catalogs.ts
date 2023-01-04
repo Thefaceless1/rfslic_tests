@@ -3,16 +3,17 @@ import superagent from "superagent";
 import {RequestProp} from "../helpers/request-prop";
 
 export class Catalogs {
-    public  seasons: TCurrentSeason[];
+    public  seasons: TSeasons[];
     public  criteriaGroups: TCriteriaGroups[];
-    public  licTypes: TLicTypes[] ;
-    public  docTypes: TDocTypes[] ;
+    public  licTypes: TLicTypes[];
+    public  docTypes: TDocTypes[];
     public  rankCriteria : TRankCriteria[];
     public  criteriaTypes : TCriteriaTypes[];
     public  licStatus : TLicAndDocStatus[];
     public  docStatus : TLicAndDocStatus[];
     public  critGrpExperts : TClubWorkers[];
     public  clubWorkers : TClubWorkers[];
+    public  ofi : TOfi[];
     constructor() {
         this.seasons =[]
         this.criteriaGroups =[]
@@ -24,25 +25,38 @@ export class Catalogs {
         this.docStatus =[]
         this.critGrpExperts =[]
         this.clubWorkers =[]
+        this.ofi =[]
     }
+    /**
+     * id всех записей свойства clubWorkers (сотрудники клубов)
+     */
     public static getClubWorkersId (clubWorkers : TClubWorkers[]) : number[] {
-        /**
-         * Получаем id всех записей свойства clubWorkers (сотрудники клубов)
-         */
         const clubWorkersId = clubWorkers.map(value => value.id);
         return clubWorkersId;
     }
+    /**
+     * id всех записей свойства critGrpExperts (Эксперты групп критерив)
+     */
     public static getCritGrpExpertsId (critGrpExperts : TClubWorkers[]) : number[] {
-        /**
-         * Получаем id всех записей свойства critGrpExperts (Эксперты групп критерив)
-         */
         const critGrpExpertsId = critGrpExperts.map(value => value.id);
         return critGrpExpertsId;
     }
+    /**
+     * id всех возможных типов документов для типа критерия : Документы
+     */
+    public static getDocTypesForCrit (docTypes : TDocTypes[]) : TDocTypes[] {
+        return docTypes.filter(value => (value.id != 3 && value.id != 4 && value.id != 7 && value.id != 10));
+    }
+    /**
+     * id всех записей свойства ofi
+     */
+    public static getOfiId (ofi : TOfi[]) {
+        return ofi.map(value => value.id);
+    }
+    /**
+     * Получаем данные из справочников и записываем их в свойства
+     */
     public async fillCatalogsData () : Promise<void> {
-        /**
-         * Получаем данные из справочников и записываем их в свойства класса
-         */
         const api = new RequestProp();
         for (const i of TestData.fileNames) {
             const files = await superagent.post(RequestProp.basicUrl + api.upload.upload).
@@ -51,7 +65,7 @@ export class Catalogs {
             TestData.addDataToFiles(i,files.body.data);
         }
         const seasons = await superagent.get(RequestProp.basicUrl + api.constructors.seasons);
-        this.seasons = seasons.body.data.filter((value: TCurrentSeason, index: number, arr: TCurrentSeason[]) => (value.current || index == arr.length - 1));
+        this.seasons = seasons.body.data;
         const groupCriterias = await superagent.get(RequestProp.basicUrl + api.constructors.critGroups);
         this.criteriaGroups = groupCriterias.body.data;
         const licenseType = await superagent.get(RequestProp.basicUrl + api.constructors.licTypes);
@@ -67,24 +81,18 @@ export class Catalogs {
         const docStatus = await superagent.get(RequestProp.basicUrl + api.request.docStatus);
         this.docStatus = docStatus.body.data;
         const clubWorkers = await superagent.get(RequestProp.basicUrl+api.user.clubWorkers).
-        query(
-            {
-                pageNum : 0,
-                pageSize : 10
-            }
-        )
+        query({pageNum : 0, pageSize : 10});
         this.clubWorkers = clubWorkers.body.data;
         const critGrpExperts = await superagent.get(RequestProp.basicUrl+api.user.critGrpExperts).
-        query(
-            {
-                rights : "request.checkExpert"
-            }
-        )
+        query({rights : "request.checkExpert"});
         this.critGrpExperts = critGrpExperts.body.data;
+        const ofi = await superagent.get(RequestProp.basicUrl + api.infraObject.ofi).
+        query({pageNum : 0, pageSize : 10});
+        this.ofi = ofi.body.data;
     }
 }
 
-export type TCurrentSeason = {
+export type TSeasons = {
     id: number,
     current: boolean,
     dateStart: string,
@@ -133,4 +141,30 @@ export type TClubWorkers = {
     orgName : string,
     position : string,
     sportRole : string
+}
+export type TOfi = {
+    geo_lat: string,
+    geo_lon: string,
+    id: number,
+    name: string,
+    categoryName: string,
+    typeName: string,
+    typeSysName: string,
+    favorite: boolean,
+    address: string,
+    logo: TLogo,
+    status: {
+        code: number,
+        description: string
+},
+    timezone: string
+}
+export type TLogo = {
+    id: number,
+    fileName: string,
+    contentType: string,
+    size: number,
+    dataLoad: string,
+    hash: string,
+    storageId: string
 }

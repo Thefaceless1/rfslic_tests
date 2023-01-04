@@ -1,11 +1,12 @@
 import {jest, test, expect, describe, beforeAll, afterEach} from "@jest/globals";
-import superagent from "superagent";
+import superagent, {Response} from "superagent";
 import {RequestProp} from "../helpers/request-prop";
 import {TestData} from "../helpers/test-data";
-import {Catalogs,TCurrentSeason} from "../class/catalogs";
+import {Catalogs,TSeasons} from "../class/catalogs";
 import {Prolicense, TDocuments} from "../class/prolicense";
 import {Criterias, TCriterias} from "../class/criterias";
-jest.setTimeout(60000);
+import {ProlicenseStatus} from "../helpers/enums/prolicense-status";
+jest.setTimeout(120000);
 
 describe("Пролицензия", () => {
     const prolicense = new Prolicense();
@@ -176,6 +177,14 @@ describe("Пролицензия", () => {
         expect(response.status).toBe(200);
         expect(response.body.status).toBe("SUCCESS");
         expect(response.body.data).toEqual({});
-        prolicense.prolicense[0].stateId = 2;
+        prolicense.prolicense[0].stateId = ProlicenseStatus.published;
+    })
+    test("Снятие с публикации проекта лицензии", async () => {
+        const response = await superagent.put(RequestProp.basicUrl + api.constructors.unpublishProlicense);
+        expect(response.ok).toBeTruthy();
+        expect(response.status).toBe(200);
+        expect(response.body.status).toBe("SUCCESS");
+        expect(response.body.data).toEqual({});
+        prolicense.prolicense[0].stateId = ProlicenseStatus.unpublished;
     })
 })

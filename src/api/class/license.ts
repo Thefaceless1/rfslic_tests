@@ -1,4 +1,4 @@
-import {Catalogs, TClubWorkers, TLicAndDocStatus} from "./catalogs";
+import {Catalogs, TClubWorkers, TLicAndDocStatus, TOfi} from "./catalogs";
 import {TestData} from "../helpers/test-data";
 import {Prolicense, TProlicense} from "./prolicense";
 import {randomInt} from "crypto";
@@ -44,12 +44,21 @@ export class License {
         })
         return this.license[0];
     }
-    public static addDocAndComToCritDoc () {
-        this.license[0].criteriaGroups.forEach((value, index) => {
-            value.criterias.forEach((value1, index1) => {
-                value1.documents.forEach((value2, index2) => {
-                    value2.comment = TestData.commentValue;
-                    value2.files = TestData.files
+    public static addDataToCritDoc (clubWorkers : TClubWorkers[], ofi : TOfi[]) {
+        this.license[0].criteriaGroups.forEach((critGrp, index) => {
+            critGrp.criterias.forEach((criterias, index1) => {
+                criterias.documents.forEach((documents, index2) => {
+                    /**
+                     * Для документов критериев добавляем :
+                     * 1. Комментарии
+                     * 2. Если Тип документа = Файл или Документ клуба, то добавляем файлы
+                     * 3. Если Тип документа = Список участников, то добавляем участников
+                     * 4. Если тип документа = ОФИ, то добавляем офи
+                     */
+                    documents.comment = TestData.commentValue;
+                    documents.files = (documents.docTypeId <= 2 || documents.docTypeId == 8) ? TestData.files : [];
+                    if (documents.docTypeId == 5) documents.externalIds = Catalogs.getClubWorkersId(clubWorkers);
+                    if (documents.docTypeId == 6) documents.externalIds = Catalogs.getOfiId(ofi);
                 })
             })
         })
@@ -151,10 +160,7 @@ export type TLicense = {
                 comment: string,
                 reviewComment: string,
                 externalIds : number[],
-                externals : {
-                    ofi : string,
-                    user : TClubWorkers
-                }[]
+                externals : TOfi[],
                 stateId: number,
                 state: string,
                 templates: {

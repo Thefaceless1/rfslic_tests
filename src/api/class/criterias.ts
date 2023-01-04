@@ -29,6 +29,7 @@ export class Criterias {
     public static createCriterias (criterias : TCriterias[],criteriaTypes : TCriteriaTypes[],rankCriteria : TRankCriteria[],docTypes : TDocTypes[]) : void {
         criterias.forEach((value, index) => {
                 criteriaTypes.forEach((value1, index1) => {
+                const randomDocNumber : number = TestData.getRandomIntForDocs(Catalogs.getDocTypesForCrit(docTypes));
                 value.criterias.push(
                     {
                         groupId: value.id,
@@ -37,19 +38,24 @@ export class Criterias {
                         name: TestData.getRandomWord,
                         description: TestData.descValue,
                         isMulti: TestData.getRandomIntForMulti,
-                        typeId: value1.id,
+                        typeId: criteriaTypes[0].id,
                         docSubmitDate: TestData.getFutureDate,
                         reviewDate: TestData.getFutureDate,
                         documents: [
                             {
                                 name: TestData.getRandomWord,
-                                docTypeId: docTypes[0].id,
-                                templates: TestData.files
+                                docTypeId: Catalogs.getDocTypesForCrit(docTypes)[randomDocNumber].id,
+                                templates: (randomDocNumber >= 2 && randomDocNumber !=4) ? [] : TestData.files
                             },
                             {
                                 name: TestData.getRandomWord,
-                                docTypeId: docTypes[0].id,
-                                templates: TestData.files
+                                docTypeId: Catalogs.getDocTypesForCrit(docTypes)[randomDocNumber].id,
+                                templates: (randomDocNumber >= 2 && randomDocNumber !=4) ? [] : TestData.files
+                            },
+                            {
+                                name: TestData.getRandomWord,
+                                docTypeId: Catalogs.getDocTypesForCrit(docTypes)[randomDocNumber].id,
+                                templates: (randomDocNumber >= 2 && randomDocNumber !=4) ? [] : TestData.files
                             }
                         ]
                     }
@@ -62,14 +68,15 @@ export class Criterias {
     public static changeCriterias (criterias : TCriterias[],rankCriteria : TRankCriteria[],docTypes : TDocTypes[]) : void {
         criterias.forEach((value, index) => {
             value.criterias.forEach((value1, index1) => {
+                const randomDocNumber : number = TestData.getRandomIntForDocs(Catalogs.getDocTypesForCrit(docTypes));
                 value1.number = TestData.getRandomWord;
                 value1.name = TestData.getRandomWord;
                 value1.categoryId = rankCriteria[rankCriteria.length-1].id;
                 value1.documents.push(
                     {
                     name: TestData.getRandomWord,
-                    docTypeId: docTypes[randomInt(0, docTypes.length - 1)].id,
-                    templates: TestData.files
+                    docTypeId: Catalogs.getDocTypesForCrit(docTypes)[randomDocNumber].id,
+                    templates: (randomDocNumber >= 2 && randomDocNumber !=4) ? [] : TestData.files
                 }
                 )
             })
@@ -91,7 +98,6 @@ export class Criterias {
             );
         }
         //Создаем критерии
-        //"/api/rest/prolicenses/" + Prolicense.getProlicense(prolicense,0).id + "/criterias"
         Criterias.createCriterias(criterias,criteriaTypes,rankCriteria,docTypes);
         for(const i of criterias) {
             for(let criteria of i.criterias) {
