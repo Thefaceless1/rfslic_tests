@@ -7,4 +7,7 @@ export class BaseElement {
     public static getElement (page : Page, selector : string) : Locator {
         return page.locator(selector);
     }
+    public static async waitForElementVisible (element : Locator) {
+        await element.waitFor({state : "visible"});
+    }
 }
