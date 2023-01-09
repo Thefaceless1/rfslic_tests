@@ -3,6 +3,20 @@ import {Api} from "../helpers/api";
 
 
 export class Catalogs {
+    /**
+     * seasons - Сезоны
+     * criteriaGroups - Группы критериев
+     * licTypes - Типы лицензий
+     * docTypes - Типы документов
+     * rankCriteria - Разряды критериев
+     * criteriaTypes - Типы критериев
+     * licStatus - Статусы заявки
+     * docStatus - Типы документов
+     * critGrpExperts - Эксперты группы критериев
+     * clubWorkers - Сотрудники клубов
+     * ofi - ОФИ
+     * organization - Организации
+     */
     public  seasons: TSeasons[];
     public  criteriaGroups: TCriteriaGroups[];
     public  licTypes: TLicTypes[];
@@ -14,6 +28,7 @@ export class Catalogs {
     public  critGrpExperts : TClubWorkers[];
     public  clubWorkers : TClubWorkers[];
     public  ofi : TOfi[];
+    public organization : TOrganization[]
     constructor() {
         this.seasons =[]
         this.criteriaGroups =[]
@@ -26,6 +41,7 @@ export class Catalogs {
         this.critGrpExperts =[]
         this.clubWorkers =[]
         this.ofi =[]
+        this.organization =[]
     }
     /**
      * id всех записей свойства clubWorkers (сотрудники клубов)
@@ -48,8 +64,14 @@ export class Catalogs {
     /**
      * id всех записей свойства ofi
      */
-    public get ofiId () {
+    public get ofiId () : number[] {
         return this.ofi.map(value => value.id);
+    }
+    /**
+     * id всех записей свойства organization
+     */
+    public get orgId () : number[] {
+        return this.organization.map(value => value.id);
     }
     /**
      * Получаем данные из справочников и записываем их в свойства объектов класса
@@ -81,6 +103,10 @@ export class Catalogs {
         const ofi = await superagent.get(api.basicUrl + api.infraObject.ofi).
         query({pageNum : 0, pageSize : 10});
         this.ofi = ofi.body.data;
+        const organization = await superagent.get(api.basicUrl + api.user.organization).
+        query({pageNum : 0, pageSize : 10});
+        this.organization = organization.body.data;
+
     }
 }
 
@@ -159,4 +185,32 @@ export type TLogo = {
     dataLoad: string,
     hash: string,
     storageId: string
+}
+export type TOrganization = {
+    geo_lat: string,
+    geo_lon: string,
+    id: number,
+    shortName: string,
+    fullName: string,
+    namewithlegal: string,
+    legalid: number,
+    legalname: string,
+    fullAddress: string,
+    settlementWithType: string,
+    city: string,
+    cityOnLogin: string,
+    district: string,
+    discriminator: string,
+    favorite: boolean,
+    isDuplicate: boolean,
+    logo: TLogo,
+    parent: TParent,
+    status: string,
+    statusName: string,
+    timezone: string,
+    type: string
+}
+export type TParent = {
+    id : number,
+    fullName : string
 }

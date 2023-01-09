@@ -1,8 +1,8 @@
-import {BaseElement} from "./base-element.js";
+import {Element} from "./element";
 import {ElementHandle, Locator, Page} from "@playwright/test";
 import {InputData} from "../helpers/input-data.js";
 
-export class Date extends BaseElement {
+export class Date extends Element {
     /**
      * Заполнение поля с типом Date
      */

@@ -2,6 +2,9 @@ import {TProlicense} from "../class/prolicense";
 
 export class Api {
     public readonly basicUrl : string = "https://rfs-lic-test-01.fors.ru";
+    /**
+     * Апи constructor-controller
+     */
     public constructors : TConstructor = {
         seasons : "/api/rest/seasons",
         critGroups : "/api/rest/prolicenses/criterias/groups",
@@ -12,21 +15,37 @@ export class Api {
         createProlicense : "/api/rest/prolicenses",
         changeCriterias : `/api/rest/prolicenses/criterias/`
     }
+    /**
+     * Апи request-controller
+     */
     public request : TRequest = {
         requestStatus : "/api/rest/licenses/states",
         docStatus : "/api/rest/licenses/docstates",
         createLicense : "/api/rest/licenses"
     }
+    /**
+     * Апи upload-controller
+     */
     public upload : TUpload = {
         upload : "/api/rest/uploadFile"
     }
+    /**
+     * Апи user-controller
+     */
     public user : TUser = {
         clubWorkers : "/api/rest/persons/findbyparams",
-        critGrpExperts : "/api/rest/persons/withRights"
+        critGrpExperts : "/api/rest/persons/withRights",
+        organization : "/api/rest/organizations/find"
     }
+    /**
+     * Апи infra-object-controller
+     */
     public infraObject : TInfraObject  = {
         ofi : "/api/rest/objects/findbyparams"
     }
+    /**
+     * Заполнение свойств объекта constructors , которые требуют наличия id пролицензии
+     */
     public fillProlicenseApi (prolicense : TProlicense[]) : void {
         if (prolicense.length == 1) {
             this.constructors.changeProlicense = `/api/rest/prolicenses/${prolicense[0].id}`;
@@ -41,6 +60,9 @@ export class Api {
             this.constructors.deleteProlicense = `/api/rest/prolicenses/${prolicense[1].id}`
         }
     }
+    /**
+     * Заполнение свойств объекта request , которые требуют наличия id заявки
+     */
     public fillLicenseApi (licenseId : number) : void {
             this.request.changeLicense = `/api/rest/licenses/${licenseId}`;
             this.request.publishLicense = `${this.request.changeLicense}/publish`;
@@ -76,7 +98,8 @@ export type TRequest = {
 }
 export type TUser = {
     clubWorkers : string,
-    critGrpExperts : string
+    critGrpExperts : string,
+    organization : string
 }
 export type TInfraObject = {
     ofi : string

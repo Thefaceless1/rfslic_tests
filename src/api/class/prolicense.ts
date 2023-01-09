@@ -9,6 +9,9 @@ export class Prolicense {
     constructor() {
         this.prolicense =[]
     }
+    /**
+     * Создание пролицензии
+     */
     public createProlicense() : void {
         const docArray : TDocuments[] = [...Array(5)].fill(
             {
@@ -34,6 +37,13 @@ export class Prolicense {
         }
         )
     }
+    /**
+     * Изменение пролицензии:
+     * 1. Наименование
+     * 2. Тип
+     * 3. Сезон
+     * 4. Добавление документа
+     */
     public changeProlicense () {
         this.prolicense[0].name = TestData.randomWord;
         this.prolicense[0].type = this.catalogs.licTypes[this.catalogs.licTypes.length-1].name;
@@ -46,6 +56,9 @@ export class Prolicense {
         }
         )
     }
+    /**
+     * Создание пролицензии по образцу
+     */
     public createSampleProlicense () : TSampleLicense {
         return {
             type : this.catalogs.licTypes[0].name,
@@ -53,12 +66,21 @@ export class Prolicense {
             name : TestData.randomWord
         }
     }
+    /**
+     * Получение пролицензии по индексу массива свойста prolicense
+     */
     public getProlicense (index : number) : TProlicense {
         return this.prolicense[index];
     }
+    /**
+     * Добавление тела ответа в массив свойства prolicense
+     */
     public addRespToProlic (index : number,response : TProlicense) : void {
         this.prolicense[index] = response;
     }
+    /**
+     * Создание тестовой пролицензии для сценария license.test.ts
+     */
     public async createTestProlicense () : Promise<void> {
         const api = new Api();
         this.createProlicense();

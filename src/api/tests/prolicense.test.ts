@@ -1,4 +1,4 @@
-import {jest, test, expect, describe, beforeAll, afterEach} from "@jest/globals";
+import {jest, test, expect, describe, beforeAll, afterEach, afterAll} from "@jest/globals";
 import superagent, {Response} from "superagent";
 import {TestData} from "../helpers/test-data";
 import {Prolicense, TDocuments} from "../class/prolicense";
@@ -27,7 +27,7 @@ describe("Пролицензия", () => {
         expect(response.body.data.id).toBeDefined();
         expect(response.body.data.type).toBe(prolicense.catalogs.licTypes[0].name);
         expect(response.body.data.season).toBe(prolicense.catalogs.seasons[0].name);
-        expect(response.body.data.stateId).toBe(1);
+        expect(response.body.data.stateId).toBe(ProlicenseStatus.unpublished);
         expect(response.body.data.begin && response.body.data.requestBegin).toBe(TestData.todayDate);
         expect(response.body.data.end && response.body.data.requestEnd &&
             response.body.data.docSubmitDate && response.body.data.dueDate &&
@@ -165,6 +165,5 @@ describe("Пролицензия", () => {
         expect(response.statusCode).toBe(200);
         expect(response.body.status).toBe("SUCCESS");
         prolicense.prolicense[0].stateId = ProlicenseStatus.unpublished;
-        console.log(prolicense.prolicense[0].name);
     })
 })
