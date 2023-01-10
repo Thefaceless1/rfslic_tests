@@ -4,16 +4,11 @@ export class InputData {
     /**
      * Получение сегодняшней даты
      */
-    public static get todayDate () : string {
-        return new Date().toDateString();
-    }
+    public static todayDate  : string = new Date().toDateString();
     /**
-     * Получение уникального наименования
+     * Случайное число для поля "Минимальное количество"
      */
-    public static get currentDate () : string {
-        const dateNow : string = new  Date().toLocaleString();
-        return `автотест|${dateNow}`;
-    }
+    public static randomIntForMulti : string = String(randomInt(2,10));
     /**
      * Случайное слово до 20 символов
      */
@@ -25,11 +20,5 @@ export class InputData {
 
         }
         return randomWord;
-    }
-    /**
-     * Случайное число для поля "Минимальное количество"
-     */
-    public static get randomIntForMulti () : string {
-        return String(randomInt(2,10));
     }
 }

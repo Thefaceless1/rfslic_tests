@@ -1,5 +1,5 @@
-import {Locator} from "@playwright/test";
+import {Elements} from "./elements.js";
 
-export class Checkbox {
+export class Checkbox extends Elements{
 
 }

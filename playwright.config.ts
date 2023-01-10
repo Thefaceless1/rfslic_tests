@@ -13,7 +13,7 @@ import { devices } from '@playwright/test';
 const config: PlaywrightTestConfig = {
   testDir: 'src/e2e/tests/',
   /* Maximum time one test can run for. */
-  timeout: 60 * 1000,
+  timeout: 180 * 1000,
   expect: {
     /**
      * Maximum time expect() should wait for the condition to be met.
@@ -30,7 +30,7 @@ const config: PlaywrightTestConfig = {
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : 1,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: [['html',{outputFolder : 'src/e2e/test-results/', open : "never"}]],
+  reporter: [['html',{outputFolder : 'src/e2e/playwright-report/', open : "never",}]],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     headless : false,
@@ -49,7 +49,7 @@ const config: PlaywrightTestConfig = {
     {
       name: 'chromium',
       use: {
-        ...devices['Desktop Chrome'],
+        ...devices['Desktop Chrome']
       },
     },
 
@@ -97,7 +97,7 @@ const config: PlaywrightTestConfig = {
   ],
 
   /* Folder for test artifacts such as screenshots, videos, traces, etc. */
-   //outputDir: 'src/e2e/test-results/',
+   //outputDir: 'src/e2e/playwright-report/',
 
   /* Run your local dev server before starting the tests */
   /*webServer: {

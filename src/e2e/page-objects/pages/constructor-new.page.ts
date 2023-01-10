@@ -1,12 +1,12 @@
 import {Locator, Page} from "@playwright/test";
-import {Element} from "../../framework/elements/element";
+import {Elements} from "../../framework/elements/elements.js";
 import {Date} from "../../framework/elements/date.js";
 import {Input} from "../../framework/elements/input.js";
-import {ProlicenseActions} from "../../framework/helpers/enums/prolicense-actions.js";
-import {InputData} from "../../framework/helpers/input-data.js";
+import {ProlicenseActions} from "../helpers/enums/prolicense-actions.js";
+import {InputData} from "../helpers/input-data.js";
 import {randomInt} from "crypto";
-import {NonFilesDoctypes} from "../../framework/helpers/enums/non-files-doctypes.js";
-import {BasePage} from "./base-page.js";
+import {NonFilesDoctypes} from "../helpers/enums/non-files-doctypes.js";
+import {BasePage} from "./base.page.js";
 
 export class ConstructorNewPage extends BasePage {
     constructor(page : Page) {
@@ -17,109 +17,85 @@ export class ConstructorNewPage extends BasePage {
      * Поле "Название пролицензии"
      */
     public get prolicenseName () : Locator {
-        return Element.getElement(this.page,"//input[@name='name']");
+        return Elements.getElement(this.page,"//input[@name='name']");
     }
     /**
      * Название созданной пролицензии
      */
     public get createdProlicName() : Locator {
-        return Element.getElement(this.page,"//*[text()='Название пролицензии:']//following-sibling::*");
+        return Elements.getElement(this.page,"//*[text()='Название пролицензии:']//following-sibling::*");
     }
     /**
      * Поле "Сезон"
      */
     public get season () : Locator {
-        return Element.getElement(this.page,"//*[contains(@class,'season__control')]");
+        return Elements.getElement(this.page,"//*[contains(@class,'season__control')]");
     }
     /**
      * Поле "Тип лицензии"
      */
     public get licType () : Locator {
-        return Element.getElement(this.page,"//*[contains(@class,'type__control')]");
+        return Elements.getElement(this.page,"//*[contains(@class,'type__control')]");
     }
     /**
      * Поле "Название документа"
      */
     public get docName () : Locator {
-        return Element.getElement(this.page,"//input[@placeholder='Введите название документа']");
+        return Elements.getElement(this.page,"//input[@placeholder='Введите название документа']");
     }
     /**
      * Кнопка "Добавить документ"
      */
     public get addDocButton () : Locator {
-        return Element.getElement(this.page,"//span[text()='Добавить документ']");
-    }
-    /**
-     * Поле "Шаблоны документов"
-     */
-    public get templates () : Locator {
-        return Element.getElement(this.page,"//input[@type='file']");
+        return Elements.getElement(this.page,"//span[text()='Добавить документ']");
     }
     /**
      * Поля с датами блока "Общая информация"
      */
     public get dates () {
-        return Element.getElement(this.page,"//*[contains(@class,'datepicker')]//input");
-    }
-    /**
-     * Кнопка "Сохранить"
-     */
-    public get saveButton () {
-        return Element.getElement(this.page,"//button[text()='Сохранить']");
+        return Elements.getElement(this.page,"//*[contains(@class,'datepicker')]//input");
     }
     /**
      * Кнопка вызова действий для пролицензии
      */
     public get actionButton() : Locator {
-        return Element.getElement(this.page,"//button[.//span[contains(@class,'IconMeatball')]]");
+        return Elements.getElement(this.page,"//button[.//span[contains(@class,'IconMeatball')]]");
     }
     /**
      * Кнопка "Удалить"
      */
     public get deleteButton() : Locator {
-        return Element.getElement(this.page,"//button[text()='Удалить']");
+        return Elements.getElement(this.page,"//button[text()='Удалить']");
     }
     /**
      * Кнопка "Добавить группу критериев"
      */
     public get addGrpCritButton() : Locator {
-        return Element.getElement(this.page,"//span[text()='Добавить группу критериев']");
+        return Elements.getElement(this.page,"//button[contains(@class,'CriteriasMain_add_btn')]");
     }
     /**
      * Поле "Название группы критериев"
      */
     public get grpCrit() {
-        return Element.getElement(this.page,"//*[contains(@class,'groupName__placeholder')]");
+        return Elements.getElement(this.page,"//*[contains(@class,'groupName__placeholder')]");
     }
     /**
      * Значения выпадающего списка поля "Название группы критериев"
      */
     public get grpCritList() : Locator {
-        return Element.getElement(this.page,"//*[contains(@class,'groupName__option')]");
+        return Elements.getElement(this.page,"//*[contains(@class,'groupName__option')]");
     }
     /**
      * Созданные группы критериев
      */
     public get createdGroups() : Locator {
-        return Element.getElement(this.page,"//*[contains(text(),'критерии')]");
-    }
-    /**
-     * Поле "Выберите экспертов"
-     */
-    public get experts() : Locator {
-        return Element.getElement(this.page,"//*[contains(@class,'experts__indicators')]");
-    }
-    /**
-     * Значения выпадающего списка поля "Выберите экспертов"
-     */
-    public get expertsList() :Locator {
-        return Element.getElement(this.page,"//*[contains(@class,'experts__option')]");
+        return Elements.getElement(this.page,"//*[contains(text(),'критерии')]");
     }
     /**
      * Значения выпадающего списка действий
      */
     public get actionsList () : Locator {
-        return Element.getElement(this.page,"//*[contains(@class,'ContextMenuLevelCanary-Item')]");
+        return Elements.getElement(this.page,"//*[contains(@class,'ContextMenuLevelCanary-Item')]");
     }
     /**
      * Получение действия для пролицензии по enum
@@ -134,97 +110,91 @@ export class ConstructorNewPage extends BasePage {
      * Выпадающий список значений поля "Сезон"
      */
     public get seasons() : Locator {
-        return Element.getElement(this.page,"//*[contains(@class,'season__option')]");
+        return Elements.getElement(this.page,"//*[contains(@class,'season__option')]");
     }
     /**
      * Выпадающий список значений поля "Тип лицензий"
      */
     public get licenseTypes() : Locator {
-        return Element.getElement(this.page,"//*[contains(@class,'type__option')]");
-    }
-    /**
-     * Кнопки "Добавить" (+)
-     */
-    public get plusButton() : Locator {
-        return Element.getElement(this.page,"//*[@class='Collapse-Side']//button[.//span[contains(@class,'IconAdd')]]");
+        return Elements.getElement(this.page,"//*[contains(@class,'type__option')]");
     }
     /**
      * Поле "Номер" (критерия)
      */
     public get criteriaNumber() : Locator {
-        return Element.getElement(this.page,"//input[@placeholder='Введите номер критерия']");
+        return Elements.getElement(this.page,"//input[@placeholder='Введите номер критерия']");
     }
     /**
      * Поле "Разряд"
      */
     public get rankCriteria() : Locator {
-        return Element.getElement(this.page,"//*[contains(@class,'category__control')]");
+        return Elements.getElement(this.page,"//*[contains(@class,'category__control')]");
     }
     /**
      * Значения выпадающего списка поля "Разряд"
      */
     public get rankList() : Locator {
-        return Element.getElement(this.page,"//*[contains(@class,'category__option')]");
+        return Elements.getElement(this.page,"//*[contains(@class,'category__option')]");
     }
     /**
      * Поле "Название" (критерия)
      */
     public get criteriaName() : Locator {
-        return Element.getElement(this.page,"//input[@placeholder='Введите название критерия']");
+        return Elements.getElement(this.page,"//input[@placeholder='Введите название критерия']");
     }
     /**
      * Поле "Тип критерия"
      */
     public get criteriaType() : Locator {
-        return Element.getElement(this.page,"//*[contains(@class,'type__control')]");
+        return Elements.getElement(this.page,"//*[contains(@class,'type__control')]");
     }
     /**
      * Значения выпадающего списка поля "Тип критерия"
      */
     public get criteriaTypeList() : Locator {
-        return Element.getElement(this.page,"//*[contains(@class,'type__option')]");
+        return Elements.getElement(this.page,"//*[contains(@class,'type__option')]");
     }
     /**
      * Чекбокс "Множественный критерий"
      */
     public get multi() : Locator {
-        return Element.getElement(this.page,"//input[@name='isMulti']");
+        return Elements.getElement(this.page,"//input[@name='isMulti']");
     }
     /**
      * Поле "Минимальное количество"
      */
     public get minCount() : Locator {
-        return Element.getElement(this.page,"//input[@name='minCount']");
+        return Elements.getElement(this.page,"//input[@name='minCount']");
     }
     /**
      * Поле "Описание"
      */
     public get description() : Locator {
-        return Element.getElement(this.page,"//textarea[@name='description']");
+        return Elements.getElement(this.page,"//textarea[@name='description']");
     }
     /**
      * Поле "Дополнительный тип данных"
      */
     public get additionalDataType() : Locator {
-        return Element.getElement(this.page,"//*[contains(@class,'additionalDocType__control')]");
+        return Elements.getElement(this.page,"//*[contains(@class,'additionalDocType__control')]");
     }
     /**
      * Значения выпадающего списка поля "Дополнительный тип данных"
      */
     public get additionalDataTypeList() : Locator {
-        return Element.getElement(this.page,"//*[contains(@class,'additionalDocType__option')]");
+        return Elements.getElement(this.page,"//*[contains(@class,'additionalDocType__option')]");
     }
     /**
      * Кнопка "Опубликовать"
      */
     public get publishButton() : Locator {
-        return Element.getElement(this.page,"//button[text()='Опубликовать']");
+        return Elements.getElement(this.page,"//button[text()='Опубликовать']");
     }
     /**
      * Кнопка "Снять с публикации"
      */
     public get unpublishButton() : Locator {
-        return Element.getElement(this.page,"//button[text()='Снять с публикации']");
+        return Elements.getElement(this.page,"//button[text()='Снять с публикации']");
     }
     /**
      * Заполнение полей блока "Общая информация"
@@ -246,18 +216,11 @@ export class ConstructorNewPage extends BasePage {
     public async fillDocs() : Promise<void> {
         const docsCount : number = 5;
         for(let i = 1 ; i<=docsCount ; i++) {
-            switch (i) {
-                case 1 : {
-                    await this.docName.type(InputData.randomWord);
-                    await Input.uploadFiles(this.templates);
-                    break;
-                }
-                default : {
-                    await this.addDocButton.click();
-                    await this.docName.last().type(InputData.randomWord);
-                    await Input.uploadFiles(this.templates.last());
-                }
-            }
+            if (i != 1) await this.addDocButton.click();
+            await this.docName.last().type(InputData.randomWord);
+            await Input.uploadFiles(this.templates.last());
+            await Elements.waitForVisible(this.docIcon.last());
+            await Elements.waitForVisible(this.xlsxIcon.last());
         }
     }
     /**
@@ -311,13 +274,15 @@ export class ConstructorNewPage extends BasePage {
     public async createGrpCrit() : Promise<void> {
         let groupsCount : number;
         do {
+            await Elements.waitForVisible(this.addGrpCritButton);
             await this.addGrpCritButton.click();
-            await Element.waitForVisible(this.grpCrit);
+            await Elements.waitForVisible(this.grpCrit);
             await this.grpCrit.click();
+            await Elements.waitForVisible(this.grpCritList.last());
             groupsCount = await this.grpCritList.count();
             await this.grpCritList.first().click();
             await this.experts.click();
-            await Element.waitForVisible(this.expertsList.last());
+            await Elements.waitForVisible(this.expertsList.last());
             const expertsCount = await this.expertsList.count();
             for (let i = 0; i<expertsCount; i++) {
                 await this.expertsList.first().click();
@@ -348,12 +313,14 @@ export class ConstructorNewPage extends BasePage {
         await this.addDocButton.click();
         await this.docName.last().type(InputData.randomWord);
         await this.additionalDataType.last().click();
-        await Element.waitForVisible(this.additionalDataTypeList.last());
+        await Elements.waitForVisible(this.additionalDataTypeList.last());
         const dataTypeCount : number = await this.additionalDataTypeList.count();
         const randomNumb : number = randomInt(0,dataTypeCount);
         await this.additionalDataTypeList.nth(randomNumb).click();
         if (this.checkDocType(randomNumb)) {
             await Input.uploadFiles(this.templates.last());
+            await Elements.waitForVisible(this.docIcon.last());
+            await Elements.waitForVisible(this.xlsxIcon.last());
         }
     }
     /**

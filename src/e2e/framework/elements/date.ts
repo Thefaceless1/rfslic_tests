@@ -1,8 +1,8 @@
-import {Element} from "./element";
-import {ElementHandle, Locator, Page} from "@playwright/test";
-import {InputData} from "../helpers/input-data.js";
+import {Elements} from "./elements.js";
+import {Locator} from "@playwright/test";
+import {InputData} from "../../page-objects/helpers/input-data.js";
 
-export class Date extends Element {
+export class Date extends Elements {
     /**
      * Заполнение поля с типом Date
      */

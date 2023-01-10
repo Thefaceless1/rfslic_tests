@@ -1,7 +1,7 @@
 import * as fs from "fs";
 
 export class FileReader {
-    private static readonly path : string = "src/e2e/framework/helpers/testfiles/";
+    private static readonly path : string = "src/e2e/page-objects/helpers/testfiles/";
     /**
      * Получение массива тестовых файлов с относительными путями
      */

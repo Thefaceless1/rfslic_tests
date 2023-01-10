@@ -117,7 +117,7 @@ export class License {
             allDocsCount++;
             if (document.state == this.docStatusById(3) ||
                 document.state == this.docStatusById(4) ||
-                document.state == this.docStatusById(3))
+                document.state == this.docStatusById(5))
                 checkedDocsCount++;
         })
         this.license[0].criteriaGroups.forEach((criteriaGroup) => {
@@ -126,7 +126,7 @@ export class License {
                     allDocsCount++;
                     if (document.state == this.docStatusById(3) ||
                         document.state == this.docStatusById(4) ||
-                        document.state == this.docStatusById(3))
+                        document.state == this.docStatusById(5))
                         checkedDocsCount++;
                 })
             })

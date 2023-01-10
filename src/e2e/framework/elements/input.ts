@@ -1,8 +1,8 @@
 import {Locator} from "@playwright/test";
-import {FileReader} from "../helpers/file-reader.js";
-import {InputData} from "../helpers/input-data.js";
+import {FileReader} from "../../page-objects/helpers/file-reader.js";
+import {Elements} from "./elements.js";
 
-export class Input {
+export class Input extends Elements{
     /**
      * Загрузка тестовых файлов в поле с типом input
      */
