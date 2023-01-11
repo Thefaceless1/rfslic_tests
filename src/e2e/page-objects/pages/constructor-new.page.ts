@@ -16,87 +16,119 @@ export class ConstructorNewPage extends BasePage {
     /**
      * Поле "Название пролицензии"
      */
-    public get prolicenseName () : Locator {
-        return Elements.getElement(this.page,"//input[@name='name']");
-    }
+    public prolicenseName : Locator = Elements.getElement(this.page,"//input[@name='name']");
     /**
      * Название созданной пролицензии
      */
-    public get createdProlicName() : Locator {
-        return Elements.getElement(this.page,"//*[text()='Название пролицензии:']//following-sibling::*");
-    }
+    public createdProlicName : Locator = Elements.getElement(this.page,"//*[text()='Название пролицензии:']//following-sibling::*");
     /**
      * Поле "Сезон"
      */
-    public get season () : Locator {
-        return Elements.getElement(this.page,"//*[contains(@class,'season__control')]");
-    }
+    public season : Locator = Elements.getElement(this.page,"//*[contains(@class,'season__control')]");
     /**
      * Поле "Тип лицензии"
      */
-    public get licType () : Locator {
-        return Elements.getElement(this.page,"//*[contains(@class,'type__control')]");
-    }
+    public licType : Locator = Elements.getElement(this.page,"//*[contains(@class,'type__control')]");
     /**
      * Поле "Название документа"
      */
-    public get docName () : Locator {
-        return Elements.getElement(this.page,"//input[@placeholder='Введите название документа']");
-    }
+    public docName : Locator = Elements.getElement(this.page,"//input[@placeholder='Введите название документа']");
     /**
      * Кнопка "Добавить документ"
      */
-    public get addDocButton () : Locator {
-        return Elements.getElement(this.page,"//span[text()='Добавить документ']");
-    }
+    public addDocButton : Locator = Elements.getElement(this.page,"//span[text()='Добавить документ']");
     /**
      * Поля с датами блока "Общая информация"
      */
-    public get dates () {
-        return Elements.getElement(this.page,"//*[contains(@class,'datepicker')]//input");
-    }
+    public dates : Locator = Elements.getElement(this.page,"//*[contains(@class,'datepicker')]//input");
     /**
      * Кнопка вызова действий для пролицензии
      */
-    public get actionButton() : Locator {
-        return Elements.getElement(this.page,"//button[.//span[contains(@class,'IconMeatball')]]");
-    }
+    public  actionButton : Locator = Elements.getElement(this.page,"//button[.//span[contains(@class,'IconMeatball')]]");
     /**
      * Кнопка "Удалить"
      */
-    public get deleteButton() : Locator {
-        return Elements.getElement(this.page,"//button[text()='Удалить']");
-    }
+    public deleteButton : Locator = Elements.getElement(this.page,"//button[text()='Удалить']");
     /**
      * Кнопка "Добавить группу критериев"
      */
-    public get addGrpCritButton() : Locator {
-        return Elements.getElement(this.page,"//button[contains(@class,'CriteriasMain_add_btn')]");
-    }
+    public addGrpCritButton : Locator = Elements.getElement(this.page,"//button[contains(@class,'CriteriasMain_add_btn')]");
     /**
      * Поле "Название группы критериев"
      */
-    public get grpCrit() {
-        return Elements.getElement(this.page,"//*[contains(@class,'groupName__placeholder')]");
-    }
+    public grpCrit = Elements.getElement(this.page,"//*[contains(@class,'groupName__placeholder')]");
     /**
      * Значения выпадающего списка поля "Название группы критериев"
      */
-    public get grpCritList() : Locator {
-        return Elements.getElement(this.page,"//*[contains(@class,'groupName__option')]");
-    }
+    public grpCritList : Locator = Elements.getElement(this.page,"//*[contains(@class,'groupName__option')]");
     /**
      * Созданные группы критериев
      */
-    public get createdGroups() : Locator {
-        return Elements.getElement(this.page,"//*[contains(text(),'критерии')]");
-    }
+    public createdGroups : Locator = Elements.getElement(this.page,"//*[contains(text(),'критерии')]");
     /**
      * Значения выпадающего списка действий
      */
-    public get actionsList () : Locator {
-        return Elements.getElement(this.page,"//*[contains(@class,'ContextMenuLevelCanary-Item')]");
-    }
+    public actionsList : Locator = Elements.getElement(this.page,"//*[contains(@class,'ContextMenuLevelCanary-Item')]");
+    /**
+     * Выпадающий список значений поля "Сезон"
+     */
+    public seasons : Locator = Elements.getElement(this.page,"//*[contains(@class,'season__option')]");
+    /**
+     * Выпадающий список значений поля "Тип лицензий"
+     */
+    public licenseTypes : Locator = Elements.getElement(this.page,"//*[contains(@class,'type__option')]");
+    /**
+     * Поле "Номер" (критерия)
+     */
+    public criteriaNumber : Locator = Elements.getElement(this.page,"//input[@placeholder='Введите номер критерия']");
+    /**
+     * Поле "Разряд"
+     */
+    public rankCriteria : Locator = Elements.getElement(this.page,"//*[contains(@class,'category__control')]");
+    /**
+     * Значения выпадающего списка поля "Разряд"
+     */
+    public rankList : Locator = Elements.getElement(this.page,"//*[contains(@class,'category__option')]");
+    /**
+     * Поле "Название" (критерия)
+     */
+    public criteriaName : Locator = Elements.getElement(this.page,"//input[@placeholder='Введите название критерия']");
+    /**
+     * Поле "Тип критерия"
+     */
+    public criteriaType : Locator = Elements.getElement(this.page,"//*[contains(@class,'type__control')]");
+    /**
+     * Значения выпадающего списка поля "Тип критерия"
+     */
+    public criteriaTypeList : Locator = Elements.getElement(this.page,"//*[contains(@class,'type__option')]");
+    /**
+     * Чекбокс "Множественный критерий"
+     */
+    public multi : Locator = Elements.getElement(this.page,"//input[@name='isMulti']");
+    /**
+     * Поле "Минимальное количество"
+     */
+    public minCount : Locator = Elements.getElement(this.page,"//input[@name='minCount']");
+    /**
+     * Поле "Описание"
+     */
+    public description : Locator = Elements.getElement(this.page,"//textarea[@name='description']");
+    /**
+     * Поле "Дополнительный тип данных"
+     */
+    public additionalDataType : Locator = Elements.getElement(this.page,"//*[contains(@class,'additionalDocType__control')]");
+    /**
+     * Значения выпадающего списка поля "Дополнительный тип данных"
+     */
+    public additionalDataTypeList : Locator = Elements.getElement(this.page,"//*[contains(@class,'additionalDocType__option')]");
+    /**
+     * Кнопка "Опубликовать"
+     */
+    public publishButton : Locator = Elements.getElement(this.page,"//button[text()='Опубликовать']");
+    /**
+     * Кнопка "Снять с публикации"
+     */
+    public unpublishButton : Locator = Elements.getElement(this.page,"//button[text()='Снять с публикации']");
     /**
      * Получение действия для пролицензии по enum
      */
@@ -105,96 +137,6 @@ export class ConstructorNewPage extends BasePage {
         for (const action of actionArray) {
             if (await action.textContent() == enumValue) return action;
         }
-    }
-    /**
-     * Выпадающий список значений поля "Сезон"
-     */
-    public get seasons() : Locator {
-        return Elements.getElement(this.page,"//*[contains(@class,'season__option')]");
-    }
-    /**
-     * Выпадающий список значений поля "Тип лицензий"
-     */
-    public get licenseTypes() : Locator {
-        return Elements.getElement(this.page,"//*[contains(@class,'type__option')]");
-    }
-    /**
-     * Поле "Номер" (критерия)
-     */
-    public get criteriaNumber() : Locator {
-        return Elements.getElement(this.page,"//input[@placeholder='Введите номер критерия']");
-    }
-    /**
-     * Поле "Разряд"
-     */
-    public get rankCriteria() : Locator {
-        return Elements.getElement(this.page,"//*[contains(@class,'category__control')]");
-    }
-    /**
-     * Значения выпадающего списка поля "Разряд"
-     */
-    public get rankList() : Locator {
-        return Elements.getElement(this.page,"//*[contains(@class,'category__option')]");
-    }
-    /**
-     * Поле "Название" (критерия)
-     */
-    public get criteriaName() : Locator {
-        return Elements.getElement(this.page,"//input[@placeholder='Введите название критерия']");
-    }
-    /**
-     * Поле "Тип критерия"
-     */
-    public get criteriaType() : Locator {
-        return Elements.getElement(this.page,"//*[contains(@class,'type__control')]");
-    }
-    /**
-     * Значения выпадающего списка поля "Тип критерия"
-     */
-    public get criteriaTypeList() : Locator {
-        return Elements.getElement(this.page,"//*[contains(@class,'type__option')]");
-    }
-    /**
-     * Чекбокс "Множественный критерий"
-     */
-    public get multi() : Locator {
-        return Elements.getElement(this.page,"//input[@name='isMulti']");
-    }
-    /**
-     * Поле "Минимальное количество"
-     */
-    public get minCount() : Locator {
-        return Elements.getElement(this.page,"//input[@name='minCount']");
-    }
-    /**
-     * Поле "Описание"
-     */
-    public get description() : Locator {
-        return Elements.getElement(this.page,"//textarea[@name='description']");
-    }
-    /**
-     * Поле "Дополнительный тип данных"
-     */
-    public get additionalDataType() : Locator {
-        return Elements.getElement(this.page,"//*[contains(@class,'additionalDocType__control')]");
-    }
-    /**
-     * Значения выпадающего списка поля "Дополнительный тип данных"
-     */
-    public get additionalDataTypeList() : Locator {
-        return Elements.getElement(this.page,"//*[contains(@class,'additionalDocType__option')]");
-    }
-    /**
-     * Кнопка "Опубликовать"
-     */
-    public get publishButton() : Locator {
-        return Elements.getElement(this.page,"//button[text()='Опубликовать']");
-    }
-    /**
-     * Кнопка "Снять с публикации"
-     */
-    public get unpublishButton() : Locator {
-        return Elements.getElement(this.page,"//button[text()='Снять с публикации']");
     }
     /**
      * Заполнение полей блока "Общая информация"
@@ -214,7 +156,7 @@ export class ConstructorNewPage extends BasePage {
      * Заполнение полей блока "Документы для подачи заявки"
      */
     public async fillDocs() : Promise<void> {
-        const docsCount : number = 5;
+        const docsCount : number = 3;
         for(let i = 1 ; i<=docsCount ; i++) {
             if (i != 1) await this.addDocButton.click();
             await this.docName.last().type(InputData.randomWord);
@@ -338,7 +280,7 @@ export class ConstructorNewPage extends BasePage {
      */
     public async createCriteria() : Promise<void> {
         const groupsCount = await this.createdGroups.count();
-        const docCount = 3;
+        const docCount = 1;
         for(let i = 0; i < groupsCount; i++) {
             await this.fillCriteriaInfo(i);
             for(let i=0; i < docCount; i++) {

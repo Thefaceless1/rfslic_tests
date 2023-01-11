@@ -21,17 +21,6 @@ export class RequestNewPage extends BasePage {
      * Кнопка "Перейти к заявке"
      */
     public goToRequest : Locator = Elements.getElement(this.page,"//span[text()='Перейти к заявке']");
-
-    /**
-     * Текстовое поле "Комментарий"
-     */
-    public comment : Locator = Elements.getElement(this.page,"//textarea[@name='comment']")
-
-    /**
-     * Кнопка "Добавить"
-     */
-    public addButton : Locator = Elements.getElement(this.page,"//button[text()='Добавить']");
-
     /**
      * Кнопка "Подать заявку"
      */
@@ -72,11 +61,7 @@ export class RequestNewPage extends BasePage {
         const iterationCount : number = await this.plusButton.count();
         for(let i = 0; i<iterationCount; i++) {
             await this.plusButton.nth(i).click();
-            await Input.uploadFiles(this.templates);
-            await Elements.waitForVisible(this.docIcon);
-            await Elements.waitForVisible(this.xlsxIcon);
-            await this.comment.type(InputData.randomWord);
-            await this.addButton.click();
+            await this.addDocsAndComment();
         }
         await this.publishReqButton.click();
     }

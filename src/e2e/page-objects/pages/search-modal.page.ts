@@ -24,4 +24,11 @@ export class SearchModalPage extends BasePage {
      * Индикатор ожидания получения записей таблицы
      */
     public loadIndicator : Locator = Elements.getElement(this.page,"//span[contains(@class,'ant-spin-dot-spin')]");
+    /**
+     * Количество одновременно отображаемых строк в таблице
+     */
+    public async countRowsInTable () : Promise<number> {
+        const ews = await Elements.getElement(this.page,"(//span[contains(@class,'selection-item')])[1]");
+        return  ews.innerText().then(value => parseInt(value));
+    }
 }

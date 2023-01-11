@@ -8,8 +8,19 @@ test.describe("Работа с заявками", () => {
         await request.createTestLic();
         await request.openPublishedLic();
     })
-    test.only("Заполнение экспертов и сотрудников клуба для групп критериев",async ({page}) => {
+    test("Заполнение экспертов и сотрудников клуба для групп критериев",async ({page}) => {
         const request = new RequestPage(page);
-        await request.fillExperts();
+        await request.addExperts();
+    })
+    test("Заполнение документов критериев", async ({page}) => {
+        const request = new RequestPage(page);
+        await request.addExperts();
+        await request.addCritDocs();
+    })
+    test("Проставление статусов и комментариев для документов",async ({page}) => {
+        const request = new RequestPage(page);
+        await request.addExperts();
+        await request.addCritDocs();
+        await request.addStatusAndComment();
     })
 })

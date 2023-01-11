@@ -34,7 +34,6 @@ test.describe("Пролицензия", () => {
     test("Создание групп критериев",async ({page}) => {
         const constructor = new ConstructorNewPage(page);
         await constructor.createGrpCrit();
-        await page.pause();
     })
     test("Создание критериев",async ({page}) => {
         const constructor = new ConstructorNewPage(page);
