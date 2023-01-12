@@ -1,4 +1,4 @@
-import {test,expect} from "@playwright/test";
+import {expect, test} from "@playwright/test";
 import {ConstructorNewPage} from "../../page-objects/pages/constructor-new.page.js";
 import {Notifications} from "../../page-objects/helpers/enums/notifications.js";
 
@@ -11,6 +11,7 @@ test.describe("Пролицензия", () => {
     test.afterEach(async ({page}) => {
         const constructor = new ConstructorNewPage(page);
         await constructor.deleteProlicense();
+        await expect(constructor.notifyByEnum(Notifications.prolicenseDeleted)).toBeVisible();
     })
     test("Создание пролицензии",async ({page}) => {
         const constructor = new ConstructorNewPage(page);
@@ -34,10 +35,12 @@ test.describe("Пролицензия", () => {
     test("Создание групп критериев",async ({page}) => {
         const constructor = new ConstructorNewPage(page);
         await constructor.createGrpCrit();
+        await expect(constructor.notifyByEnum(Notifications.createdCritGrp).last()).toBeVisible();
     })
     test("Создание критериев",async ({page}) => {
         const constructor = new ConstructorNewPage(page);
         await constructor.createGrpCrit();
         await constructor.createCriteria();
+        await expect(constructor.notifyByEnum(Notifications.createdCriteria).last()).toBeVisible();
     })
 })

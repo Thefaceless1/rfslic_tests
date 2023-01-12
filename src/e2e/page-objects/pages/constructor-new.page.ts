@@ -16,7 +16,7 @@ export class ConstructorNewPage extends BasePage {
     /**
      * Поле "Название пролицензии"
      */
-    public prolicenseName : Locator = Elements.getElement(this.page,"//input[@name='name']");
+    private prolicenseName : Locator = Elements.getElement(this.page,"//input[@name='name']");
     /**
      * Название созданной пролицензии
      */
@@ -24,115 +24,115 @@ export class ConstructorNewPage extends BasePage {
     /**
      * Поле "Сезон"
      */
-    public season : Locator = Elements.getElement(this.page,"//*[contains(@class,'season__control')]");
+    private season : Locator = Elements.getElement(this.page,"//*[contains(@class,'season__control')]");
     /**
      * Поле "Тип лицензии"
      */
-    public licType : Locator = Elements.getElement(this.page,"//*[contains(@class,'type__control')]");
+    private licType : Locator = Elements.getElement(this.page,"//*[contains(@class,'type__control')]");
     /**
      * Поле "Название документа"
      */
-    public docName : Locator = Elements.getElement(this.page,"//input[@placeholder='Введите название документа']");
+    private docName : Locator = Elements.getElement(this.page,"//input[@placeholder='Введите название документа']");
     /**
      * Кнопка "Добавить документ"
      */
-    public addDocButton : Locator = Elements.getElement(this.page,"//span[text()='Добавить документ']");
+    private addDocButton : Locator = Elements.getElement(this.page,"//span[text()='Добавить документ']");
     /**
      * Поля с датами блока "Общая информация"
      */
-    public dates : Locator = Elements.getElement(this.page,"//*[contains(@class,'datepicker')]//input");
+    private dates : Locator = Elements.getElement(this.page,"//*[contains(@class,'datepicker')]//input");
     /**
      * Кнопка вызова действий для пролицензии
      */
-    public  actionButton : Locator = Elements.getElement(this.page,"//button[.//span[contains(@class,'IconMeatball')]]");
+    private  actionButton : Locator = Elements.getElement(this.page,"//button[.//span[contains(@class,'IconMeatball')]]");
     /**
      * Кнопка "Удалить"
      */
-    public deleteButton : Locator = Elements.getElement(this.page,"//button[text()='Удалить']");
+    private deleteButton : Locator = Elements.getElement(this.page,"//button[text()='Удалить']");
     /**
      * Кнопка "Добавить группу критериев"
      */
-    public addGrpCritButton : Locator = Elements.getElement(this.page,"//button[contains(@class,'CriteriasMain_add_btn')]");
+    private addGrpCritButton : Locator = Elements.getElement(this.page,"//button[contains(@class,'CriteriasMain_add_btn')]");
     /**
      * Поле "Название группы критериев"
      */
-    public grpCrit = Elements.getElement(this.page,"//*[contains(@class,'groupName__placeholder')]");
+    private grpCrit = Elements.getElement(this.page,"//*[contains(@class,'groupName__placeholder')]");
     /**
      * Значения выпадающего списка поля "Название группы критериев"
      */
-    public grpCritList : Locator = Elements.getElement(this.page,"//*[contains(@class,'groupName__option')]");
+    private grpCritList : Locator = Elements.getElement(this.page,"//*[contains(@class,'groupName__option')]");
     /**
      * Созданные группы критериев
      */
-    public createdGroups : Locator = Elements.getElement(this.page,"//*[contains(text(),'критерии')]");
+    private createdGroups : Locator = Elements.getElement(this.page,"//*[contains(text(),'критерии')]");
     /**
      * Значения выпадающего списка действий
      */
-    public actionsList : Locator = Elements.getElement(this.page,"//*[contains(@class,'ContextMenuLevelCanary-Item')]");
+    private actionsList : Locator = Elements.getElement(this.page,"//*[contains(@class,'ContextMenuLevelCanary-Item')]");
     /**
      * Выпадающий список значений поля "Сезон"
      */
-    public seasons : Locator = Elements.getElement(this.page,"//*[contains(@class,'season__option')]");
+    private seasons : Locator = Elements.getElement(this.page,"//*[contains(@class,'season__option')]");
     /**
      * Выпадающий список значений поля "Тип лицензий"
      */
-    public licenseTypes : Locator = Elements.getElement(this.page,"//*[contains(@class,'type__option')]");
+    private licenseTypes : Locator = Elements.getElement(this.page,"//*[contains(@class,'type__option')]");
     /**
      * Поле "Номер" (критерия)
      */
-    public criteriaNumber : Locator = Elements.getElement(this.page,"//input[@placeholder='Введите номер критерия']");
+    private criteriaNumber : Locator = Elements.getElement(this.page,"//input[@placeholder='Введите номер критерия']");
     /**
      * Поле "Разряд"
      */
-    public rankCriteria : Locator = Elements.getElement(this.page,"//*[contains(@class,'category__control')]");
+    private rankCriteria : Locator = Elements.getElement(this.page,"//*[contains(@class,'category__control')]");
     /**
      * Значения выпадающего списка поля "Разряд"
      */
-    public rankList : Locator = Elements.getElement(this.page,"//*[contains(@class,'category__option')]");
+    private rankList : Locator = Elements.getElement(this.page,"//*[contains(@class,'category__option')]");
     /**
      * Поле "Название" (критерия)
      */
-    public criteriaName : Locator = Elements.getElement(this.page,"//input[@placeholder='Введите название критерия']");
+    private criteriaName : Locator = Elements.getElement(this.page,"//input[@placeholder='Введите название критерия']");
     /**
      * Поле "Тип критерия"
      */
-    public criteriaType : Locator = Elements.getElement(this.page,"//*[contains(@class,'type__control')]");
+    private criteriaType : Locator = Elements.getElement(this.page,"//*[contains(@class,'type__control')]");
     /**
      * Значения выпадающего списка поля "Тип критерия"
      */
-    public criteriaTypeList : Locator = Elements.getElement(this.page,"//*[contains(@class,'type__option')]");
+    private criteriaTypeList : Locator = Elements.getElement(this.page,"//*[contains(@class,'type__option')]");
     /**
      * Чекбокс "Множественный критерий"
      */
-    public multi : Locator = Elements.getElement(this.page,"//input[@name='isMulti']");
+    private multi : Locator = Elements.getElement(this.page,"//input[@name='isMulti']");
     /**
      * Поле "Минимальное количество"
      */
-    public minCount : Locator = Elements.getElement(this.page,"//input[@name='minCount']");
+    private minCount : Locator = Elements.getElement(this.page,"//input[@name='minCount']");
     /**
      * Поле "Описание"
      */
-    public description : Locator = Elements.getElement(this.page,"//textarea[@name='description']");
+    private description : Locator = Elements.getElement(this.page,"//textarea[@name='description']");
     /**
      * Поле "Дополнительный тип данных"
      */
-    public additionalDataType : Locator = Elements.getElement(this.page,"//*[contains(@class,'additionalDocType__control')]");
+    private additionalDataType : Locator = Elements.getElement(this.page,"//*[contains(@class,'additionalDocType__control')]");
     /**
      * Значения выпадающего списка поля "Дополнительный тип данных"
      */
-    public additionalDataTypeList : Locator = Elements.getElement(this.page,"//*[contains(@class,'additionalDocType__option')]");
+    private additionalDataTypeList : Locator = Elements.getElement(this.page,"//*[contains(@class,'additionalDocType__option')]");
     /**
      * Кнопка "Опубликовать"
      */
-    public publishButton : Locator = Elements.getElement(this.page,"//button[text()='Опубликовать']");
+    private publishButton : Locator = Elements.getElement(this.page,"//button[text()='Опубликовать']");
     /**
      * Кнопка "Снять с публикации"
      */
-    public unpublishButton : Locator = Elements.getElement(this.page,"//button[text()='Снять с публикации']");
+    private unpublishButton : Locator = Elements.getElement(this.page,"//button[text()='Снять с публикации']");
     /**
      * Получение действия для пролицензии по enum
      */
-    public async action (enumValue : ProlicenseActions) {
+    private async actionByEnum (enumValue : ProlicenseActions) {
         const actionArray = await this.actionsList.all();
         for (const action of actionArray) {
             if (await action.textContent() == enumValue) return action;
@@ -141,7 +141,7 @@ export class ConstructorNewPage extends BasePage {
     /**
      * Заполнение полей блока "Общая информация"
      */
-    public async fillBasicInfo() : Promise<void> {
+    private async fillBasicInfo() : Promise<void> {
         await this.prolicenseName.type(InputData.randomWord)
         await this.season.click();
         await this.seasons.last().click();
@@ -155,7 +155,7 @@ export class ConstructorNewPage extends BasePage {
     /**
      * Заполнение полей блока "Документы для подачи заявки"
      */
-    public async fillDocs() : Promise<void> {
+    private async fillDocs() : Promise<void> {
         const docsCount : number = 3;
         for(let i = 1 ; i<=docsCount ; i++) {
             if (i != 1) await this.addDocButton.click();
@@ -204,7 +204,7 @@ export class ConstructorNewPage extends BasePage {
      */
     public async deleteProlicense() : Promise<void> {
         await this.actionButton.click();
-        const deleteValue = await this.action(ProlicenseActions.delete);
+        const deleteValue = await this.actionByEnum(ProlicenseActions.delete);
         if (deleteValue) {
             await deleteValue.click();
             await this.deleteButton.click();
@@ -231,12 +231,12 @@ export class ConstructorNewPage extends BasePage {
             }
             await this.saveButton.click();
         }
-        while (groupsCount > 1);
+        while (groupsCount > 3);
     }
     /**
      * Заполнение полей критерия
      */
-    public async fillCriteriaInfo(index : number) : Promise<void> {
+    private async fillCriteriaInfo(index : number) : Promise<void> {
         await this.plusButton.nth(index).click();
         await this.criteriaNumber.type(InputData.randomWord)
         await this.rankCriteria.click();
@@ -251,7 +251,7 @@ export class ConstructorNewPage extends BasePage {
     /**
      * Заполнение полей документов критерия
      */
-    public async fillCriteriaDocs() : Promise<void> {
+    private async fillCriteriaDocs() : Promise<void> {
         await this.addDocButton.click();
         await this.docName.last().type(InputData.randomWord);
         await this.additionalDataType.last().click();
@@ -268,7 +268,7 @@ export class ConstructorNewPage extends BasePage {
     /**
      * Проверка нужно ли добавлять выбранному типу документа критерия файлы
      */
-    public checkDocType(randomNumb : number) : boolean {
+    private checkDocType(randomNumb : number) : boolean {
         return (
             randomNumb != NonFilesDoctypes.participantsList &&
             randomNumb != NonFilesDoctypes.organization &&
@@ -280,7 +280,7 @@ export class ConstructorNewPage extends BasePage {
      */
     public async createCriteria() : Promise<void> {
         const groupsCount = await this.createdGroups.count();
-        const docCount = 1;
+        const docCount = 2;
         for(let i = 0; i < groupsCount; i++) {
             await this.fillCriteriaInfo(i);
             for(let i=0; i < docCount; i++) {

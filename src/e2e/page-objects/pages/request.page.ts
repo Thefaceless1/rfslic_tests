@@ -42,7 +42,7 @@ export class RequestPage extends RequestNewPage {
     /**
      * Выбранный статус около наименования документа
      */
-    private statusNearDoc : Locator = Elements.getElement(this.page,"//*[contains(text(),'автотест')]//*[contains(@class,'Badge_view_filled')]");
+    private statusNearDoc : Locator = Elements.getElement(this.page,"//*[contains(@class,'DocumentInfo')]//*[contains(@class,'Badge_view_filled')]");
     /**
      * Выбранный статус в поле "Решение по документу"
      */
@@ -88,7 +88,7 @@ export class RequestPage extends RequestNewPage {
                     await this.fillExperts();
                 }
                 else {
-                    await this.addSearchModalData();
+                    await this.fillSearchModalData();
                 }
             }
         }
@@ -106,7 +106,7 @@ export class RequestPage extends RequestNewPage {
     /**
      * Добавить данные из модального окна поиска сотрудников клуба, организаций, офи
      */
-    private async addSearchModalData () : Promise<void> {
+    private async fillSearchModalData () : Promise<void> {
         const searchModal = new SearchModalPage(this.page);
         await this.searchDataButton.click();
         await searchModal.searchModalButton.click();
@@ -125,13 +125,17 @@ export class RequestPage extends RequestNewPage {
         for(let i = groupsCount-1; i>=0; i--) {
             await this.criteriaGroups.nth(i).click();
             await this.criteriaInfo.click();
-            await this.plusButton.click();
-            await Elements.waitForVisible(this.cancelButton);
-            if(await this.searchDataButton.isVisible()) {
-                await this.addSearchModalData();
-            }
-            else {
-                await this.addDocsAndComment();
+            await Elements.waitForVisible(this.checkButton.last());
+            const docsCount : number = await this.checkButton.count();
+            for(let c = 0;c<docsCount; c++) {
+                await this.plusButton.nth(c).click();
+                await Elements.waitForVisible(this.cancelButton);
+                if(await this.searchDataButton.isVisible()) {
+                    await this.fillSearchModalData();
+                }
+                else {
+                    await this.fillDocsAndComment();
+                }
             }
         }
     }
@@ -143,20 +147,28 @@ export class RequestPage extends RequestNewPage {
             await this.reviewComment.nth(i).type(InputData.randomWord);
             await this.docStates.nth(i).click();
             await Elements.waitForVisible(this.docStatesList.last());
-            const randomStateNumb = randomInt(0,await this.docStatesList.count()-1);
+            const randomStateNumb = randomInt(0,await this.docStatesList.count());
             await this.docStatesList.nth(randomStateNumb).click();
             await this.checkButton.nth(i).click()
             await this.waitForDisplayStatus(i);
         }
-        await this.page.pause();
     }
     /**
      * Добавить комментарии и проставить статусы документам
      */
     public async addStatusAndComment () : Promise<void> {
         await this.sectionByEnum(RequestSections.generalInfo).click();
-        const docsCount : number = await this.checkButton.count();
+        let docsCount : number = await this.checkButton.count();
         await this.fillStatusAndComment(docsCount);
+        await this.sectionByEnum(RequestSections.criterias).click();
+        const groupsCount : number = await this.criteriaGroups.count();
+        for(let i = 0; i<groupsCount;i++) {
+            await this.criteriaGroups.nth(i).click();
+            await this.criteriaInfo.click();
+            await Elements.waitForVisible(this.checkButton.last());
+            docsCount = await this.checkButton.count();
+            await this.fillStatusAndComment(docsCount);
+        }
     }
     /**
      * Ожидание обновления статуса около наименования документа в соответствии с выбранным статусом

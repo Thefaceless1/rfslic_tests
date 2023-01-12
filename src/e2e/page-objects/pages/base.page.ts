@@ -12,70 +12,70 @@ export class BasePage extends PlaywrightDevPage{
     /**
      * Кнопка "Добавить" (+)
      */
-    public plusButton : Locator = Elements.getElement(this.page,"//button[contains(@class,'Button_view_secondary')][.//span[contains(@class,'IconAdd')]]");
+    protected plusButton : Locator = Elements.getElement(this.page,"//button[contains(@class,'Button_view_secondary')][.//span[contains(@class,'IconAdd')]]");
     /**
      * Кнопка "Сохранить"
      */
-    public saveButton = Elements.getElement(this.page,"//button[text()='Сохранить']");
+    protected saveButton = Elements.getElement(this.page,"//button[text()='Сохранить']");
     /**
      * Кнопка "Отменить"
      */
-    public cancelButton = Elements.getElement(this.page,"//button[text()='Отменить']");
+    protected cancelButton = Elements.getElement(this.page,"//button[text()='Отменить']");
     /**
      * Кнопка "Добавить" (карандаш)
      */
-    public editButton : Locator = Elements.getElement(this.page,"//button[contains(@class,'Button_view_secondary')][.//span[contains(@class,'IconEdit')]]");
+    protected editButton : Locator = Elements.getElement(this.page,"//button[contains(@class,'Button_view_secondary')][.//span[contains(@class,'IconEdit')]]");
     /**
      * Поле "Выберите экспертов"
      */
-    public experts : Locator = Elements.getElement(this.page,"//*[contains(@class,'experts__indicators')]");
+    protected experts : Locator = Elements.getElement(this.page,"//*[contains(@class,'experts__indicators')]");
     /**
      * Значения выпадающего списка поля "Выберите экспертов"
      */
-    public expertsList :Locator = Elements.getElement(this.page,"//*[contains(@class,'experts__option')]");
+    protected expertsList :Locator = Elements.getElement(this.page,"//*[contains(@class,'experts__option')]");
     /**
      * Поле "Шаблоны документов"
      */
-    public templates : Locator = Elements.getElement(this.page,"//input[@type='file']");
+    protected templates : Locator = Elements.getElement(this.page,"//input[@type='file']");
     /**
      * Иконка загруженного doc файла
      */
-    public docIcon : Locator = Elements.getElement(this.page,"//*[contains(@class,'FileIconDoc')]");
+    protected docIcon : Locator = Elements.getElement(this.page,"//*[contains(@class,'FileIconDoc')]");
     /**
      * Иконка загруженного xlsx файла
      */
-    public xlsxIcon : Locator = Elements.getElement(this.page,"//*[contains(@class,'FileIconXls')]");
+    protected xlsxIcon : Locator = Elements.getElement(this.page,"//*[contains(@class,'FileIconXls')]");
     /**
      * Список текущих уведомлений на экране
      */
-    public notifications : Locator = Elements.getElement(this.page,"//div[contains(@class,'notice-message')]");
+    protected notifications : Locator = Elements.getElement(this.page,"//div[contains(@class,'notice-message')]");
     /**
      * Поле ввода значения в фильтре поля "Название пролицензии"
      */
-    public prolicNameSearchInput : Locator = Elements.getElement(this.page,"//input[contains(@class,'Table_filterElement')]");
+    protected prolicNameSearchInput : Locator = Elements.getElement(this.page,"//input[contains(@class,'Table_filterElement')]");
     /**
      * Кнопки "Фильтр" в поле "Наименование"(пролицензии)
      */
-    public prolicFilterButton : Locator = Elements.getElement(this.page,"//span[contains(text(),'Название')]//following-sibling::span");
+    protected prolicFilterButton : Locator = Elements.getElement(this.page,"//span[contains(text(),'Название')]//following-sibling::span");
     /**
      * Кнопка "Найти" в фильтре столбца таблицы
      */
-    public searchButton : Locator = Elements.getElement(this.page,"//span[text()='Найти']");
+    protected searchButton : Locator = Elements.getElement(this.page,"//span[text()='Найти']");
     /**
      * Текстовое поле "Комментарий"
      */
-    public comment : Locator = Elements.getElement(this.page,"//textarea[@name='comment']")
+    protected comment : Locator = Elements.getElement(this.page,"//textarea[@name='comment']")
     /**
      * Кнопка "Добавить"
      */
-    public addButton : Locator = Elements.getElement(this.page,"//button[text()='Добавить']");
+    protected addButton : Locator = Elements.getElement(this.page,"//button[text()='Добавить']");
     /**
      * Получение уведомления по enum
      */
     public notifyByEnum (enumValue : Notifications) : Locator {
         return this.notifications.filter({hasText : enumValue});
     }
-    public async addDocsAndComment () : Promise<void> {
+    protected async fillDocsAndComment () : Promise<void> {
         await Input.uploadFiles(this.templates);
         await Elements.waitForVisible(this.docIcon);
         await Elements.waitForVisible(this.xlsxIcon);

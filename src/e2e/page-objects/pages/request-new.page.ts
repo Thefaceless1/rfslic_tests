@@ -15,16 +15,16 @@ export class RequestNewPage extends BasePage {
     /**
      * Кнопка "->" в левом углу таблицы
      */
-    public arrow  : Locator = Elements.getElement(this.page,"(//td[contains(@class,'fix-left')]/button)[1]");
+    private arrow  : Locator = Elements.getElement(this.page,"(//td[contains(@class,'fix-left')]/button)[1]");
 
     /**
      * Кнопка "Перейти к заявке"
      */
-    public goToRequest : Locator = Elements.getElement(this.page,"//span[text()='Перейти к заявке']");
+    private goToRequest : Locator = Elements.getElement(this.page,"//span[text()='Перейти к заявке']");
     /**
      * Кнопка "Подать заявку"
      */
-    public publishReqButton : Locator = Elements.getElement(this.page,"//button[text()='Подать заявку']");
+    private publishReqButton : Locator = Elements.getElement(this.page,"//button[text()='Подать заявку']");
 
     /**
      * Создание пролицензии с заполненными группами критериев и критериями
@@ -61,7 +61,7 @@ export class RequestNewPage extends BasePage {
         const iterationCount : number = await this.plusButton.count();
         for(let i = 0; i<iterationCount; i++) {
             await this.plusButton.nth(i).click();
-            await this.addDocsAndComment();
+            await this.fillDocsAndComment();
         }
         await this.publishReqButton.click();
     }
