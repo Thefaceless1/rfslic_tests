@@ -5,7 +5,6 @@ import {Prolicense} from "../class/prolicense";
 import {License} from "../class/license";
 import {Criterias} from "../class/criterias";
 import {Api} from "../helpers/api";
-jest.setTimeout(120000);
 
 describe("Работа с заявками", () => {
     const license = new License();

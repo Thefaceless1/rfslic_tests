@@ -5,9 +5,9 @@ import {Elements} from "../../framework/elements/elements.js";
 import {SearchModalPage} from "./search-modal.page.js";
 import {InputData} from "../helpers/input-data.js";
 import {randomInt} from "crypto";
+import {Pages} from "../helpers/enums/pages.js";
 
 export class RequestPage extends RequestNewPage {
-    public readonly requestUrl : string = "/#/request"
     constructor(page : Page) {
         super(page);
     }
@@ -67,7 +67,7 @@ export class RequestPage extends RequestNewPage {
      * Открыть опубликованную лицензию
      */
     public async openPublishedLic() : Promise<void> {
-        await this.goto(this.requestUrl);
+        await this.goto(Pages.requestPage);
         await this.filterByProlicName();
         await this.licenseRow(this.prolicenseName).click();
     }

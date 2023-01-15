@@ -5,7 +5,6 @@ import {Prolicense, TDocuments} from "../class/prolicense";
 import {Criterias, TCriterias} from "../class/criterias";
 import {ProlicenseStatus} from "../helpers/enums/prolicense-status";
 import {Api} from "../helpers/api";
-jest.setTimeout(120000);
 
 describe("Пролицензия", () => {
     const prolicense = new Prolicense();

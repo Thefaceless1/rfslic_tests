@@ -12,7 +12,6 @@ export class ConstructorNewPage extends BasePage {
     constructor(page : Page) {
         super(page);
     }
-    public readonly url : string = "/#/constructor/new";
     /**
      * Поле "Название пролицензии"
      */

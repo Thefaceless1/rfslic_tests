@@ -1,11 +1,12 @@
 import {expect, test} from "@playwright/test";
 import {ConstructorNewPage} from "../../page-objects/pages/constructor-new.page.js";
 import {Notifications} from "../../page-objects/helpers/enums/notifications.js";
+import {Pages} from "../../page-objects/helpers/enums/pages.js";
 
 test.describe("Пролицензия", () => {
     test.beforeEach(async ({page}) => {
       const constructor = new ConstructorNewPage(page);
-      await constructor.goto(constructor.url);
+      await constructor.goto(Pages.constructorNewPage);
       await constructor.createProlicense();
     })
     test.afterEach(async ({page}) => {

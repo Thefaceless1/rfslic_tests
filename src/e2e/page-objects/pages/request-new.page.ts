@@ -2,12 +2,11 @@ import {BasePage} from "./base.page.js";
 import {Locator, Page} from "@playwright/test";
 import {ConstructorNewPage} from "./constructor-new.page.js";
 import {Elements} from "../../framework/elements/elements.js";
-import {Input} from "../../framework/elements/input.js";
-import {InputData} from "../helpers/input-data.js";
+import {Pages} from "../helpers/enums/pages.js";
 
 export class RequestNewPage extends BasePage {
     public prolicenseName : string
-    public readonly newRequestUrl : string = "/#/request_new"
+    //public readonly newRequestUrl : string = "/#/request_new"
     constructor(page : Page) {
         super(page);
         this.prolicenseName = ''
@@ -31,7 +30,7 @@ export class RequestNewPage extends BasePage {
      */
     public async createTestProlicense() : Promise<void> {
         const constructor = new ConstructorNewPage(this.page);
-        await constructor.goto(constructor.url);
+        await constructor.goto(Pages.constructorNewPage);
         await constructor.createProlicense();
         await constructor.createGrpCrit();
         await constructor.createCriteria();
@@ -69,7 +68,7 @@ export class RequestNewPage extends BasePage {
      * Создание тестовой поданной заявки для дальнейших действий с ней
      */
     public async createTestLic() : Promise<void> {
-        await this.goto(this.newRequestUrl);
+        await this.goto(Pages.requestNewPage);
         await this.filterByProlicName();
         await this.createDraft();
         await this.publishLic();
