@@ -6,9 +6,10 @@ import {ProlicenseActions} from "../helpers/enums/prolicense-actions.js";
 import {InputData} from "../helpers/input-data.js";
 import {randomInt} from "crypto";
 import {NonFilesDoctypes} from "../helpers/enums/non-files-doctypes.js";
-import {BasePage} from "./base.page.js";
+import {ConstructorPage} from "./constructor.page.js";
+import {MainMenuOptions} from "../helpers/enums/main-menu-options.js";
 
-export class ConstructorNewPage extends BasePage {
+export class ConstructorNewPage extends ConstructorPage {
     constructor(page : Page) {
         super(page);
     }
@@ -128,6 +129,13 @@ export class ConstructorNewPage extends BasePage {
      * Кнопка "Снять с публикации"
      */
     private unpublishButton : Locator = Elements.getElement(this.page,"//button[text()='Снять с публикации']");
+    /**
+     * Перейти к списку созданных пролицензий и нажать "Создать пролицензию"
+     */
+    public async openConstructor () : Promise<void> {
+        await this.clickOnMenuOption(MainMenuOptions.constructor);
+        await this.createProlicButton.click();
+    }
     /**
      * Получение действия для пролицензии по enum
      */

@@ -30,7 +30,8 @@ export class RequestNewPage extends BasePage {
      */
     public async createTestProlicense() : Promise<void> {
         const constructor = new ConstructorNewPage(this.page);
-        await constructor.goto(Pages.constructorNewPage);
+        await constructor.goto(Pages.mainPage);
+        await constructor.openConstructor();
         await constructor.createProlicense();
         await constructor.createGrpCrit();
         await constructor.createCriteria();

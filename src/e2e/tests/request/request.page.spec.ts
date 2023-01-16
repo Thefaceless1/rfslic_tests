@@ -27,4 +27,7 @@ test.describe("Работа с заявками", () => {
         await request.addStatusAndComment();
         await expect(request.notifyByEnum(Notifications.madeDecision).last()).toBeVisible();
     })
+    test("Вынесение решения по заявке", async ({page}) => {
+
+    })
 })

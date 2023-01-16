@@ -6,7 +6,8 @@ import {Pages} from "../../page-objects/helpers/enums/pages.js";
 test.describe("Пролицензия", () => {
     test.beforeEach(async ({page}) => {
       const constructor = new ConstructorNewPage(page);
-      await constructor.goto(Pages.constructorNewPage);
+      await constructor.goto(Pages.mainPage);
+      await constructor.openConstructor();
       await constructor.createProlicense();
     })
     test.afterEach(async ({page}) => {
