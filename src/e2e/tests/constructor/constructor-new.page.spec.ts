@@ -19,6 +19,11 @@ test.describe("Пролицензия", () => {
         const constructor = new ConstructorNewPage(page);
         await expect(constructor.notifyByEnum(Notifications.prolicenseCreated)).toBeVisible();
     })
+    test("Изменение общей информации пролицензии", async ({page}) => {
+        const constructor = new ConstructorNewPage(page);
+        await constructor.changeBasicInfo();
+        await expect(constructor.notifyByEnum(Notifications.prolicenseChanged)).toBeVisible();
+    })
     test("Создание пролицензии по образцу",async ({page}) => {
         const constructor = new ConstructorNewPage(page);
         await constructor.cloneProlicense();

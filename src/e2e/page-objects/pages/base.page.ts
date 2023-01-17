@@ -22,7 +22,7 @@ export class BasePage extends PlaywrightDevPage{
      */
     protected cancelButton = Elements.getElement(this.page,"//button[text()='Отменить']");
     /**
-     * Кнопка "Добавить" (карандаш)
+     * Кнопка "Редактировать" (карандаш)
      */
     protected editButton : Locator = Elements.getElement(this.page,"//button[contains(@class,'Button_view_secondary')][.//span[contains(@class,'IconEdit')]]");
     /**

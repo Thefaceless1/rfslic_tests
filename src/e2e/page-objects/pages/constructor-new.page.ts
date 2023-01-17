@@ -149,15 +149,27 @@ export class ConstructorNewPage extends ConstructorPage {
      * Заполнение полей блока "Общая информация"
      */
     private async fillBasicInfo() : Promise<void> {
-        await this.prolicenseName.type(InputData.randomWord)
+        await this.prolicenseName.type(InputData.randomWord);
         await this.season.click();
         await this.seasons.last().click();
         await this.licType.click();
         await this.licenseTypes.last().click();
         const allDates = await this.dates.all();
         for (const date of allDates) {
-            await Date.fillDateInput(date);
+            await Date.fillDateInput(date,InputData.todayDate);
         }
+    }
+    /**
+     * Изменение значений в полях блока "Общая информация"
+     */
+    public async changeBasicInfo() : Promise<void> {
+        await this.editButton.first().click();
+        await this.prolicenseName.type(InputData.randomWord);
+        const allDates = await this.dates.all();
+        for (const date of allDates) {
+            await Date.fillDateInput(date,InputData.todayDate);
+        }
+        await this.saveButton.click();
     }
     /**
      * Заполнение полей блока "Документы для подачи заявки"
@@ -252,8 +264,6 @@ export class ConstructorNewPage extends ConstructorPage {
         await this.description.type(InputData.randomWord)
         await this.criteriaType.click();
         await this.criteriaTypeList.filter({hasText : "Документы"}).click();
-        await this.multi.check();
-        await this.minCount.type(InputData.randomIntForMulti);
     }
     /**
      * Заполнение полей документов критерия

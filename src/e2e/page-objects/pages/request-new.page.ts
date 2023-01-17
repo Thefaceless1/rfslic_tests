@@ -6,7 +6,6 @@ import {Pages} from "../helpers/enums/pages.js";
 
 export class RequestNewPage extends BasePage {
     public prolicenseName : string
-    //public readonly newRequestUrl : string = "/#/request_new"
     constructor(page : Page) {
         super(page);
         this.prolicenseName = ''
@@ -24,7 +23,23 @@ export class RequestNewPage extends BasePage {
      * Кнопка "Подать заявку"
      */
     private publishReqButton : Locator = Elements.getElement(this.page,"//button[text()='Подать заявку']");
-
+    /**
+     * Поле "Выберите клуб"
+     */
+    private selectClub : Locator = Elements.getElement(this.page,"//*[contains(@class,'club__control')]");
+    /**
+     * Выпадающий список значений поля "Выберите клуб"
+     */
+    private selectClubList : Locator = Elements.getElement(this.page,"//*[contains(@class,'club__option')]")
+    /**
+     * Выбрать клуб из выпадающего списка значений
+     */
+    public async chooseClub() : Promise<void> {
+        await Elements.waitForVisible(this.selectClub);
+        await this.selectClub.click();
+        await Elements.waitForVisible(this.selectClubList.first());
+        await this.selectClubList.first().click();
+    }
     /**
      * Создание пролицензии с заполненными группами критериев и критериями
      */
@@ -70,6 +85,7 @@ export class RequestNewPage extends BasePage {
      */
     public async createTestLic() : Promise<void> {
         await this.goto(Pages.requestNewPage);
+        await this.chooseClub();
         await this.filterByProlicName();
         await this.createDraft();
         await this.publishLic();

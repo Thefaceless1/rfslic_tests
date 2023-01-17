@@ -8,12 +8,12 @@ test.describe("Подача заявки", () => {
         const newRequest = new RequestNewPage(page);
         await newRequest.createTestProlicense();
         await newRequest.goto(Pages.requestNewPage);
+        await newRequest.chooseClub();
         await newRequest.filterByProlicName();
     })
     test("Создание заявки в статусе 'Черновик' ",async ({page}) => {
         const newRequest = new RequestNewPage(page);
         await newRequest.createDraft();
-        await page.pause()
         await expect(newRequest.notifyByEnum(Notifications.draftCreated)).toBeVisible();
     })
     test("Подача заявки", async ({page}) => {

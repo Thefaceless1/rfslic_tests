@@ -1,6 +1,7 @@
 export enum Notifications {
     prolicenseCopied = "Пролицензия создана по образцу",
     prolicenseCreated = "Пролицензия создана",
+    prolicenseChanged = "Пролицензия обновлена",
     prolicensePublished = "Пролицензия опубликована",
     prolicenseUnpublished = "Пролицензия снята с публикации",
     prolicenseDeleted = "Пролицензия удалена",

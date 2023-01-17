@@ -16,12 +16,6 @@ export class Elements {
     /**
      * Ожидание невидимости элемента
      */
-    public static async waitForNotVisible (element : Locator) {
-        if(await element.isVisible()) setTimeout(() =>this.waitForNotVisible(element),500);
-    }
-    /**
-     * Ожидание невидимости элемента
-     */
     public static async waitForHidden (element : Locator) {
         await element.waitFor({state : "hidden"});
     }

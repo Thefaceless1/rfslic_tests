@@ -6,9 +6,9 @@ export class Date extends Elements {
     /**
      * Заполнение поля с типом Date
      */
-    public static async fillDateInput (element: Locator) {
+    public static async fillDateInput (element: Locator, inputData : string) {
         await element.clear()
-        await element.type(InputData.todayDate);
+        await element.type(inputData);
         await element.press("Enter");
     }
 }
