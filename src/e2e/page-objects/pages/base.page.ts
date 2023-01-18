@@ -76,7 +76,7 @@ export class BasePage extends PlaywrightDevPage{
         return this.notifications.filter({hasText : enumValue});
     }
     protected async fillDocsAndComment () : Promise<void> {
-        await Input.uploadFiles(this.templates);
+        await Input.uploadFiles(this.templates.first());
         await Elements.waitForVisible(this.docIcon);
         await Elements.waitForVisible(this.xlsxIcon);
         await this.comment.type(InputData.randomWord);

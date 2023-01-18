@@ -11,11 +11,4 @@ export class PlaywrightDevPage {
     public async goto (url : string)  {
         await this.page.goto(url);
     }
-    /**
-     * Текущий url
-     */
-    public get currentUrl () : string {
-        const regExp = /\/#.+/;
-        return this.page.url().match(regExp)!.join();
-    }
 }

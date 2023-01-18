@@ -20,11 +20,12 @@ test.describe("Работа с заявками", () => {
         await request.addCritDocs();
         await expect(request.notifyByEnum(Notifications.saved).last() || request.notifyByEnum(Notifications.addedDocs).last()).toBeVisible();
     })
-    test("Проставление статусов и комментариев для документов",async ({page}) => {
+    test.only("Проставление статусов и комментариев для документов",async ({page}) => {
         const request = new RequestPage(page);
         await request.addExperts();
         await request.addCritDocs();
         await request.addStatusAndComment();
+        await page.pause()
         await expect(request.notifyByEnum(Notifications.madeDecision).last()).toBeVisible();
     })
     test("Вынесение решения по заявке", async ({page}) => {

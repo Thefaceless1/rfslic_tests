@@ -28,7 +28,7 @@ export class Catalogs {
     public  critGrpExperts : TClubWorkers[];
     public  clubWorkers : TClubWorkers[];
     public  ofi : TOfi[];
-    public organization : TOrganization[]
+    public organization : TOrganization[];
     constructor() {
         this.seasons =[]
         this.criteriaGroups =[]
@@ -74,6 +74,12 @@ export class Catalogs {
         return this.organization.map(value => value.id);
     }
     /**
+     * Получение объекта со статусом заявки "Выдана"
+     */
+    public get issuedLicStatus () : TLicAndDocStatus {
+        return this.licStatus.find(value => value.name == 'выдана')!;
+    }
+    /**
      * Получаем данные из справочников и записываем их в свойства объектов класса
      */
     public async fillCatalogsData () : Promise<void> {
@@ -106,7 +112,6 @@ export class Catalogs {
         const organization = await superagent.get(api.basicUrl + api.user.organization).
         query({pageNum : 0, pageSize : 10});
         this.organization = organization.body.data;
-
     }
 }
 

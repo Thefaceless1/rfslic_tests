@@ -1,4 +1,4 @@
-import {Catalogs, TClubWorkers, TOfi, TOrganization} from "./catalogs";
+import {Catalogs, TClubWorkers, TLicTypes, TOfi, TOrganization} from "./catalogs";
 import {TestData} from "../helpers/test-data";
 import {TProlicense} from "./prolicense";
 
@@ -110,6 +110,9 @@ export class License {
         })
         return this.license[0];
     }
+    /**
+     * Расчет процентов заполнения лицензии после проставления решений по документам
+     */
     public get licPercent () : number {
         let allDocsCount : number = 0;
         let checkedDocsCount : number = 0;
@@ -132,6 +135,14 @@ export class License {
             })
         })
         return Math.round((checkedDocsCount / allDocsCount) * 100);
+    }
+    /**
+     * Проставление статуса "Выдана" для лицензии в целом
+     */
+    public addStatusToLicense () : TLicense {
+        this.license[0].stateId = this.catalogs.issuedLicStatus.id;
+        this.license[0].state = this.catalogs.issuedLicStatus.name;
+        return this.license[0];
     }
 }
 export type TCreateLicense = {

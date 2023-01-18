@@ -164,4 +164,10 @@ describe("Работа с заявками", () => {
             })
         })
     })
+    test("Проставление статуса в целом для лицензии,",async () => {
+        const response = await superagent.put(api.basicUrl + api.request.changeLicense).
+        send(license.addStatusToLicense());
+        expect(response.body.data.stateId).toBe(license.catalogs.issuedLicStatus.id);
+        expect(response.body.data.state).toBe(license.catalogs.issuedLicStatus.name);
+    })
 })

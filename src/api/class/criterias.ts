@@ -49,7 +49,7 @@ export class Criterias {
                         categoryId: this.catalogs.rankCriteria[0].id,
                         name: TestData.randomWord,
                         description: TestData.descValue,
-                        isMulti: TestData.randomIntForMulti,
+                        isMulti: null,
                         typeId: this.catalogs.criteriaTypes[0].id,
                         docSubmitDate: TestData.futureDate,
                         reviewDate: TestData.futureDate,
@@ -124,7 +124,7 @@ export type TCriteria = {
         description?: string,
         docSubmitDate: string,
         reviewDate: string,
-        isMulti: number,
+        isMulti: number | null,
         typeId: number,
         documents: TDocuments[]
 }
