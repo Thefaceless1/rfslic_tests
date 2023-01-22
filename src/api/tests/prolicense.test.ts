@@ -1,23 +1,18 @@
-import {jest, test, expect, describe, beforeAll, afterEach, afterAll} from "@jest/globals";
-import superagent, {Response} from "superagent";
+import {test, expect, describe, beforeAll, afterEach} from "@jest/globals";
+import superagent from "superagent";
 import {TestData} from "../helpers/test-data";
 import {Prolicense, TDocuments} from "../class/prolicense";
 import {Criterias, TCriterias} from "../class/criterias";
 import {ProlicenseStatus} from "../helpers/enums/prolicense-status";
 import {Api} from "../helpers/api";
+import {Hooks} from "../helpers/hooks/hooks";
 
 describe("Пролицензия", () => {
     const prolicense = new Prolicense();
     const criterias = new Criterias();
     const api = new Api();
-
-    beforeAll(async () => {
-        await TestData.uploadFiles();
-        await prolicense.catalogs.fillCatalogsData();
-        await criterias.catalogs.fillCatalogsData();
-    });
-    afterEach(() => api.fillProlicenseApi(prolicense.prolicense));
-
+    Hooks.beforeProlic(prolicense,criterias);
+    Hooks.afterEachProlic(prolicense,api);
     test("Создание проекта лицензии", async () => {
         prolicense.createProlicense();
         const response = await superagent.put(api.basicUrl + api.constructors.createProlicense).

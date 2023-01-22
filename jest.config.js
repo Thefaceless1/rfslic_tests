@@ -111,7 +111,7 @@ export default {
      ["jest-html-reporters", {
        "publicPath": "./src/api/report",
        "filename": "report.html",
-       "openReport": true
+       "openReport": false
      }]],
 
   // Automatically reset mock state before every test
@@ -160,7 +160,7 @@ export default {
 
   // The glob patterns Jest uses to detect test files
   testMatch: [
-    "**/src/api/tests/*.test.ts"
+    "**/src/api/tests/*.test.ts", "**/src/unit/*.test.ts"
   ],
 
   // An array of regexp pattern strings that are matched against all test paths, matched tests are skipped

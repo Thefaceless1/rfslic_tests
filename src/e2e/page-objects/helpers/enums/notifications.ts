@@ -13,5 +13,7 @@ export enum Notifications {
     changedClubWorkers = "Сотрудники клуба для доступа к группе критериев изменены",
     madeDecision = "Решение по документу критерия принято",
     saved = "Сохранено",
-    addedDocs = "Документы добавлены"
+    addedDocs = "Документы добавлены",
+    licStatusSelected = "Решение по заявке принято",
+    reportCreated = "Отчет сформирован"
 }

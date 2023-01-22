@@ -1,13 +1,19 @@
 
 export class Matrix {
-
-    public static sumProdDiags (matrix: number[][]): number {
+    // Условия задачи на данный метод https://www.codewars.com/kata/590bb735517888ae6b000012
+    public static sumProdDiags (matrix: number[][]): number | string {
+        if(matrix.length == 0) return "Invalid data";
+        for(const i of matrix) {
+            if (
+                (i.some(element => element == 0 || element > 9 || element < -9 || !Number.isInteger(element)))
+                || (i.length != matrix.length)
+            ) return "Invalid data";
+        }
         const sum1 : number = this.sumDiags(matrix);
         const reverseMatrix = matrix.map(value => value.reverse());
         const sum2 : number = this.sumDiags(reverseMatrix);
         return sum1-sum2;
     }
-
     private static sumDiags (matrix : number[][]) : number {
         let sum : number = 0
         matrix.forEach((value, index, array) => {
@@ -28,10 +34,30 @@ export class Matrix {
         })
         return sum;
     }
+    //Условия задачи на данный метод https://www.codewars.com/kata/590b8d5cee471472f40000aa
+    public static upDownColSort(matrix: number[][]): number[][] | string {
+        if(matrix.length == 0 || matrix.some(value => value.length ==0)) return "Invalid data";
+        let countRowNumb : number = 0
+        for(const i of matrix) {
+            const index : number = matrix.indexOf(i);
+            if(i.some(number => isNaN(number) || number == Infinity)) return "Invalid data";
+            if(index == 0) countRowNumb = i.length
+            if(index>0 && countRowNumb != i.length) return "Invalid data";
+        }
+        let i : number = matrix.length - 1;
+        const result : number[][] = []
+        const ascNumbers : number[] = matrix.flat().sort((a : number, b : number) => a-b);
+        ascNumbers.forEach((value, index) => {
+            if(index<matrix.length) result.push([value]);
+            else if( i>= 0 && result[0].length <= result[result.length-1].length) {
+                result[i].push(value);
+                i--;
+            }
+            else {
+                i++;
+                result[i].push(value);
+            }
+        })
+        return result;
+    }
 }
-console.log(Matrix.sumProdDiags([
-    [1, 2, 3, 2, 1],
-    [2, 3, 4, 3, 2],
-    [3, 4, 5, 4, 3],
-    [4, 5, 6, 5, 4],
-    [5, 6, 7, 6, 5]]))

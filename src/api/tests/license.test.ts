@@ -1,25 +1,18 @@
-import {jest, test, expect, describe, beforeAll} from "@jest/globals";
+import {test, expect, describe, beforeAll} from "@jest/globals";
 import superagent from "superagent";
 import {TestData} from "../helpers/test-data";
 import {Prolicense} from "../class/prolicense";
 import {License} from "../class/license";
 import {Criterias} from "../class/criterias";
 import {Api} from "../helpers/api";
+import {Hooks} from "../helpers/hooks/hooks";
 
 describe("Работа с заявками", () => {
     const license = new License();
     const prolicense = new Prolicense();
     const criterias = new Criterias();
     const api = new Api();
-    beforeAll(async () => {
-        await TestData.uploadFiles();
-        await license.catalogs.fillCatalogsData();
-        await prolicense.catalogs.fillCatalogsData();
-        await criterias.catalogs.fillCatalogsData();
-        await prolicense.createTestProlicense();
-        await api.fillProlicenseApi(prolicense.prolicense);
-        await criterias.createTestCriterias(api);
-    })
+    Hooks.beforeLicense(prolicense,license,criterias,api);
     test("Создание заявки в статусе 'Черновик' ",async () => {
         const response = await superagent.put(api.basicUrl+api.request.createLicense).
         send(license.createLicense(prolicense.prolicense));
@@ -109,7 +102,7 @@ describe("Работа с заявками", () => {
                     expect(document.comment).toBe(TestData.commentValue);
                     switch (document.docTypeId <= 2 || document.docTypeId == 8) {
                         case true : expect(document.files.length).toEqual(TestData.files.length); break;
-                        default : expect(document.files.length).toEqual(0);
+                         default : expect(document.files.length).toEqual(0);
                     }
                 })
             })
@@ -143,7 +136,7 @@ describe("Работа с заявками", () => {
             }
             else expect(criteriaGroup.state).toBe(license.docStatusById(3));
             criteriaGroup.criterias.forEach((criteria) => {
-                const critPercent = criteria.documents.filter(value => value.stateId != 2).length*100/criteria.documents.length;
+                const critPercent = criteria.documents.filter(value => value.stateId != 2 && value.stateId != 1).length*100/criteria.documents.length;
                 expect(Math.round(criteria.percent)).toBe(Math.round(critPercent));
                 if (criteria.documents.every(value => value.state == license.docStatusById(1))){
                     expect(criteria.state).toBe(license.docStatusById(1));

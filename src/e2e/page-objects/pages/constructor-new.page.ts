@@ -8,6 +8,7 @@ import {randomInt} from "crypto";
 import {NonFilesDoctypes} from "../helpers/enums/non-files-doctypes.js";
 import {ConstructorPage} from "./constructor.page.js";
 import {MainMenuOptions} from "../helpers/enums/main-menu-options.js";
+import {LicStatus} from "../helpers/enums/licstatus.js";
 
 export class ConstructorNewPage extends ConstructorPage {
     constructor(page : Page) {
@@ -250,7 +251,7 @@ export class ConstructorNewPage extends ConstructorPage {
             }
             await this.saveButton.click();
         }
-        while (groupsCount > 3);
+        while (groupsCount > 5);
     }
     /**
      * Заполнение полей критерия

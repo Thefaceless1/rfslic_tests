@@ -1,51 +1,32 @@
-import {expect, test} from "@playwright/test";
-import {ConstructorNewPage} from "../../page-objects/pages/constructor-new.page.js";
+import {expect} from "@playwright/test";
 import {Notifications} from "../../page-objects/helpers/enums/notifications.js";
-import {Pages} from "../../page-objects/helpers/enums/pages.js";
+import {test} from "../../page-objects/helpers/fixtures/fixtures.js";
 
 test.describe("Пролицензия", () => {
-    test.beforeEach(async ({page}) => {
-      const constructor = new ConstructorNewPage(page);
-      await constructor.goto(Pages.mainPage);
-      await constructor.openConstructor();
-      await constructor.createProlicense();
-    })
-    test.afterEach(async ({page}) => {
-        const constructor = new ConstructorNewPage(page);
-        await constructor.deleteProlicense();
-        await expect(constructor.notifyByEnum(Notifications.prolicenseDeleted)).toBeVisible();
-    })
-    test("Создание пролицензии",async ({page}) => {
-        const constructor = new ConstructorNewPage(page);
+    test("Создание пролицензии",async ({constructor}) => {
         await expect(constructor.notifyByEnum(Notifications.prolicenseCreated)).toBeVisible();
     })
-    test("Изменение общей информации пролицензии", async ({page}) => {
-        const constructor = new ConstructorNewPage(page);
+    test("Изменение общей информации пролицензии", async ({constructor}) => {
         await constructor.changeBasicInfo();
         await expect(constructor.notifyByEnum(Notifications.prolicenseChanged)).toBeVisible();
     })
-    test("Создание пролицензии по образцу",async ({page}) => {
-        const constructor = new ConstructorNewPage(page);
+    test("Создание пролицензии по образцу",async ({constructor}) => {
         await constructor.cloneProlicense();
         await expect(constructor.notifyByEnum(Notifications.prolicenseCopied)).toBeVisible();
     })
-    test("Публикация пролицензии",async ({page}) => {
-        const constructor = new ConstructorNewPage(page);
+    test("Публикация пролицензии",async ({constructor}) => {
         await constructor.publishProlicense();
         await expect(constructor.notifyByEnum(Notifications.prolicensePublished)).toBeVisible();
     })
-    test("Снятие с публикации пролицензии",async ({page}) => {
-        const constructor = new ConstructorNewPage(page);
+    test("Снятие с публикации пролицензии",async ({constructor}) => {
         await constructor.unpublishProlicense();
         await expect(constructor.notifyByEnum(Notifications.prolicenseUnpublished)).toBeVisible();
     })
-    test("Создание групп критериев",async ({page}) => {
-        const constructor = new ConstructorNewPage(page);
+    test("Создание групп критериев",async ({constructor}) => {
         await constructor.createGrpCrit();
         await expect(constructor.notifyByEnum(Notifications.createdCritGrp).last()).toBeVisible();
     })
-    test("Создание критериев",async ({page}) => {
-        const constructor = new ConstructorNewPage(page);
+    test("Создание критериев",async ({constructor}) => {
         await constructor.createGrpCrit();
         await constructor.createCriteria();
         await expect(constructor.notifyByEnum(Notifications.createdCriteria).last()).toBeVisible();

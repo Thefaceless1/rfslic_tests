@@ -3,6 +3,9 @@ import {Locator, Page} from "@playwright/test";
 import {ConstructorNewPage} from "./constructor-new.page.js";
 import {Elements} from "../../framework/elements/elements.js";
 import {Pages} from "../helpers/enums/pages.js";
+import {Columns} from "../helpers/enums/columns.js";
+import {Input} from "../../framework/elements/input.js";
+import {InputData} from "../helpers/input-data.js";
 
 export class RequestNewPage extends BasePage {
     public prolicenseName : string
@@ -30,7 +33,11 @@ export class RequestNewPage extends BasePage {
     /**
      * Выпадающий список значений поля "Выберите клуб"
      */
-    private selectClubList : Locator = Elements.getElement(this.page,"//*[contains(@class,'club__option')]")
+    private selectClubList : Locator = Elements.getElement(this.page,"//*[contains(@class,'club__option')]");
+    /**
+     * Заголовок страницы "Заявка на лицензирование клуба"
+     */
+    public requestTitle : Locator = Elements.getElement(this.page,"//*[text()='Заявка на лицензирование клуба']");
     /**
      * Выбрать клуб из выпадающего списка значений
      */
@@ -54,11 +61,11 @@ export class RequestNewPage extends BasePage {
         this.prolicenseName = await constructor.createdProlicName.innerText();
     }
     /**
-     * Установить в таблице фильтр по наименованию созданной пролицензии
+     * Установить в таблице фильтр по заданному столбцу
      */
-    public async filterByProlicName() : Promise<void> {
-        await this.prolicFilterButton.click();
-        await this.prolicNameSearchInput.type(this.prolicenseName);
+    public async filterByColumn(column : Locator) : Promise<void> {
+        await column.click();
+        await this.searchInput.type(this.prolicenseName);
         await this.searchButton.click();
     }
     /**
@@ -86,8 +93,18 @@ export class RequestNewPage extends BasePage {
     public async createTestLic() : Promise<void> {
         await this.goto(Pages.requestNewPage);
         await this.chooseClub();
-        await this.filterByProlicName();
+        await this.filterByColumn(this.filterButtonByEnum(Columns.licName));
         await this.createDraft();
         await this.publishLic();
+    }
+    /**
+     * Добавить файлы и комментарии для документов лицензии
+     */
+    protected async fillDocsAndComment () : Promise<void> {
+        await Input.uploadFiles(this.templates.first());
+        await Elements.waitForVisible(this.docIcon);
+        await Elements.waitForVisible(this.xlsxIcon);
+        await this.comment.type(InputData.randomWord);
+        await this.addButton.click();
     }
 }

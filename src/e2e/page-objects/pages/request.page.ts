@@ -6,6 +6,8 @@ import {SearchModalPage} from "./search-modal.page.js";
 import {InputData} from "../helpers/input-data.js";
 import {randomInt} from "crypto";
 import {Pages} from "../helpers/enums/pages.js";
+import {LicStatus} from "../helpers/enums/licstatus.js";
+import {Columns} from "../helpers/enums/columns.js";
 
 export class RequestPage extends RequestNewPage {
     constructor(page : Page) {
@@ -52,6 +54,32 @@ export class RequestPage extends RequestNewPage {
      */
     private reviewComment : Locator = Elements.getElement(this.page,"//textarea[@name='reviewComment']");
     /**
+     * Поле "Принятие решения по лицензии"
+     */
+    private selectLicStatus : Locator = Elements.getElement(this.page,"//*[contains(@class,'requestState__control')]");
+    /**
+     * Кнопка "Подтвердить"
+     */
+    private submitButton : Locator = Elements.getElement(this.page,"//button[text()='Подтвердить']");
+    /**
+     * Поле "Вывод"
+     */
+    private conclusion : Locator = Elements.getElement(this.page,"//textarea[@name='conclusion']");
+    /**
+     * Поле "Рекомендации"
+     */
+    private recommendation : Locator = Elements.getElement(this.page,"//textarea[@name='recommendation']");
+    /**
+     * Кнопка "Сформировать отчет эксперта"
+     */
+    private createReport : Locator = Elements.getElement(this.page,"//button[text()='Сформировать отчет эксперта']");
+    /**
+     * Получить значение выпадающего списка поля 'Принятие решения по лицензии' по enum
+     */
+    private licStatusByEnum(statusValue : LicStatus ) : Locator {
+        return Elements.getElement(this.page,`//*[contains(@class,'requestState__option') and text()='${statusValue}']`);
+    }
+    /**
      * Получение ячейки с наименованием пролицензии в таблице по наименованию пролицензии
      */
     private licenseRow(prolicName : string) : Locator {
@@ -68,7 +96,7 @@ export class RequestPage extends RequestNewPage {
      */
     public async openPublishedLic() : Promise<void> {
         await this.goto(Pages.requestPage);
-        await this.filterByProlicName();
+        await this.filterByColumn(this.filterButtonByEnum(Columns.licName));
         await this.licenseRow(this.prolicenseName).click();
     }
     /**
@@ -156,7 +184,7 @@ export class RequestPage extends RequestNewPage {
     /**
      * Добавить комментарии и проставить статусы документам
      */
-    public async addStatusAndComment () : Promise<void> {
+    public async addExpertInfo () : Promise<void> {
         await this.sectionByEnum(RequestSections.generalInfo).click();
         let docsCount : number = await this.checkButton.count();
         await this.fillStatusAndComment(docsCount);
@@ -168,6 +196,7 @@ export class RequestPage extends RequestNewPage {
             await Elements.waitForVisible(this.checkButton.last());
             docsCount = await this.checkButton.count();
             await this.fillStatusAndComment(docsCount);
+            await this.fillExpertSolution();
         }
     }
     /**
@@ -177,5 +206,24 @@ export class RequestPage extends RequestNewPage {
         const selectedStatusText : string = await this.selectedStatus.nth(statusNumb).innerText();
         const nearDocStatusText : string = await this.statusNearDoc.nth(statusNumb).innerText();
         if (selectedStatusText.toLowerCase() != nearDocStatusText.toLowerCase()) await this.waitForDisplayStatus(statusNumb);
+    }
+    /**
+     * Принятие решения по заявке
+     */
+    public async chooseLicStatus () : Promise<void> {
+        await this.sectionByEnum(RequestSections.commissions).click()
+        await this.selectLicStatus.click();
+        await Elements.waitForVisible(this.licStatusByEnum(LicStatus.issued));
+        await this.licStatusByEnum(LicStatus.issued).click();
+        await this.submitButton.click();
+    }
+    /**
+     * Добавление отчета эксперта
+     */
+    private async fillExpertSolution() : Promise<void> {
+        await this.conclusion.type(InputData.randomWord);
+        await this.recommendation.type(InputData.randomWord);
+        await this.createReport.click();
+        await Elements.waitForVisible(this.createReport);
     }
 }

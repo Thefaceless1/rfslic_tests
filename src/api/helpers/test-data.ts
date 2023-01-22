@@ -64,6 +64,9 @@ export class TestData {
     public static randomIntForDocs (docTypes : TDocTypes[]) : number {
         return randomInt(0,docTypes.length);
     }
+    /**
+     * Получение случайного числа для статуса документа заявки
+     */
     public static randomIntForDocStat (docStatus : TLicAndDocStatus[]) : number {
         return randomInt(0,docStatus.length);
     }

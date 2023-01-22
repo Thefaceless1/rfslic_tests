@@ -12,9 +12,10 @@ export class License {
      * Создание заявки на получение лицензии
      */
     public createLicense (prolicense : TProlicense[]) : TCreateLicense {
+        const firstClubId : number = this.catalogs.organization[0].id;
         return {
             proLicId : prolicense[0].id as number,
-            clubId : 0
+            clubId : firstClubId
         }
     }
     /**

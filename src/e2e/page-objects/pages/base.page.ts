@@ -4,6 +4,7 @@ import {Elements} from "../../framework/elements/elements.js";
 import {Notifications} from "../helpers/enums/notifications.js";
 import {Input} from "../../framework/elements/input.js";
 import {InputData} from "../helpers/input-data.js";
+import {Columns} from "../helpers/enums/columns.js";
 
 export class BasePage extends PlaywrightDevPage{
     constructor(page : Page) {
@@ -52,11 +53,7 @@ export class BasePage extends PlaywrightDevPage{
     /**
      * Поле ввода значения в фильтре поля "Название пролицензии"
      */
-    protected prolicNameSearchInput : Locator = Elements.getElement(this.page,"//input[contains(@class,'Table_filterElement')]");
-    /**
-     * Кнопки "Фильтр" в поле "Наименование"(пролицензии)
-     */
-    protected prolicFilterButton : Locator = Elements.getElement(this.page,"//span[contains(text(),'Название')]//following-sibling::span");
+    protected searchInput : Locator = Elements.getElement(this.page,"//input[contains(@class,'Table_filterElement')]");
     /**
      * Кнопка "Найти" в фильтре столбца таблицы
      */
@@ -75,11 +72,10 @@ export class BasePage extends PlaywrightDevPage{
     public notifyByEnum (enumValue : Notifications) : Locator {
         return this.notifications.filter({hasText : enumValue});
     }
-    protected async fillDocsAndComment () : Promise<void> {
-        await Input.uploadFiles(this.templates.first());
-        await Elements.waitForVisible(this.docIcon);
-        await Elements.waitForVisible(this.xlsxIcon);
-        await this.comment.type(InputData.randomWord);
-        await this.addButton.click();
+    /**
+     * Получить кнопку "Фильтр" по названию столбца таблиц
+     */
+    public filterButtonByEnum(columnValue : Columns) : Locator {
+        return Elements.getElement(this.page,`//span[contains(text(),'${columnValue}')]//following-sibling::span`);
     }
 }
