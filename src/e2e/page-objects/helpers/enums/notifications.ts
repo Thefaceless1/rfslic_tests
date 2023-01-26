@@ -15,5 +15,7 @@ export enum Notifications {
     saved = "Сохранено",
     addedDocs = "Документы добавлены",
     licStatusSelected = "Решение по заявке принято",
-    reportCreated = "Отчет сформирован"
+    reportCreated = "Отчет сформирован",
+    roleSaved = "Роль сохранена с выбранными правами",
+    roleRightsChanged = "Права изменены"
 }

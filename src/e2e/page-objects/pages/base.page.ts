@@ -2,8 +2,6 @@ import {PlaywrightDevPage} from "../../framework/helpers/playwright-dev-page.js"
 import {Locator, Page} from "@playwright/test";
 import {Elements} from "../../framework/elements/elements.js";
 import {Notifications} from "../helpers/enums/notifications.js";
-import {Input} from "../../framework/elements/input.js";
-import {InputData} from "../helpers/input-data.js";
 import {Columns} from "../helpers/enums/columns.js";
 
 export class BasePage extends PlaywrightDevPage{
@@ -18,6 +16,10 @@ export class BasePage extends PlaywrightDevPage{
      * Кнопка "Сохранить"
      */
     protected saveButton = Elements.getElement(this.page,"//button[text()='Сохранить']");
+    /**
+     * Кнопка "Удалить"
+     */
+    protected deleteButton = Elements.getElement(this.page,"//button[text()='Удалить']");
     /**
      * Кнопка "Отменить"
      */
@@ -66,6 +68,14 @@ export class BasePage extends PlaywrightDevPage{
      * Кнопка "Добавить"
      */
     protected addButton : Locator = Elements.getElement(this.page,"//button[text()='Добавить']");
+    /**
+     * Чекбоксы
+     */
+    public checkbox : Locator = Elements.getElement(this.page,"//input[@type='checkbox']");
+    /**
+     * Кнопка поиска для вызова модального окна выбора сотрудников клуба, организаций, офи
+     */
+    protected searchDataButton : Locator = Elements.getElement(this.page,"//button//span[contains(@class,'IconSearch')]");
     /**
      * Получение уведомления по enum
      */

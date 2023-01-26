@@ -9,13 +9,7 @@ export class SearchModalPage extends BasePage {
     /**
      * Кнопка поиска на модальном окне поиска сотрудников клуба, организаций, офи
      */
-    public searchModalButton : Locator = Elements.getElement(this.page,"//button[contains(@class,'SearchModal_searchBtn')]");
-
-    /**
-     * Чекбоксы строк таблицы найденных значений на модальном окне поиска сотрудников клуба, организаций, офи
-     */
-    public checkboxTable : Locator = Elements.getElement(this.page,"//input[@type='checkbox']");
-
+    public findButton : Locator = Elements.getElement(this.page,"//button[contains(@class,'SearchModal_searchBtn')]");
     /**
      * Кнопка "Выбрать" на модальном окне поиска сотрудников клуба, организаций, офи
      */

@@ -1,3 +1,4 @@
 export enum Columns {
-    licName = "Название"
+    licName = "Название",
+    status = "Статус"
 }

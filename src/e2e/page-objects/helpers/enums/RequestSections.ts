@@ -1,5 +1,6 @@
 export enum RequestSections  {
     generalInfo = "Общая информация",
     criterias = "Критерии",
-    commissions = "Комиссии"
+    commissions = "Комиссии",
+    actionHistory = "История действий"
 }

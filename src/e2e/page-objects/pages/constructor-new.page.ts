@@ -47,10 +47,6 @@ export class ConstructorNewPage extends ConstructorPage {
      */
     private  actionButton : Locator = Elements.getElement(this.page,"//button[.//span[contains(@class,'IconMeatball')]]");
     /**
-     * Кнопка "Удалить"
-     */
-    private deleteButton : Locator = Elements.getElement(this.page,"//button[text()='Удалить']");
-    /**
      * Кнопка "Добавить группу критериев"
      */
     private addGrpCritButton : Locator = Elements.getElement(this.page,"//button[contains(@class,'CriteriasMain_add_btn')]");
@@ -134,7 +130,7 @@ export class ConstructorNewPage extends ConstructorPage {
      * Перейти к списку созданных пролицензий и нажать "Создать пролицензию"
      */
     public async openConstructor () : Promise<void> {
-        await this.clickOnMenuOption(MainMenuOptions.constructor);
+        await this.menuOptionByEnum(MainMenuOptions.constructor).click();
         await this.createProlicButton.click();
     }
     /**
@@ -251,7 +247,7 @@ export class ConstructorNewPage extends ConstructorPage {
             }
             await this.saveButton.click();
         }
-        while (groupsCount > 5);
+        while (groupsCount > 3);
     }
     /**
      * Заполнение полей критерия

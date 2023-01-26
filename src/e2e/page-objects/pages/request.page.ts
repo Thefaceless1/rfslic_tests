@@ -18,17 +18,13 @@ export class RequestPage extends RequestNewPage {
      */
     private criteriaGroups : Locator = Elements.getElement(this.page,"//button[contains(text(),'критерии')]");
     /**
-     * Кнопка поиска для вызова модального окна выбора сотрудников клуба, организаций, офи
-     */
-    private searchDataButton : Locator = Elements.getElement(this.page,"//button//span[contains(@class,'IconSearch')]");
-    /**
      * Список выбранных сотрудников клуба или ОФИ или организаций
      */
     private selectedData : Locator = Elements.getElement(this.page,"//*[contains(@class,'multi-value__label')]");
     /**
      * Поле с информацией о критерии
      */
-    private criteriaInfo : Locator = Elements.getElement(this.page,"//span[contains(@class,'CriteriaInfo_collapse_title')]");
+    private criteriaInfo : Locator = Elements.getElement(this.page,"//span[contains(@class,'CriteriasInfoItem_collapse_title')]");
     /**
      * Кнопка подтверждения статуса документа
      */
@@ -137,9 +133,9 @@ export class RequestPage extends RequestNewPage {
     private async fillSearchModalData () : Promise<void> {
         const searchModal = new SearchModalPage(this.page);
         await this.searchDataButton.click();
-        await searchModal.searchModalButton.click();
+        await searchModal.findButton.click();
         await Elements.waitForHidden(searchModal.loadIndicator);
-        await searchModal.checkboxTable.nth(1).check();
+        await this.checkbox.nth(1).check();
         await searchModal.selectButton.click();
         await Elements.waitForVisible(this.selectedData);
         await this.saveButton.click();
