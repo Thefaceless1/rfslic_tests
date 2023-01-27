@@ -8,14 +8,6 @@ export class RolesPage extends MainPage {
         super(page);
     }
     /**
-     * Поле "Выберите роль"
-     */
-    private selectRole : Locator = Elements.getElement(this.page,"//*[contains(@class,'role__control')]");
-    /**
-     * Значения выпадающего списка поля "Выберите роль"
-     */
-    private rolesList : Locator = Elements.getElement(this.page,"//*[contains(@class,'role__option')]");
-    /**
      * Кнопка "Сохранить как"
      */
     private saveAsButton : Locator = Elements.getElement(this.page,"//button[text()='Сохранить как...']");
@@ -42,16 +34,6 @@ export class RolesPage extends MainPage {
         await this.roleDescription.clear()
         await this.roleDescription.type(InputData.randomWord);
         await this.saveButton.last().click();
-    }
-    /**
-     * Изменение прав роли
-     */
-    public async changeRoleRights() : Promise<void> {
-        const checkboxCount : number = await this.checkbox.count()-1;
-        for(let i = 1; i<checkboxCount;i++) {
-            if(i%2 == 0) await this.checkbox.nth(i).click();
-        }
-        await this.saveButton.click();
     }
     /**
      * Удаление роли

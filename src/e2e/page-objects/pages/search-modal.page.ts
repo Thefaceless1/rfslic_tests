@@ -18,4 +18,8 @@ export class SearchModalPage extends BasePage {
      * Индикатор ожидания получения записей таблицы
      */
     public loadIndicator : Locator = Elements.getElement(this.page,"//span[contains(@class,'ant-spin-dot-spin')]");
+    /**
+     * Радиобаттоны таблицы с найденными значениями
+     */
+    public radio : Locator = Elements.getElement(this.page,"//input[@type='radio']");
 }

@@ -17,5 +17,9 @@ export enum Notifications {
     licStatusSelected = "Решение по заявке принято",
     reportCreated = "Отчет сформирован",
     roleSaved = "Роль сохранена с выбранными правами",
-    roleRightsChanged = "Права изменены"
+    roleRightsChanged = "Права изменены",
+    userAdded = "Пользователь добавлен",
+    userRightsChanged = "Права пользователя изменены",
+    userRoleChanged = "Роль пользователя изменена",
+    userGrpCritChanged = "Группы критериев пользователя изменены"
 }

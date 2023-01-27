@@ -9,6 +9,14 @@ export class BasePage extends PlaywrightDevPage{
         super(page);
     }
     /**
+     * Поле "Выберите роль"
+     */
+    protected selectRole : Locator = Elements.getElement(this.page,"//*[contains(@class,'role__control')]");
+    /**
+     * Значения выпадающего списка поля "Выберите роль"
+     */
+    protected rolesList : Locator = Elements.getElement(this.page,"//*[contains(@class,'role__option')]");
+    /**
      * Кнопка "Добавить" (+)
      */
     protected plusButton : Locator = Elements.getElement(this.page,"//button[contains(@class,'Button_view_secondary')][.//span[contains(@class,'IconAdd')]]");
@@ -87,5 +95,16 @@ export class BasePage extends PlaywrightDevPage{
      */
     public filterButtonByEnum(columnValue : Columns) : Locator {
         return Elements.getElement(this.page,`//span[contains(text(),'${columnValue}')]//following-sibling::span`);
+    }
+    /**
+     * Изменение прав роли
+     */
+    public async changeRoleRights() : Promise<void> {
+        await Elements.waitForVisible(this.checkbox.first());
+        const checkboxCount : number = await this.checkbox.count()-1;
+        for(let i = 1; i<checkboxCount;i++) {
+            if(i%2 == 0) await this.checkbox.nth(i).click();
+        }
+        await this.saveButton.click();
     }
 }
