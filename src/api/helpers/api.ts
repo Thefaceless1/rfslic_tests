@@ -66,6 +66,7 @@ export class Api {
     public fillLicenseApi (licenseId : number) : void {
             this.request.changeLicense = `/api/rest/licenses/${licenseId}`;
             this.request.publishLicense = `${this.request.changeLicense}/publish`;
+            this.request.createExpertReport = `${this.request.changeLicense}/groupReport/generate`;
     }
 }
 export type TConstructor = {
@@ -94,7 +95,8 @@ export type TRequest = {
     docStatus : string,
     createLicense : string,
     changeLicense? : string,
-    publishLicense? : string
+    publishLicense? : string,
+    createExpertReport? : string
 }
 export type TUser = {
     clubWorkers : string,

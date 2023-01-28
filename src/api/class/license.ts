@@ -72,7 +72,7 @@ export class License {
     /**
      * Добавление для документов критериев :
      * 1. Комментарии
-     * 2. Если Тип документа = Файл или Документ клуба, то добавляем файлы
+     * 2. Если Тип документа != Cписок участников, ОФИ, Организация, то добавляем файлы
      * 3. Если Тип документа = Список участников, то добавляем участников
      * 4. Если тип документа = ОФИ, то добавляем офи
      * 5. Если тип документа = Организация, то добавляем организации
@@ -82,10 +82,12 @@ export class License {
             critGrp.criterias.forEach((criterias) => {
                 criterias.documents.forEach((documents) => {
                     documents.comment = TestData.commentValue;
-                    documents.files = (documents.docTypeId <= 2 || documents.docTypeId == 8) ? TestData.files : [];
-                    if (documents.docTypeId == 5) documents.externalIds = this.catalogs.clubWorkersId;
-                    if (documents.docTypeId == 6) documents.externalIds = this.catalogs.ofiId;
-                    if (documents.docTypeId == 9) documents.externalIds = this.catalogs.orgId;
+                    switch (documents.docTypeId) {
+                        case 5 : documents.externalIds = this.catalogs.clubWorkersId; break;
+                        case 6 : documents.externalIds = this.catalogs.ofiId; break;
+                        case 9 : documents.externalIds = this.catalogs.orgId; break;
+                        default : documents.files = TestData.files;
+                    }
                 })
             })
         })
@@ -145,7 +147,47 @@ export class License {
         this.license[0].state = this.catalogs.issuedLicStatus.name;
         return this.license[0];
     }
+    /**
+     * Добавление отчета эксперта для групп критериев
+     */
+    public addExpertReport(grpId : number) : TExpertReport {
+        return {
+            groupId : grpId,
+            conclusion : TestData.commentValue,
+            recommendation : TestData.commentValue
+        }
+    }
+    /**
+     * Добавление участников и ОФИ для критериев с типами Участник и ОФИ
+     */
+    public addOfiAndUsers() : TLicense {
+        this.license[0].criteriaGroups.forEach(critGrp => {
+            critGrp.criterias[1].externalId = this.catalogs.clubWorkersId[0];
+            critGrp.criterias[2].externalId = this.catalogs.ofiId[0];
+            const iterationCount : number = 5;
+            critGrp.criterias[iterationCount+1] = critGrp.criterias[2];
+            for(let i=1; i<iterationCount; i++) {
+                let newUser = {...critGrp.criterias[1]};
+                let newOfi = {...critGrp.criterias[iterationCount+1]};
+                const docCount : number = newUser.documents.length;
+                for(let i = 0; i<docCount; i++) {
+                    delete newUser.documents[i].id;
+                    delete newOfi.documents[i].id
+                }
+                delete newUser.id;
+                delete newOfi.id;
+                newUser.orderNum = i;
+                newOfi.orderNum = i;
+                newUser.externalId = this.catalogs.clubWorkersId[i];
+                newOfi.externalId = this.catalogs.ofiId[i];
+                critGrp.criterias[i+1] = newUser;
+                critGrp.criterias.push(newOfi);
+            }
+        })
+        return this.license[0];
+    }
 }
+
 export type TCreateLicense = {
     proLicId : number,
     clubId : number
@@ -196,6 +238,10 @@ export type TLicense = {
         percent : number,
         stateId : number,
         state : string,
+        conclusion : string,
+        recommendation : string,
+        reportName : string,
+        reportStorageId : string,
         experts : number[],
         rfuExpertChoice : number[],
         rfuExpert : number,
@@ -205,7 +251,7 @@ export type TLicense = {
             rfuExpert : TClubWorkers
         }
         criterias : {
-            id: number,
+            id?: number,
             proCritId: number,
             number: string,
             categoryId: number,
@@ -223,7 +269,7 @@ export type TLicense = {
             stateId: number,
             state: string,
             documents: {
-                id: number,
+                id?: number,
                 proDocId: number,
                 name: string,
                 docTypeId: number,
@@ -246,5 +292,10 @@ export type TLicense = {
             }[]
         }[]
     }[]
+}
+export type TExpertReport = {
+    groupId: number,
+    conclusion: string,
+    recommendation: string
 }
 

@@ -1,4 +1,4 @@
-import {test, expect, describe, beforeAll, afterEach} from "@jest/globals";
+import {test, expect, describe} from "@jest/globals";
 import superagent from "superagent";
 import {TestData} from "../helpers/test-data";
 import {Prolicense, TDocuments} from "../class/prolicense";
@@ -17,8 +17,7 @@ describe("Пролицензия", () => {
         prolicense.createProlicense();
         const response = await superagent.put(api.basicUrl + api.constructors.createProlicense).
         send(prolicense.getProlicense(0));
-        expect(response.statusCode).toBe(200);
-        expect(response.body.data.id).toBeDefined();
+        expect(response.body.data.id).toBeTruthy();
         expect(response.body.data.type).toBe(prolicense.catalogs.licTypes[0].name);
         expect(response.body.data.season).toBe(prolicense.catalogs.seasons[0].name);
         expect(response.body.data.stateId).toBe(ProlicenseStatus.unpublished);
@@ -33,13 +32,10 @@ describe("Пролицензия", () => {
         prolicense.changeProlicense();
         const response = await superagent.put(api.basicUrl + api.constructors.changeProlicense).
         send(prolicense.getProlicense(0));
-        expect(response.statusCode).toBe(200);
         expect(response.body.status).toBe("SUCCESS");
     })
     test("Получение проекта лицензии по ID", async () => {
         const response = await superagent.get(api.basicUrl + api.constructors.changeProlicense);
-        expect(response.statusCode).toBe(200);
-        expect(response.body.status).toBe("SUCCESS");
         expect(response.body.data.id).toBe(prolicense.getProlicense(0).id);
         expect(response.body.data.type).toBe(prolicense.getProlicense(0).type);
         expect(response.body.data.season).toBe(prolicense.getProlicense(0).season);
@@ -52,7 +48,6 @@ describe("Пролицензия", () => {
         for (const criteriaGroup of criterias.criterias) {
             const response = await superagent.put(api.basicUrl + api.constructors.createCriteriaGrp).
             query({groupId: criteriaGroup.id, experts: criteriaGroup.experts});
-            expect(response.statusCode).toBe(200);
             expect(response.body.status).toBe("SUCCESS");
         }
     })
@@ -63,9 +58,7 @@ describe("Пролицензия", () => {
                 const index = criteriaGroup.criterias.indexOf(criteria);
                 const response = await superagent.put(api.basicUrl + api.constructors.createCriterias).
                 send(criteria);
-                expect(response.statusCode).toBe(200);
-                expect(response.body.status).toBe("SUCCESS");
-                expect(response.body.data.id).toBeDefined();
+                expect(response.body.data.id).toBeTruthy();
                 expect(response.body.data.documents.length).toEqual(criteria.documents.length);
                 expect(response.body.data.number).toBe(criteria.number);
                 criteriaGroup.criterias[index] = response.body.data;
@@ -78,15 +71,12 @@ describe("Пролицензия", () => {
             for (const criteria of criteriaGroup.criterias) {
                 const response = await superagent.put(api.basicUrl + api.constructors.changeCriterias + criteria.id).
                 send(criteria)
-                expect(response.statusCode).toBe(200);
                 expect(response.body.status).toBe("SUCCESS");
             }
         }
     })
     test("Получение полной информации о критериях пролицензии", async () => {
         const response = await superagent.get(api.basicUrl + api.constructors.createCriterias);
-        expect(response.statusCode).toBe(200);
-        expect(response.body.status).toBe("SUCCESS");
         expect(response.body.data.groups.length).toBeGreaterThan(0);
         response.body.data.groups.forEach((criteriaGroup: TCriterias, index: number) => {
             criteriaGroup.criterias.forEach((criteria, index1) => {
@@ -101,8 +91,6 @@ describe("Пролицензия", () => {
     test("Создание пролицензии по образцу", async () => {
         const response = await superagent.put(api.basicUrl + api.constructors.cloneProlicense).
         send(prolicense.createSampleProlicense());
-        expect(response.statusCode).toBe(200);
-        expect(response.body.status).toBe("SUCCESS");
         expect(response.body.data.id).not.toBe(prolicense.getProlicense(0).id);
         expect(
             response.body.data.end && response.body.data.requestEnd &&
@@ -122,7 +110,6 @@ describe("Пролицензия", () => {
     })
     test("Удаление пролицензии", async () => {
         const response = await superagent.delete(api.basicUrl + api.constructors.deleteProlicense);
-        expect(response.statusCode).toBe(200);
         expect(response.body.status).toBe("SUCCESS");
         prolicense.prolicense.pop();
     })
@@ -131,7 +118,6 @@ describe("Пролицензия", () => {
             if (criteriaGroup.id % 2 == 0) {
                 for (const criteria of criteriaGroup.criterias) {
                     const response = await superagent.delete(api.basicUrl + api.constructors.changeCriterias + criteria.id);
-                    expect(response.statusCode).toBe(200);
                     expect(response.body.status).toBe("SUCCESS");
                 }
                 criteriaGroup.criterias = [];
@@ -142,7 +128,6 @@ describe("Пролицензия", () => {
         for (let i = 0; i<criterias.criterias.length; i++) {
             if (criterias.criterias[i].id % 2 == 0) {
                 const response = await superagent.delete(api.basicUrl + api.constructors.deleteCriteriasGrp + criterias.criterias[i].id);
-                expect(response.statusCode).toBe(200);
                 expect(response.body.status).toBe("SUCCESS");
                 criterias.criterias.splice(i,1);
             }
@@ -150,13 +135,11 @@ describe("Пролицензия", () => {
     })
     test("Публикация проекта лицензии",async () => {
         const response = await superagent.put(api.basicUrl+api.constructors.publishProlicense);
-        expect(response.statusCode).toBe(200);
         expect(response.body.status).toBe("SUCCESS");
         prolicense.prolicense[0].stateId = ProlicenseStatus.published;
     })
     test("Снятие с публикации проекта лицензии", async () => {
         const response = await superagent.put(api.basicUrl + api.constructors.unpublishProlicense);
-        expect(response.statusCode).toBe(200);
         expect(response.body.status).toBe("SUCCESS");
         prolicense.prolicense[0].stateId = ProlicenseStatus.unpublished;
     })

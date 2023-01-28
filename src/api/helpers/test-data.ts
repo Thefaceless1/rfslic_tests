@@ -55,8 +55,7 @@ export class TestData {
      * Получение случайного числа для поля Минимальное количество
      */
     public static get randomIntForMulti () : number {
-        const randomNumb : number = randomInt(-1,6);
-        return (randomNumb >- 1 && randomNumb <= 1) ? this.randomIntForMulti : randomNumb;
+        return randomInt(2,10);
     }
     /**
      * Получение случайного числа для Типа документа пролицензии

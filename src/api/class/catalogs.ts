@@ -56,10 +56,14 @@ export class Catalogs {
         return this.critGrpExperts.map(value => value.id);
     }
     /**
-     * id всех возможных типов документов для типа критерия : Документы
+     * Получить id всех возможных типов документов в зависимости от типа критерия
      */
-    public get docTypesForCrit () : TDocTypes[] {
-        return this.docTypes.filter(value => (value.id != 3 && value.id != 4 && value.id != 7 && value.id != 10));
+    public docTypesForCrit (criteriaType : TCriteriaTypes) : TDocTypes[] {
+        switch (criteriaType.name) {
+            case "Документы" : return this.docTypes.filter(value => (value.id != 3 && value.id != 4 && value.id != 7 && value.id != 10));
+            case "Участник" : return this.docTypes.filter(value => (value.id <= 3));
+            default : return this.docTypes.filter(value => (value.id <= 2 || value.id == 10));
+        }
     }
     /**
      * id всех записей свойства ofi
@@ -77,7 +81,7 @@ export class Catalogs {
      * Получение объекта со статусом заявки "Выдана"
      */
     public get issuedLicStatus () : TLicAndDocStatus {
-        return this.licStatus.find(value => value.name == 'выдана')!;
+        return this.licStatus.find(value => value.name == 'Выдана')!;
     }
     /**
      * Получаем данные из справочников и записываем их в свойства объектов класса

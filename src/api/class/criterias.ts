@@ -29,19 +29,17 @@ export class Criterias {
         })
     }
     /**
-     * Создание критериев
+     * Создание критериев и документов критериев
      */
     public createCriterias () : void {
         this.criterias.forEach((criteriaGroup) => {
-                this.catalogs.criteriaTypes.forEach((criteria) => {
-                const randomDocNumber : number = TestData.randomIntForDocs(this.catalogs.docTypesForCrit);
-                        const docArray = [...new Array(3)].fill(
-                            {
-                            name: TestData.randomWord,
-                            docTypeId: this.catalogs.docTypesForCrit[randomDocNumber].id,
-                            templates: (randomDocNumber >= 2 && randomDocNumber !=4) ? [] : TestData.files
-                        }
-                        )
+            this.catalogs.criteriaTypes.forEach((criteriaType,index) => {
+                const randomDocNumber : number = TestData.randomIntForDocs(this.catalogs.docTypesForCrit(criteriaType));
+                const docArray = [...new Array(3)].fill({
+                        name: TestData.randomWord,
+                        docTypeId: this.catalogs.docTypesForCrit(criteriaType)[randomDocNumber].id,
+                        templates: (randomDocNumber != 5 && randomDocNumber != 6 && randomDocNumber != 9) ? TestData.files : []
+                    })
                 criteriaGroup.criterias.push(
                     {
                         groupId: criteriaGroup.id,
@@ -49,15 +47,14 @@ export class Criterias {
                         categoryId: this.catalogs.rankCriteria[0].id,
                         name: TestData.randomWord,
                         description: TestData.descValue,
-                        isMulti: null,
-                        typeId: this.catalogs.criteriaTypes[0].id,
+                        isMulti: (criteriaType.name == "Документы") ? null : TestData.randomIntForMulti,
+                        typeId: this.catalogs.criteriaTypes[index].id,
                         docSubmitDate: TestData.futureDate,
                         reviewDate: TestData.futureDate,
                         documents: docArray
                     }
                 )
-            }
-            )
+            })
         }
         )
     }
@@ -66,22 +63,13 @@ export class Criterias {
      * 1. Номер критерия
      * 2. Наименование
      * 3. Разряд
-     * 4. Добавление документа
      */
     public changeCriterias () : void {
         this.criterias.forEach((criteriaGroup) => {
             criteriaGroup.criterias.forEach((criteria) => {
-                const randomDocNumber : number = TestData.randomIntForDocs(this.catalogs.docTypesForCrit);
                 criteria.number = TestData.randomWord;
                 criteria.name = TestData.randomWord;
                 criteria.categoryId = this.catalogs.rankCriteria[1].id;
-                criteria.documents.push(
-                    {
-                    name: TestData.randomWord,
-                    docTypeId: this.catalogs.docTypesForCrit[randomDocNumber].id,
-                    templates: (randomDocNumber >= 2 && randomDocNumber !=4) ? [] : TestData.files
-                }
-                )
             })
         })
     }

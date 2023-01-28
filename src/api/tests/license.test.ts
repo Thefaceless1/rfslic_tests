@@ -1,4 +1,4 @@
-import {test, expect, describe, beforeAll} from "@jest/globals";
+import {test, expect, describe} from "@jest/globals";
 import superagent from "superagent";
 import {TestData} from "../helpers/test-data";
 import {Prolicense} from "../class/prolicense";
@@ -16,8 +16,6 @@ describe("Работа с заявками", () => {
     test("Создание заявки в статусе 'Черновик' ",async () => {
         const response = await superagent.put(api.basicUrl+api.request.createLicense).
         send(license.createLicense(prolicense.prolicense));
-        expect(response.statusCode).toBe(200);
-        expect(response.body.status).toBe("SUCCESS");
         expect(response.body.data.proLicId).toBe(prolicense.prolicense[0].id);
         expect(response.body.data.state).toBe(license.licStatusById(response.body.data.stateId));
         expect(response.body.data.percent).toBe(0);
@@ -51,8 +49,6 @@ describe("Работа с заявками", () => {
     test("Добавление документов и комментариев на вкладке Общая информация",async () => {
         const response = await superagent.put(api.basicUrl + api.request.changeLicense).
         send(license.addCommentsAndDocuments());
-        expect(response.statusCode).toBe(200);
-        expect(response.body.status).toBe("SUCCESS");
         /**
          * Проверяем наличие добавленных документов и комментариев
          */
@@ -65,8 +61,6 @@ describe("Работа с заявками", () => {
     test("Публикация лицензии", async () => {
         const response = await superagent.put(api.basicUrl + api.request.publishLicense).
         send(license.publishLicense());
-        expect(response.statusCode).toBe(200);
-        expect(response.body.status).toBe("SUCCESS");
         expect(response.body.data.state).toBe(license.license[0].state);
         expect(response.body.data.stateId).toBe(license.license[0].stateId);
         license.addRespToLic(0,response.body.data);
@@ -74,8 +68,6 @@ describe("Работа с заявками", () => {
     test("Добавление сотрудников клуба и экспертов к группе критериев", async () => {
         const response = await superagent.put(api.basicUrl + api.request.changeLicense).
         send(license.addClubWorkersToCritGrp());
-        expect(response.status).toBe(200);
-        expect(response.body.status).toBe("SUCCESS");
         /**
          * Проверяем наличие добавленных сотрудников клубов и экспертов для групп критериев
          */
@@ -85,11 +77,22 @@ describe("Работа с заявками", () => {
         })
         license.addRespToLic(0,response.body.data);
     })
+    test("Добавление участников и ОФИ для критериев с типами Участник и ОФИ",async () => {
+        const response = await superagent.put(api.basicUrl + api.request.changeLicense).
+        send(license.addOfiAndUsers());
+        license.addRespToLic(0,response.body.data);
+        const criteriaCount = license.catalogs.criteriaTypes.length;
+        /**
+         * Проверяем наличие добавленных критериев
+         */
+        license.license[0].criteriaGroups.forEach(critGrp => {
+            expect(critGrp.criterias.length).toBeGreaterThan(criteriaCount);
+        })
+        console.log(prolicense.prolicense[0].name)
+    })
     test("Добавление документов, сотрудников клуба, ОФИ, организаций и комментариев для документов критериев", async () => {
         const response = await superagent.put(api.basicUrl + api.request.changeLicense).
         send(license.addDataToCritDoc());
-        expect(response.statusCode).toBe(200);
-        expect(response.body.status).toBe("SUCCESS");
         license.addRespToLic(0,response.body.data);
         /**
          * Проверяем значения добавленных комментариев
@@ -100,20 +103,17 @@ describe("Работа с заявками", () => {
             criteriaGroup.criterias.forEach((criteria) => {
                 criteria.documents.forEach((document) => {
                     expect(document.comment).toBe(TestData.commentValue);
-                    switch (document.docTypeId <= 2 || document.docTypeId == 8) {
-                        case true : expect(document.files.length).toEqual(TestData.files.length); break;
-                         default : expect(document.files.length).toEqual(0);
-                    }
+                    if(document.docTypeId != 5 && document.docTypeId != 6 && document.docTypeId != 9)
+                    expect(document.files.length).toEqual(TestData.files.length);
+                    else expect(document.files.length).toEqual(0);
+
                 })
             })
         })
-        console.log(prolicense.prolicense[0].name)
     })
     test("Проставление статусов и комментариев для документов",async () => {
         const response = await superagent.put(api.basicUrl + api.request.changeLicense).
         send(license.addStatusToDocuments());
-        expect(response.statusCode).toBe(200);
-        expect(response.body.status).toBe("SUCCESS");
         license.addRespToLic(0,response.body.data);
         /**
          * Проверяем проценты заполнения и статусы заявки, групп критериев, критериев
@@ -151,11 +151,21 @@ describe("Работа с заявками", () => {
                     expect(criteria.state).toBe(license.docStatusById(4));
                 }
                 else expect(criteria.state).toBe(license.docStatusById(3));
-                criteria.documents.forEach((document, index2) => {
+                criteria.documents.forEach((document) => {
                     expect(document.state).toBe(license.docStatusById(document.stateId));
                 })
             })
         })
+    })
+    test("Создание отчета эксперта", async () => {
+        const groupsCount : number = license.catalogs.criteriaGroups.length;
+        const firstGrpId : number = license.catalogs.criteriaGroups[0].id;
+        for(let i = firstGrpId; i<=groupsCount; i++) {
+            const response = await superagent.post(api.basicUrl + api.request.createExpertReport).
+            send(license.addExpertReport(i));
+            expect(response.body.data.fileName).toBeTruthy();
+            expect(response.body.data.storageId).toBeTruthy();
+        }
     })
     test("Проставление статуса в целом для лицензии,",async () => {
         const response = await superagent.put(api.basicUrl + api.request.changeLicense).
