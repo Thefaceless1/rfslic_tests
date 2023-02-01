@@ -16,6 +16,7 @@ export class Prolicense {
         const docArray : TDocuments[] = [...Array(5)].fill(
             {
             name: TestData.randomWord,
+            description : TestData.descValue,
             docTypeId: this.catalogs.docTypes[0].id,
             templates: TestData.files
         }
@@ -51,6 +52,7 @@ export class Prolicense {
         this.prolicense[0].documents.push(
             {
             name: TestData.randomWord,
+            description : TestData.descValue,
             docTypeId: this.catalogs.docTypes[0].id,
             templates: TestData.files
         }
@@ -110,6 +112,7 @@ export type TProlicense = {
 export type TDocuments = {
     id?: number
     name: string,
+    description : string
     docTypeId: number,
     templates: {
         id?: number,

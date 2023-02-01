@@ -247,7 +247,7 @@ export class ConstructorNewPage extends ConstructorPage {
             }
             await this.saveButton.click();
         }
-        while (groupsCount > 3);
+        while (groupsCount > 5);
     }
     /**
      * Заполнение полей критерия

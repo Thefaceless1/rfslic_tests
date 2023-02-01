@@ -35,8 +35,9 @@ export class Criterias {
         this.criterias.forEach((criteriaGroup) => {
             this.catalogs.criteriaTypes.forEach((criteriaType,index) => {
                 const randomDocNumber : number = TestData.randomIntForDocs(this.catalogs.docTypesForCrit(criteriaType));
-                const docArray = [...new Array(3)].fill({
+                const docArray : TDocuments[] = [...new Array(3)].fill({
                         name: TestData.randomWord,
+                        description : TestData.descValue,
                         docTypeId: this.catalogs.docTypesForCrit(criteriaType)[randomDocNumber].id,
                         templates: (randomDocNumber != 5 && randomDocNumber != 6 && randomDocNumber != 9) ? TestData.files : []
                     })

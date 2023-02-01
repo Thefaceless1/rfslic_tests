@@ -1,5 +1,7 @@
 import superagent from "superagent";
 import {Api} from "../helpers/api";
+import postgres from "postgres";
+import value = postgres.toPascal.value;
 
 
 export class Catalogs {
@@ -16,19 +18,21 @@ export class Catalogs {
      * clubWorkers - Сотрудники клубов
      * ofi - ОФИ
      * organization - Организации
+     * roles - Роли
      */
-    public  seasons: TSeasons[];
-    public  criteriaGroups: TCriteriaGroups[];
-    public  licTypes: TLicTypes[];
-    public  docTypes: TDocTypes[];
-    public  rankCriteria : TRankCriteria[];
-    public  criteriaTypes : TCriteriaTypes[];
-    public  licStatus : TLicAndDocStatus[];
-    public  docStatus : TLicAndDocStatus[];
-    public  critGrpExperts : TClubWorkers[];
-    public  clubWorkers : TClubWorkers[];
-    public  ofi : TOfi[];
-    public organization : TOrganization[];
+    public  seasons: TSeasons[]
+    public  criteriaGroups: TCriteriaGroups[]
+    public  licTypes: TLicTypes[]
+    public  docTypes: TDocTypes[]
+    public  rankCriteria : TRankCriteria[]
+    public  criteriaTypes : TCriteriaTypes[]
+    public  licStatus : TLicAndDocStatus[]
+    public  docStatus : TLicAndDocStatus[]
+    public  critGrpExperts : TClubWorkers[]
+    public  clubWorkers : TClubWorkers[]
+    public  ofi : TOfi[]
+    public organization : TOrganization[]
+    public roles : TRoles[]
     constructor() {
         this.seasons =[]
         this.criteriaGroups =[]
@@ -42,6 +46,7 @@ export class Catalogs {
         this.clubWorkers =[]
         this.ofi =[]
         this.organization =[]
+        this.roles =[]
     }
     /**
      * id всех записей свойства clubWorkers (сотрудники клубов)
@@ -83,6 +88,9 @@ export class Catalogs {
     public get issuedLicStatus () : TLicAndDocStatus {
         return this.licStatus.find(value => value.name == 'Выдана')!;
     }
+    public get rolesId() : number[] {
+        return this.roles.map(value => value.id);
+    }
     /**
      * Получаем данные из справочников и записываем их в свойства объектов класса
      */
@@ -105,7 +113,7 @@ export class Catalogs {
         const docStatus = await superagent.get(api.basicUrl + api.request.docStatus);
         this.docStatus = docStatus.body.data;
         const clubWorkers = await superagent.get(api.basicUrl+api.user.clubWorkers).
-        query({pageNum : 0, pageSize : 10});
+        query({pageNum : 2, pageSize : 10});
         this.clubWorkers = clubWorkers.body.data;
         const critGrpExperts = await superagent.get(api.basicUrl+api.user.critGrpExperts).
         query({rights : "request.checkExpert"});
@@ -116,6 +124,8 @@ export class Catalogs {
         const organization = await superagent.get(api.basicUrl + api.user.organization).
         query({pageNum : 0, pageSize : 10});
         this.organization = organization.body.data;
+        const roles = await superagent.get(api.basicUrl + api.admin.roles);
+        this.roles = roles.body.data;
     }
 }
 
@@ -222,4 +232,12 @@ export type TOrganization = {
 export type TParent = {
     id : number,
     fullName : string
+}
+export type TRoles = {
+    id: number,
+    name: string,
+    description: string,
+    isBase: boolean,
+    isClub: boolean,
+    rights: string[]
 }

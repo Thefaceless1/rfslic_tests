@@ -24,7 +24,6 @@ test.describe("Работа с заявками", () => {
         await requests.addCritDocs();
         await requests.addExpertInfo();
         await requests.chooseLicStatus();
-        await requests.page.pause();
         await expect(requests.notifyByEnum(Notifications.licStatusSelected).last()).toBeVisible();
     })
 })

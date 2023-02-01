@@ -44,6 +44,13 @@ export class Api {
         ofi : "/api/rest/objects/findbyparams"
     }
     /**
+     * Апи admin-controller
+     */
+    public admin : TAdmin = {
+        addUser : "/api/rest/admin/users",
+        roles : "/api/rest/admin/roles"
+    }
+    /**
      * Заполнение свойств объекта constructors , которые требуют наличия id пролицензии
      */
     public fillProlicenseApi (prolicense : TProlicense[]) : void {
@@ -105,5 +112,9 @@ export type TUser = {
 }
 export type TInfraObject = {
     ofi : string
+}
+export type TAdmin = {
+    addUser : string,
+    roles : string
 }
 

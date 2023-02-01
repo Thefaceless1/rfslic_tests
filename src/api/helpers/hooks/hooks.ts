@@ -4,9 +4,12 @@ import {TestData} from "../test-data";
 import {afterEach, beforeAll} from "@jest/globals";
 import {Api} from "../api";
 import {License} from "../../class/license";
+import {Catalogs} from "../../class/catalogs";
+import {DbHelper} from "../../../e2e/framework/db/db-helper";
+import {operationsLog, workUsers} from "../../../e2e/framework/db/tables";
 
 export class Hooks {
-    public static async beforeProlic(prolicense : Prolicense,criterias : Criterias) : Promise<void> {
+    public static beforeProlic(prolicense : Prolicense,criterias : Criterias) : void {
         beforeAll(async () => {
             await TestData.uploadFiles();
             await prolicense.catalogs.fillCatalogsData();
@@ -16,7 +19,7 @@ export class Hooks {
     public static afterEachProlic(prolicense : Prolicense, api : Api) : void {
         afterEach(() => api.fillProlicenseApi(prolicense.prolicense));
     }
-    public static async beforeLicense(prolicense : Prolicense, license : License,criterias : Criterias,api : Api) : Promise<void> {
+    public static beforeLicense(prolicense : Prolicense, license : License,criterias : Criterias,api : Api) : void {
         beforeAll(async () => {
             await TestData.uploadFiles();
             await license.catalogs.fillCatalogsData();
@@ -25,6 +28,18 @@ export class Hooks {
             await prolicense.createTestProlicense();
             await api.fillProlicenseApi(prolicense.prolicense);
             await criterias.createTestCriterias(api);
+        })
+    }
+    public static beforeAdmin(catalogs : Catalogs) : void {
+        beforeAll(async () => {
+            await catalogs.fillCatalogsData();
+        })
+    }
+    public static afterAdmin(catalogs : Catalogs) : void {
+        afterAll(async () => {
+            const dbHelper = new DbHelper();
+            await dbHelper.delete(operationsLog.tableName,operationsLog.columns.userId,catalogs.clubWorkersId[0]);
+            await dbHelper.delete(workUsers.tableName,workUsers.columns.userId,catalogs.clubWorkersId[0]);
         })
     }
 }

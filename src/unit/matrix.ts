@@ -1,4 +1,3 @@
-
 export class Matrix {
     // Условия задачи на данный метод https://www.codewars.com/kata/590bb735517888ae6b000012
     public static sumProdDiags (matrix: number[][]): number | string {

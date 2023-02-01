@@ -64,6 +64,7 @@ describe("Работа с заявками", () => {
         expect(response.body.data.state).toBe(license.license[0].state);
         expect(response.body.data.stateId).toBe(license.license[0].stateId);
         license.addRespToLic(0,response.body.data);
+        console.log(license.license[0].name);
     })
     test("Добавление сотрудников клуба и экспертов к группе критериев", async () => {
         const response = await superagent.put(api.basicUrl + api.request.changeLicense).
@@ -88,7 +89,6 @@ describe("Работа с заявками", () => {
         license.license[0].criteriaGroups.forEach(critGrp => {
             expect(critGrp.criterias.length).toBeGreaterThan(criteriaCount);
         })
-        console.log(prolicense.prolicense[0].name)
     })
     test("Добавление документов, сотрудников клуба, ОФИ, организаций и комментариев для документов критериев", async () => {
         const response = await superagent.put(api.basicUrl + api.request.changeLicense).
@@ -167,10 +167,13 @@ describe("Работа с заявками", () => {
             expect(response.body.data.storageId).toBeTruthy();
         }
     })
-    test("Проставление статуса в целом для лицензии,",async () => {
+    test("Вынесение решения по заявке",async () => {
         const response = await superagent.put(api.basicUrl + api.request.changeLicense).
-        send(license.addStatusToLicense());
+        send(license.addSolutionToLicense());
         expect(response.body.data.stateId).toBe(license.catalogs.issuedLicStatus.id);
         expect(response.body.data.state).toBe(license.catalogs.issuedLicStatus.name);
+        expect(response.body.data.recommendation).toBe(TestData.commentValue);
+        expect(response.body.data.conclusion).toBe(TestData.commentValue);
+        expect(response.body.data.rplCriterias).toBe(TestData.commentValue);
     })
 })

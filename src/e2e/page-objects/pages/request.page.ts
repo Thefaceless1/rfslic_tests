@@ -135,7 +135,7 @@ export class RequestPage extends RequestNewPage {
         await this.searchDataButton.click();
         await searchModal.findButton.click();
         await Elements.waitForHidden(searchModal.loadIndicator);
-        await this.checkbox.nth(1).check();
+        await this.checkbox.last().check();
         await searchModal.selectButton.click();
         await Elements.waitForVisible(this.selectedData);
         await this.saveButton.click();

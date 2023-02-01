@@ -142,9 +142,12 @@ export class License {
     /**
      * Проставление статуса "Выдана" для лицензии в целом
      */
-    public addStatusToLicense () : TLicense {
+    public addSolutionToLicense () : TLicense {
         this.license[0].stateId = this.catalogs.issuedLicStatus.id;
         this.license[0].state = this.catalogs.issuedLicStatus.name;
+        this.license[0].recommendation = TestData.commentValue;
+        this.license[0].conclusion = TestData.commentValue;
+        this.license[0].rplCriterias = TestData.commentValue;
         return this.license[0];
     }
     /**
@@ -291,7 +294,10 @@ export type TLicense = {
                 }[]
             }[]
         }[]
-    }[]
+    }[],
+    conclusion: string,
+    recommendation: string,
+    rplCriterias: string
 }
 export type TExpertReport = {
     groupId: number,
