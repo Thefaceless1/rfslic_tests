@@ -2,7 +2,7 @@ import postgres from "postgres";
 import fs from "fs";
 
 export class DbHelper {
-   private readonly sql : postgres.Sql<Record<string, postgres.PostgresType> extends {} ? {} : any>
+   public readonly sql : postgres.Sql<Record<string, postgres.PostgresType> extends {} ? {} : any>
     constructor() {
        this.sql = postgres(this.configData())
     }
@@ -10,7 +10,7 @@ export class DbHelper {
      * Удалить данные из таблиц
      */
     public async delete(table : string,column : string,data : number | string) : Promise<void> {
-       await this.sql`delete from ${this.sql(table)} where ${this.sql(column)} = ${data}`
+       await this.sql`delete from ${this.sql(table)} where ${this.sql(column)} = ${data}`;
     }
     /**
      * Получить содержимое файла db.config.json

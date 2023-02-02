@@ -48,7 +48,9 @@ export class Api {
      */
     public admin : TAdmin = {
         addUser : "/api/rest/admin/users",
-        roles : "/api/rest/admin/roles"
+        roles : "/api/rest/admin/roles",
+        addRole : "/api/rest/admin/roles",
+        rights : "/api/rest/admin/rights"
     }
     /**
      * Заполнение свойств объекта constructors , которые требуют наличия id пролицензии
@@ -74,6 +76,10 @@ export class Api {
             this.request.changeLicense = `/api/rest/licenses/${licenseId}`;
             this.request.publishLicense = `${this.request.changeLicense}/publish`;
             this.request.createExpertReport = `${this.request.changeLicense}/groupReport/generate`;
+    }
+    public fillAdminApi(userId : number) : void {
+        this.admin.changeUserRole = `/api/rest/admin/users/${userId}/newRole`;
+        this.admin.changeUser = `/api/rest/admin/users/${userId}`;
     }
 }
 export type TConstructor = {
@@ -115,6 +121,10 @@ export type TInfraObject = {
 }
 export type TAdmin = {
     addUser : string,
-    roles : string
+    roles : string,
+    addRole : string,
+    rights : string
+    changeUserRole? : string,
+    changeUser? : string
 }
 

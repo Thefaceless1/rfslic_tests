@@ -4,9 +4,9 @@ import {TestData} from "../test-data";
 import {afterEach, beforeAll} from "@jest/globals";
 import {Api} from "../api";
 import {License} from "../../class/license";
-import {Catalogs} from "../../class/catalogs";
 import {DbHelper} from "../../../e2e/framework/db/db-helper";
 import {operationsLog, workUsers} from "../../../e2e/framework/db/tables";
+import {Admin} from "../../class/admin";
 
 export class Hooks {
     public static beforeProlic(prolicense : Prolicense,criterias : Criterias) : void {
@@ -30,16 +30,13 @@ export class Hooks {
             await criterias.createTestCriterias(api);
         })
     }
-    public static beforeAdmin(catalogs : Catalogs) : void {
+    public static beforeAdmin(admin : Admin) : void {
         beforeAll(async () => {
-            await catalogs.fillCatalogsData();
-        })
-    }
-    public static afterAdmin(catalogs : Catalogs) : void {
-        afterAll(async () => {
+            await admin.catalogs.fillCatalogsData();
             const dbHelper = new DbHelper();
-            await dbHelper.delete(operationsLog.tableName,operationsLog.columns.userId,catalogs.clubWorkersId[0]);
-            await dbHelper.delete(workUsers.tableName,workUsers.columns.userId,catalogs.clubWorkersId[0]);
+            await dbHelper.delete(operationsLog.tableName,operationsLog.columns.userId,admin.catalogs.clubWorkersId[0]);
+            await dbHelper.delete(workUsers.tableName,workUsers.columns.userId,admin.catalogs.clubWorkersId[0]);
+            await dbHelper.sql.end();
         })
     }
 }

@@ -1,8 +1,5 @@
 import superagent from "superagent";
 import {Api} from "../helpers/api";
-import postgres from "postgres";
-import value = postgres.toPascal.value;
-
 
 export class Catalogs {
     /**
@@ -19,6 +16,7 @@ export class Catalogs {
      * ofi - ОФИ
      * organization - Организации
      * roles - Роли
+     * rights - Права
      */
     public  seasons: TSeasons[]
     public  criteriaGroups: TCriteriaGroups[]
@@ -33,6 +31,7 @@ export class Catalogs {
     public  ofi : TOfi[]
     public organization : TOrganization[]
     public roles : TRoles[]
+    public rights : TRights[]
     constructor() {
         this.seasons =[]
         this.criteriaGroups =[]
@@ -47,28 +46,25 @@ export class Catalogs {
         this.ofi =[]
         this.organization =[]
         this.roles =[]
+        this.rights=[]
     }
     /**
-     * id всех записей свойства clubWorkers (сотрудники клубов)
+     * ids of dictionary elements "Club workers"
      */
     public get clubWorkersId () : number[] {
         return this.clubWorkers.map(value => value.id);
     }
     /**
-     * id всех записей свойства critGrpExperts (Эксперты групп критерив)
+     * ids of dictionary elements "Criteria groups"
+     */
+    public get criteriaGrpId() : number[] {
+        return this.criteriaGroups.map(value => value.id);
+    }
+    /**
+     * ids of dictionary elements "Criteria groups experts"
      */
     public get critGrpExpertsId () : number[] {
         return this.critGrpExperts.map(value => value.id);
-    }
-    /**
-     * Получить id всех возможных типов документов в зависимости от типа критерия
-     */
-    public docTypesForCrit (criteriaType : TCriteriaTypes) : TDocTypes[] {
-        switch (criteriaType.name) {
-            case "Документы" : return this.docTypes.filter(value => (value.id != 3 && value.id != 4 && value.id != 7 && value.id != 10));
-            case "Участник" : return this.docTypes.filter(value => (value.id <= 3));
-            default : return this.docTypes.filter(value => (value.id <= 2 || value.id == 10));
-        }
     }
     /**
      * id всех записей свойства ofi
@@ -88,8 +84,33 @@ export class Catalogs {
     public get issuedLicStatus () : TLicAndDocStatus {
         return this.licStatus.find(value => value.name == 'Выдана')!;
     }
+    /**
+     * ids of dictionary elements "Roles"
+     */
     public get rolesId() : number[] {
         return this.roles.map(value => value.id);
+    }
+    /**
+     * ids of dictionary elements "Rights"
+     */
+    public get rightsId() : string[] {
+        const rightsId : string[] =[];
+        this.rights.forEach(right => {
+            right.children.forEach(child => {
+                rightsId.push(child.id);
+            })
+        })
+        return rightsId;
+    }
+    /**
+     * Получить id всех возможных типов документов в зависимости от типа критерия
+     */
+    public docTypesForCrit (criteriaType : TCriteriaTypes) : TDocTypes[] {
+        switch (criteriaType.name) {
+            case "Документы" : return this.docTypes.filter(value => (value.id != 3 && value.id != 4 && value.id != 7 && value.id != 10));
+            case "Участник" : return this.docTypes.filter(value => (value.id <= 3));
+            default : return this.docTypes.filter(value => (value.id <= 2 || value.id == 10));
+        }
     }
     /**
      * Получаем данные из справочников и записываем их в свойства объектов класса
@@ -126,6 +147,8 @@ export class Catalogs {
         this.organization = organization.body.data;
         const roles = await superagent.get(api.basicUrl + api.admin.roles);
         this.roles = roles.body.data;
+        const rights = await superagent.get(api.basicUrl + api.admin.rights);
+        this.rights = rights.body.data;
     }
 }
 
@@ -137,7 +160,7 @@ export type TSeasons = {
     name: string
 }
 export type TCriteriaGroups = {
-    id:number,
+    id : number,
     name : string
 }
 
@@ -240,4 +263,10 @@ export type TRoles = {
     isBase: boolean,
     isClub: boolean,
     rights: string[]
+}
+export type TRights = {
+    id: string,
+    name: string,
+    description: string,
+    children: TRights[]
 }
