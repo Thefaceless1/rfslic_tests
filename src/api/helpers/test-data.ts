@@ -11,7 +11,7 @@ export class TestData {
     /**
      * Текущая дата
      */
-    public static get todayDate () : string {
+    public static get currentDate () : string {
         return new Date().toLocaleDateString().split(".").reverse().join("-");
     }
     /**

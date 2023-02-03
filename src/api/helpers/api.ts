@@ -1,4 +1,5 @@
 import {TProlicense} from "../class/prolicense";
+import {Admin} from "../class/admin";
 
 export class Api {
     public readonly basicUrl : string = "https://rfs-lic-test-01.fors.ru";
@@ -52,6 +53,11 @@ export class Api {
         addRole : "/api/rest/admin/roles",
         rights : "/api/rest/admin/rights"
     }
+    public commissions : TCommissions = {
+        commissionTypes : "/api/rest/commissions/types",
+        commissionDecisions : "/api/rest/commissions/decisions",
+        createCommission : "/api/rest/commissions"
+    }
     /**
      * Заполнение свойств объекта constructors , которые требуют наличия id пролицензии
      */
@@ -77,9 +83,10 @@ export class Api {
             this.request.publishLicense = `${this.request.changeLicense}/publish`;
             this.request.createExpertReport = `${this.request.changeLicense}/groupReport/generate`;
     }
-    public fillAdminApi(userId : number) : void {
-        this.admin.changeUserRole = `/api/rest/admin/users/${userId}/newRole`;
-        this.admin.changeUser = `/api/rest/admin/users/${userId}`;
+    public fillAdminApi(admin : Admin) : void {
+        this.admin.changeUserRole = `/api/rest/admin/users/${admin.user[0].id}/newRole`;
+        this.admin.changeUser = `/api/rest/admin/users/${admin.user[0].id}`;
+        if(admin.role.length == 1) this.admin.deleteRole = `/api/rest/admin/roles/${admin.role[0].id}`;
     }
 }
 export type TConstructor = {
@@ -125,6 +132,12 @@ export type TAdmin = {
     addRole : string,
     rights : string
     changeUserRole? : string,
-    changeUser? : string
+    changeUser? : string,
+    deleteRole? : string
+}
+export type TCommissions = {
+    commissionTypes : string,
+    commissionDecisions : string,
+    createCommission : string
 }
 

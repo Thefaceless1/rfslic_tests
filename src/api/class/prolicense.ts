@@ -1,6 +1,6 @@
 import {TestData} from "../helpers/test-data";
-import {Catalogs, TSeasons, TDocTypes, TLicTypes} from "./catalogs";
-import superagent from "superagent";
+import {Catalogs} from "./catalogs";
+import superagent, {Response} from "superagent";
 import {Api} from "../helpers/api";
 
 export class Prolicense {
@@ -26,13 +26,13 @@ export class Prolicense {
             name: TestData.randomWord,
             season: this.catalogs.seasons[0].name,
             type: this.catalogs.licTypes[0].name,
-            requestBegin: TestData.todayDate,
+            requestBegin: TestData.currentDate,
             requestEnd: TestData.futureDate,
             dueDate: TestData.futureDate,
             docSubmitDate: TestData.futureDate,
             reviewDate: TestData.futureDate,
             decisionDate: TestData.futureDate,
-            begin: TestData.todayDate,
+            begin: TestData.currentDate,
             end: TestData.futureDate,
             documents: docArray
         }
@@ -77,8 +77,8 @@ export class Prolicense {
     /**
      * Добавление тела ответа в массив свойства prolicense
      */
-    public addRespToProlic (index : number,response : TProlicense) : void {
-        this.prolicense[index] = response;
+    public fillProlicense (index : number,response : Response) : void {
+        this.prolicense[index] = response.body.data;
     }
     /**
      * Создание тестовой пролицензии для сценария license.test.ts
@@ -88,7 +88,7 @@ export class Prolicense {
         this.createProlicense();
         const response = await superagent.put(api.basicUrl + api.constructors.createProlicense).
         send(this.getProlicense(0));
-        this.addRespToProlic(0,response.body.data);
+        this.fillProlicense(0,response);
     }
 }
 
@@ -114,14 +114,15 @@ export type TDocuments = {
     name: string,
     description : string
     docTypeId: number,
-    templates: {
-        id?: number,
-        name: string,
-        storageId: string
-    }[]
+    templates: Templates[]
 }
 export type TSampleLicense = {
     type : string,
     season : string,
     name : string
+}
+export type Templates = {
+    id?: number,
+    name: string,
+    storageId: string
 }

@@ -7,6 +7,7 @@ import {License} from "../../class/license";
 import {DbHelper} from "../../../e2e/framework/db/db-helper";
 import {operationsLog, workUsers} from "../../../e2e/framework/db/tables";
 import {Admin} from "../../class/admin";
+import {Commission} from "../../class/commission";
 
 export class Hooks {
     public static beforeProlic(prolicense : Prolicense,criterias : Criterias) : void {
@@ -37,6 +38,16 @@ export class Hooks {
             await dbHelper.delete(operationsLog.tableName,operationsLog.columns.userId,admin.catalogs.clubWorkersId[0]);
             await dbHelper.delete(workUsers.tableName,workUsers.columns.userId,admin.catalogs.clubWorkersId[0]);
             await dbHelper.sql.end();
+        })
+    }
+    public static afterEachAdmin(api : Api, admin : Admin) : void {
+        afterEach(() => {
+            api.fillAdminApi(admin);
+        })
+    }
+    public static beforeCommission(commission : Commission) : void {
+        beforeAll(async () => {
+            await commission.catalogs.fillCatalogsData();
         })
     }
 }

@@ -17,6 +17,8 @@ export class Catalogs {
      * organization - Организации
      * roles - Роли
      * rights - Права
+     * commissionType - Типы комиссий
+     * commissionSolution - Возможные решения комиссий
      */
     public  seasons: TSeasons[]
     public  criteriaGroups: TCriteriaGroups[]
@@ -32,6 +34,8 @@ export class Catalogs {
     public organization : TOrganization[]
     public roles : TRoles[]
     public rights : TRights[]
+    public commissionTypes : TCommissionType[]
+    public commissionDecision : commissionDecision[]
     constructor() {
         this.seasons =[]
         this.criteriaGroups =[]
@@ -47,6 +51,8 @@ export class Catalogs {
         this.organization =[]
         this.roles =[]
         this.rights=[]
+        this.commissionTypes=[]
+        this.commissionDecision=[]
     }
     /**
      * ids of dictionary elements "Club workers"
@@ -89,6 +95,12 @@ export class Catalogs {
      */
     public get rolesId() : number[] {
         return this.roles.map(value => value.id);
+    }
+    /**
+     * ids of dictionary elements "Commissions types"
+     */
+    public get commissionTypesId() : number[] {
+        return this.commissionTypes.map(value => value.id);
     }
     /**
      * ids of dictionary elements "Rights"
@@ -149,6 +161,10 @@ export class Catalogs {
         this.roles = roles.body.data;
         const rights = await superagent.get(api.basicUrl + api.admin.rights);
         this.rights = rights.body.data;
+        const commission = await superagent.get(api.basicUrl + api.commissions.commissionTypes);
+        this.commissionTypes = commission.body.data;
+        const commissionDecision = await superagent.get(api.basicUrl + api.commissions.commissionDecisions);
+        this.commissionDecision = commissionDecision.body.data;
     }
 }
 
@@ -269,4 +285,14 @@ export type TRights = {
     name: string,
     description: string,
     children: TRights[]
+}
+export type TCommissionType = {
+    id: number,
+    name : string,
+    description : string
+}
+export type commissionDecision = {
+    id: number,
+    name : string,
+    description : string
 }

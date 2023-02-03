@@ -1,5 +1,6 @@
 import {Catalogs, TCriteriaGroups, TOrganization} from "./catalogs";
 import {TestData} from "../helpers/test-data";
+import {Response} from "superagent";
 
 export class Admin {
     public user: TUser[]
@@ -29,6 +30,18 @@ export class Admin {
             rights : [...this.catalogs.rightsId]
         })
         return this.role[0];
+    }
+    /**
+     * Add response data to "user" array
+     */
+    public fillUser(index : number, response : Response) : void {
+        this.user[index] = response.body.data;
+    }
+    /**
+     * Add response data to "role" array
+     */
+    public fillRole(index : number, response : Response) : void {
+        this.role[index] = response.body.data;
     }
 }
 

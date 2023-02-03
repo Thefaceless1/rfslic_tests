@@ -21,12 +21,12 @@ describe("Пролицензия", () => {
         expect(response.body.data.type).toBe(prolicense.catalogs.licTypes[0].name);
         expect(response.body.data.season).toBe(prolicense.catalogs.seasons[0].name);
         expect(response.body.data.stateId).toBe(ProlicenseStatus.unpublished);
-        expect(response.body.data.begin && response.body.data.requestBegin).toBe(TestData.todayDate);
+        expect(response.body.data.begin && response.body.data.requestBegin).toBe(TestData.currentDate);
         expect(response.body.data.end && response.body.data.requestEnd &&
             response.body.data.docSubmitDate && response.body.data.dueDate &&
             response.body.data.reviewDate && response.body.data.decisionDate).toBe(TestData.futureDate);
 
-        prolicense.addRespToProlic(0,response.body.data);
+        prolicense.fillProlicense(0,response);
     })
     test("Изменение проекта лицензии", async () => {
         prolicense.changeProlicense();
@@ -41,7 +41,7 @@ describe("Пролицензия", () => {
         expect(response.body.data.season).toBe(prolicense.getProlicense(0).season);
         expect(response.body.data.name).toBe(prolicense.getProlicense(0).name);
         expect(response.body.data.documents.length).toBe(prolicense.getProlicense(0).documents.length);
-        prolicense.addRespToProlic(0,response.body.data);
+        prolicense.fillProlicense(0,response);
     })
     test("Создание группы критериев пролицензии", async () => {
         criterias.createCritGroups();
@@ -79,12 +79,12 @@ describe("Пролицензия", () => {
         const response = await superagent.get(api.basicUrl + api.constructors.createCriterias);
         expect(response.body.data.groups.length).toBeGreaterThan(0);
         response.body.data.groups.forEach((criteriaGroup: TCriterias, index: number) => {
-            criteriaGroup.criterias.forEach((criteria, index1) => {
-                expect(criteria.name).toBe(criterias.criterias[index].criterias[index1].name);
-                expect(criteria.number).toBe(criterias.criterias[index].criterias[index1].number);
-                expect(criteria.categoryId).toBe(criterias.criterias[index].criterias[index1].categoryId);
-                expect(criteria.documents).not.toEqual(criterias.criterias[index].criterias[index1].documents);
-                criteria.documents = criterias.criterias[index].criterias[index1].documents;
+            criteriaGroup.criterias.forEach((criteria, criteriaIndex) => {
+                expect(criteria.name).toBe(criterias.criterias[index].criterias[criteriaIndex].name);
+                expect(criteria.number).toBe(criterias.criterias[index].criterias[criteriaIndex].number);
+                expect(criteria.categoryId).toBe(criterias.criterias[index].criterias[criteriaIndex].categoryId);
+                expect(criteria.documents).not.toEqual(criterias.criterias[index].criterias[criteriaIndex].documents);
+                criteria.documents = criterias.criterias[index].criterias[criteriaIndex].documents;
             })
         })
     })
@@ -97,7 +97,7 @@ describe("Пролицензия", () => {
             response.body.data.docSubmitDate && response.body.data.dueDate &&
             response.body.data.reviewDate && response.body.data.decisionDate
         ).toBe(TestData.futureDate);
-        expect(response.body.data.begin && response.body.data.requestBegin).toBe(TestData.todayDate);
+        expect(response.body.data.begin && response.body.data.requestBegin).toBe(TestData.currentDate);
         expect(response.body.data.stateId).toBe(1);
         response.body.data.documents.forEach((document : TDocuments, index : number) =>{
         expect(document.name).toBe(prolicense.prolicense[0].documents[index].name);

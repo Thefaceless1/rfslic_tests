@@ -1,6 +1,7 @@
-import {Catalogs, TClubWorkers, TLicTypes, TOfi, TOrganization} from "./catalogs";
+import {Catalogs, TClubWorkers, TOfi, TOrganization} from "./catalogs";
 import {TestData} from "../helpers/test-data";
 import {TProlicense} from "./prolicense";
+import {Response} from "superagent";
 
 export class License {
     public license : TLicense[]
@@ -21,8 +22,8 @@ export class License {
     /**
      * Добавление тела ответа от сервера в свойство license объекта класса
      */
-    public addRespToLic(index : number,response : TLicense) : void {
-        this.license[index] = response;
+    public fillLicense(index : number,response : Response) : void {
+        this.license[index] = response.body.data;
     }
     /**
      * Добавление документов и комментариев для заявки
@@ -63,8 +64,10 @@ export class License {
      * Добавление экспертов групп критериев и сотрудников клуба для группы критериев
      */
     public addClubWorkersToCritGrp () : TLicense {
-        this.license[0].criteriaGroups.forEach((value, index) => {
-            value.experts = this.catalogs.clubWorkersId;
+        const checkedClubWorkers : number[] = this.catalogs.clubWorkersId.
+        filter(workerId => workerId != this.catalogs.critGrpExperts[0].id);
+        this.license[0].criteriaGroups.forEach((value) => {
+            value.experts = checkedClubWorkers;
             value.rfuExpert = this.catalogs.critGrpExperts[0].id;
         })
         return this.license[0];
