@@ -14,9 +14,8 @@ describe("Пролицензия", () => {
     Hooks.beforeProlic(prolicense,criterias);
     Hooks.afterEachProlic(prolicense,api);
     test("Создание проекта лицензии", async () => {
-        prolicense.createProlicense();
         const response = await superagent.put(api.basicUrl + api.constructors.createProlicense).
-        send(prolicense.getProlicense(0));
+        send(prolicense.createProlicense());
         expect(response.body.data.id).toBeTruthy();
         expect(response.body.data.type).toBe(prolicense.catalogs.licTypes[0].name);
         expect(response.body.data.season).toBe(prolicense.catalogs.seasons[0].name);
@@ -29,18 +28,17 @@ describe("Пролицензия", () => {
         prolicense.fillProlicense(0,response);
     })
     test("Изменение проекта лицензии", async () => {
-        prolicense.changeProlicense();
         const response = await superagent.put(api.basicUrl + api.constructors.changeProlicense).
-        send(prolicense.getProlicense(0));
+        send(prolicense.changeProlicense());
         expect(response.body.status).toBe("SUCCESS");
     })
     test("Получение проекта лицензии по ID", async () => {
         const response = await superagent.get(api.basicUrl + api.constructors.changeProlicense);
-        expect(response.body.data.id).toBe(prolicense.getProlicense(0).id);
-        expect(response.body.data.type).toBe(prolicense.getProlicense(0).type);
-        expect(response.body.data.season).toBe(prolicense.getProlicense(0).season);
-        expect(response.body.data.name).toBe(prolicense.getProlicense(0).name);
-        expect(response.body.data.documents.length).toBe(prolicense.getProlicense(0).documents.length);
+        expect(response.body.data.id).toBe(prolicense.prolicense[0].id);
+        expect(response.body.data.type).toBe(prolicense.prolicense[0].type);
+        expect(response.body.data.season).toBe(prolicense.prolicense[0].season);
+        expect(response.body.data.name).toBe(prolicense.prolicense[0].name);
+        expect(response.body.data.documents.length).toBe(prolicense.prolicense[0].documents.length);
         prolicense.fillProlicense(0,response);
     })
     test("Создание группы критериев пролицензии", async () => {
@@ -91,7 +89,7 @@ describe("Пролицензия", () => {
     test("Создание пролицензии по образцу", async () => {
         const response = await superagent.put(api.basicUrl + api.constructors.cloneProlicense).
         send(prolicense.createSampleProlicense());
-        expect(response.body.data.id).not.toBe(prolicense.getProlicense(0).id);
+        expect(response.body.data.id).not.toBe(prolicense.prolicense[0].id);
         expect(
             response.body.data.end && response.body.data.requestEnd &&
             response.body.data.docSubmitDate && response.body.data.dueDate &&

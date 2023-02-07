@@ -143,7 +143,48 @@ export class License {
         return Math.round((checkedDocsCount / allDocsCount) * 100);
     }
     /**
-     * Проставление статуса "Выдана" для лицензии в целом
+     * Calculation of percentages of each criteria
+     */
+    public criteriaPercent(criteriaGroup : TCriteriaGroups, criteria : TCriterias) : number {
+        let critPercent : number;
+        if(criteria.external == null)
+            critPercent = criteria.documents.filter(value => value.stateId != 2 && value.stateId != 1).length*100/criteria.documents.length;
+        else {
+            const sameCriterias : TCriterias[] =[];
+            const sameCritDocs : TDocuments[] =[];
+            criteriaGroup.criterias.forEach((value) => {
+                if(value.name == criteria.name) sameCriterias.push(value);
+            })
+            sameCriterias.forEach((value) => {
+                value.documents.forEach((document) => {
+                    sameCritDocs.push(document)
+                })
+            })
+            critPercent = sameCritDocs.filter(value => value.stateId != 2 && value.stateId != 1).length*100/sameCritDocs.length;
+        }
+        return Math.round(critPercent)
+    }
+    /**
+     * Get Criteria Documents
+     */
+    public criteriaDocuments(criteriaGroup : TCriteriaGroups,criteria : TCriterias) : TDocuments[] {
+        if(criteria.external == null) return criteria.documents;
+        else {
+            const sameCriterias : TCriterias[] =[];
+            const sameCritDocs : TDocuments[] =[];
+            criteriaGroup.criterias.forEach((value) => {
+                if(value.name == criteria.name) sameCriterias.push(value);
+            })
+            sameCriterias.forEach((value) => {
+                value.documents.forEach((document) => {
+                    sameCritDocs.push(document)
+                })
+            })
+            return sameCritDocs;
+        }
+    }
+    /**
+     * Setting the status "Issued" for a license
      */
     public addSolutionToLicense () : TLicense {
         this.license[0].stateId = this.catalogs.issuedLicStatus.id;
@@ -154,7 +195,7 @@ export class License {
         return this.license[0];
     }
     /**
-     * Добавление отчета эксперта для групп критериев
+     * Adding an Expert Report for Criteria Groups
      */
     public addExpertReport(grpId : number) : TExpertReport {
         return {
@@ -164,7 +205,7 @@ export class License {
         }
     }
     /**
-     * Добавление участников и ОФИ для критериев с типами Участник и ОФИ
+     * Adding participants and OFI for criteria with types Participant and OFI
      */
     public addOfiAndUsers() : TLicense {
         this.license[0].criteriaGroups.forEach(critGrp => {
@@ -238,66 +279,7 @@ export type TLicense = {
             storageId: string
         }[]
     }[],
-    criteriaGroups : {
-        groupId : number,
-        name : string,
-        percent : number,
-        stateId : number,
-        state : string,
-        conclusion : string,
-        recommendation : string,
-        reportName : string,
-        reportStorageId : string,
-        experts : number[],
-        rfuExpertChoice : number[],
-        rfuExpert : number,
-        details : {
-            experts :TClubWorkers[],
-            rfuExpertChoice : TClubWorkers[],
-            rfuExpert : TClubWorkers
-        }
-        criterias : {
-            id?: number,
-            proCritId: number,
-            number: string,
-            categoryId: number,
-            name: string,
-            description: string,
-            isMulti: number,
-            typeId: number,
-            orderNum: number,
-            docSubmitDate: string,
-            reviewDate: string,
-            external : string,
-            externalId: number,
-            comment: string,
-            percent: number,
-            stateId: number,
-            state: string,
-            documents: {
-                id?: number,
-                proDocId: number,
-                name: string,
-                docTypeId: number,
-                comment: string,
-                reviewComment: string,
-                externalIds : number[],
-                externals : TOfi[] | TOrganization[],
-                stateId: number,
-                state: string,
-                templates: {
-                    id: number,
-                    name: string,
-                    storageId: string
-                }[],
-                files : {
-                    id?: number,
-                    name: string,
-                    storageId: string
-                }[]
-            }[]
-        }[]
-    }[],
+    criteriaGroups : TCriteriaGroups[],
     conclusion: string,
     recommendation: string,
     rplCriterias: string
@@ -306,5 +288,67 @@ export type TExpertReport = {
     groupId: number,
     conclusion: string,
     recommendation: string
+}
+export type TCriterias = {
+    id?: number,
+    proCritId: number,
+    number: string,
+    categoryId: number,
+    name: string,
+    description: string,
+    isMulti: number,
+    typeId: number,
+    orderNum: number,
+    docSubmitDate: string,
+    reviewDate: string,
+    external : string,
+    externalId: number,
+    comment: string,
+    percent: number,
+    stateId: number,
+    state: string,
+    documents: TDocuments[]
+}
+export type TCriteriaGroups = {
+    groupId : number,
+    name : string,
+    percent : number,
+    stateId : number,
+    state : string,
+    conclusion : string,
+    recommendation : string,
+    reportName : string,
+    reportStorageId : string,
+    experts : number[],
+    rfuExpertChoice : number[],
+    rfuExpert : number,
+    details : {
+        experts :TClubWorkers[],
+        rfuExpertChoice : TClubWorkers[],
+        rfuExpert : TClubWorkers
+    }
+    criterias : TCriterias[]
+}
+export type TDocuments = {
+    id?: number,
+    proDocId: number,
+    name: string,
+    docTypeId: number,
+    comment: string,
+    reviewComment: string,
+    externalIds : number[],
+    externals : TOfi[] | TOrganization[],
+    stateId: number,
+    state: string,
+    templates: {
+        id: number,
+        name: string,
+        storageId: string
+    }[],
+    files : {
+        id?: number,
+        name: string,
+        storageId: string
+    }[]
 }
 

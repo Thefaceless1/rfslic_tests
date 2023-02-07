@@ -122,7 +122,7 @@ describe("Работа с заявками", () => {
         license.license[0].criteriaGroups.forEach((criteriaGroup) => {
             const grpPercent = criteriaGroup.criterias.reduce((accum,value) =>accum+value.percent,0)/criteriaGroup.criterias.length;
             expect(Math.round(criteriaGroup.percent)).toBe(Math.round(grpPercent));
-            if(criteriaGroup.criterias.every(value => value.state == license.docStatusById(1))) {
+            if(criteriaGroup.criterias.some(value => value.state == license.docStatusById(1))) {
                 expect(criteriaGroup.state).toBe(license.docStatusById(1));
             }
             else if (criteriaGroup.criterias.some(value => value.state == license.docStatusById(5))) {
@@ -136,18 +136,17 @@ describe("Работа с заявками", () => {
             }
             else expect(criteriaGroup.state).toBe(license.docStatusById(3));
             criteriaGroup.criterias.forEach((criteria) => {
-                const critPercent = criteria.documents.filter(value => value.stateId != 2 && value.stateId != 1).length*100/criteria.documents.length;
-                expect(Math.round(criteria.percent)).toBe(Math.round(critPercent));
-                if (criteria.documents.every(value => value.state == license.docStatusById(1))){
+                expect(Math.round(criteria.percent)).toBe(license.criteriaPercent(criteriaGroup, criteria));
+                if (license.criteriaDocuments(criteriaGroup,criteria).some(value => value.state == license.docStatusById(1))){
                     expect(criteria.state).toBe(license.docStatusById(1));
                 }
-                else if (criteria.documents.some(value => value.state == license.docStatusById(5))) {
+                else if (license.criteriaDocuments(criteriaGroup,criteria).some(value => value.state == license.docStatusById(5))) {
                     expect(criteria.state).toBe(license.docStatusById(5));
                 }
-                else if (criteria.documents.some(value => value.state == license.docStatusById(2))) {
+                else if (license.criteriaDocuments(criteriaGroup,criteria).some(value => value.state == license.docStatusById(2))) {
                     expect(criteria.state).toBe(license.docStatusById(2));
                 }
-                else if (criteria.documents.some(value => value.state == license.docStatusById(4))) {
+                else if (license.criteriaDocuments(criteriaGroup,criteria).some(value => value.state == license.docStatusById(4))) {
                     expect(criteria.state).toBe(license.docStatusById(4));
                 }
                 else expect(criteria.state).toBe(license.docStatusById(3));

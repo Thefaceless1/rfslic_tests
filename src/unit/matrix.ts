@@ -60,3 +60,19 @@ export class Matrix {
         return result;
     }
 }
+export function countSixes (n: number): number {
+    let result : number = 0;
+    let odd  = 1;
+    let even  = 0;
+    const regexp : RegExp = /(?<=\.)6+/g;
+    for(let i = 2; i<n; i++) {
+        switch (i%2) {
+            case 0 : {
+                even =(even + odd)/2;
+                break;
+            }
+            default : odd=(even + odd)/2;
+        }
+    }
+    return (regexp.test(String(result))) ? String(result).match(regexp)![0].length : 0;
+}

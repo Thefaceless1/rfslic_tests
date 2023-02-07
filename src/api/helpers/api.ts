@@ -1,5 +1,6 @@
 import {TProlicense} from "../class/prolicense";
 import {Admin} from "../class/admin";
+import {Commission} from "../class/commission";
 
 export class Api {
     public readonly basicUrl : string = "https://rfs-lic-test-01.fors.ru";
@@ -22,7 +23,8 @@ export class Api {
     public request : TRequest = {
         requestStatus : "/api/rest/licenses/states",
         docStatus : "/api/rest/licenses/docstates",
-        createLicense : "/api/rest/licenses"
+        createLicense : "/api/rest/licenses",
+        requestsList : "/api/rest/licenses/find"
     }
     /**
      * Апи upload-controller
@@ -56,7 +58,10 @@ export class Api {
     public commissions : TCommissions = {
         commissionTypes : "/api/rest/commissions/types",
         commissionDecisions : "/api/rest/commissions/decisions",
-        createCommission : "/api/rest/commissions"
+        createCommission : "/api/rest/commissions",
+        changeCommissionRequest(commission : Commission, licId : number) : string {
+            return `/api/rest/commissions/${commission.commission[0].id}/licenses/${licId}`;
+        }
     }
     /**
      * Заполнение свойств объекта constructors , которые требуют наличия id пролицензии
@@ -88,6 +93,13 @@ export class Api {
         this.admin.changeUser = `/api/rest/admin/users/${admin.user[0].id}`;
         if(admin.role.length == 1) this.admin.deleteRole = `/api/rest/admin/roles/${admin.role[0].id}`;
     }
+    public fillCommissionApi(commission : Commission) : void {
+        this.commissions.addRequests = `/api/rest/commissions/${commission.commission[0].id}/licenses`;
+        this.commissions.getCommission = `/api/rest/commissions/${commission.commission[0].id}`;
+        if(commission.commission[0].licenses && commission.commission[0].licenses.length > 0) {
+            this.commissions.deleteRequest = `${this.commissions.addRequests}/${commission.commission[0].licenses[0].licId}`;
+        }
+    }
 }
 export type TConstructor = {
     seasons : string,
@@ -114,6 +126,7 @@ export type TRequest = {
     requestStatus : string,
     docStatus : string,
     createLicense : string,
+    requestsList : string,
     changeLicense? : string,
     publishLicense? : string,
     createExpertReport? : string
@@ -138,6 +151,10 @@ export type TAdmin = {
 export type TCommissions = {
     commissionTypes : string,
     commissionDecisions : string,
-    createCommission : string
+    createCommission : string,
+    changeCommissionRequest(commission : Commission, licId : number) : string,
+    addRequests? : string,
+    getCommission? : string,
+    deleteRequest? : string
 }
 

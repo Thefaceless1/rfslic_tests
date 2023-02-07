@@ -50,4 +50,9 @@ export class Hooks {
             await commission.catalogs.fillCatalogsData();
         })
     }
+    public static afterEachCommission(api : Api, commission : Commission) : void {
+        afterEach(() => {
+            api.fillCommissionApi(commission);
+        })
+    }
 }

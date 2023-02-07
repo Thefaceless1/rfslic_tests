@@ -12,7 +12,7 @@ export class Prolicense {
     /**
      * Создание пролицензии
      */
-    public createProlicense() : void {
+    public createProlicense() : TProlicense {
         const docArray : TDocuments[] = [...Array(5)].fill(
             {
             name: TestData.randomWord,
@@ -37,6 +37,7 @@ export class Prolicense {
             documents: docArray
         }
         )
+        return this.prolicense[0];
     }
     /**
      * Изменение пролицензии:
@@ -45,7 +46,7 @@ export class Prolicense {
      * 3. Сезон
      * 4. Добавление документа
      */
-    public changeProlicense () {
+    public changeProlicense () : TProlicense {
         this.prolicense[0].name = TestData.randomWord;
         this.prolicense[0].type = this.catalogs.licTypes[this.catalogs.licTypes.length-1].name;
         this.prolicense[0].season = this.catalogs.seasons[this.catalogs.seasons.length-1].name;
@@ -57,6 +58,7 @@ export class Prolicense {
             templates: TestData.files
         }
         )
+        return this.prolicense[0];
     }
     /**
      * Создание пролицензии по образцу
@@ -67,12 +69,6 @@ export class Prolicense {
             season : this.catalogs.seasons[0].name,
             name : TestData.randomWord
         }
-    }
-    /**
-     * Получение пролицензии по индексу массива свойста prolicense
-     */
-    public getProlicense (index : number) : TProlicense {
-        return this.prolicense[index];
     }
     /**
      * Добавление тела ответа в массив свойства prolicense
@@ -87,7 +83,7 @@ export class Prolicense {
         const api = new Api();
         this.createProlicense();
         const response = await superagent.put(api.basicUrl + api.constructors.createProlicense).
-        send(this.getProlicense(0));
+        send(this.prolicense[0]);
         this.fillProlicense(0,response);
     }
 }
