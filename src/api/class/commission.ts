@@ -13,7 +13,7 @@ export class Commission {
         this.commission=[]
     }
     /**
-     * Create new commission
+     * Create a new commission
      */
     public createCommission() : TCommission {
         this.commission.push({
@@ -30,16 +30,16 @@ export class Commission {
         this.commission[index] = response.body.data;
     }
     /**
-     * Adding requests for commission
+     * Add requests for a commission
      */
-    public async addRequests() : Promise<{licIds : number[]}> {
+    public async addRequests() : Promise<TRequests> {
         const api = new Api();
         const response = await superagent.get(api.basicUrl + api.request.requestsList).
         query({pageNum : 0, pageSize : 10});
         return {"licIds": response.body.data.map((value: TLicense) => value.id)};
     }
     /**
-     * Add decision for commission request
+     * Add decision for a commission request
      */
     public addDecision() : TDecision {
         const filteredRequestStatus : TLicAndDocStatus[] = this.catalogs.licStatus.
@@ -51,6 +51,40 @@ export class Commission {
             controlDate : (randomDecision.name == "Выдана с условиями") ? TestData.futureDate : "",
             comment : TestData.commentValue
         }
+    }
+    /**
+     * Add members for a commission type or for a commission
+     */
+    public addMembers() : TMembers {
+        return {userIds : this.catalogs.commissionTypeMembersId}
+    }
+    /**
+     * Add report by license type for a commission
+     */
+    public addReport(type : "byType" | "byClub") : TReport {
+        const licTypes : {licType : string, count : number}[] =[];
+        let mostPopLicType : {licType : string, count : number} = {licType: "", count: 0};
+        const mostPopLicTypeIds : number[] = [];
+        this.commission[0].licenses!.forEach(license => {
+            if(licTypes.find(value => value.licType == license.licType)) {
+                const foundType = licTypes.find(value => value.licType == license.licType);
+                const index = licTypes.indexOf(foundType!);
+                licTypes[index].count++;
+            }
+            else {
+                licTypes.push({licType : license.licType,count : 0})
+            }
+        })
+        licTypes.forEach((value, index) => {
+            if(index == 0 || mostPopLicType.count < value.count) {
+                mostPopLicType.licType = value.licType;
+                mostPopLicType.count = value.count
+            }
+        })
+        this.commission[0].licenses!.forEach(license => {
+            if(license.licType == mostPopLicType.licType) mostPopLicTypeIds.push(license.licId);
+        })
+        return {licIds : mostPopLicTypeIds, licType : mostPopLicType.licType};
     }
 }
 export type TCommission = {
@@ -83,4 +117,14 @@ export type TDecision = {
     licStateId: number,
     controlDate: string,
     comment: string
+}
+export type TMembers = {
+    userIds : number[]
+}
+export type TRequests = {
+    licIds : number[]
+}
+export type TReport = {
+    licIds : number[],
+    licType : string
 }

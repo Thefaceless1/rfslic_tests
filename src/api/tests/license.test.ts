@@ -21,7 +21,7 @@ describe("Работа с заявками", () => {
         expect(response.body.data.percent).toBe(0);
         expect(response.body.data.docState).toBe(license.docStatusById(response.body.data.docStateId));
         license.fillLicense(0,response);
-        api.fillLicenseApi(license.license[0].id);
+        api.request.fillApi(license.license[0].id);
         /**
          * Проверяем:
          * 1. Статусы и id документов лицензии

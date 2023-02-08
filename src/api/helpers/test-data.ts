@@ -1,5 +1,5 @@
 import {randomInt} from "crypto";
-import {Catalogs, TDocTypes, TLicAndDocStatus} from "../class/catalogs";
+import {TDocTypes, TLicAndDocStatus} from "../class/catalogs";
 import {Api} from "./api";
 import {FileReader} from "./file-reader";
 import superagent from "superagent";
@@ -41,7 +41,7 @@ export class TestData {
     /**
      * Загрузка файлов на сервер
      */
-    public static async uploadFiles() {
+    public static async uploadFiles() : Promise<void> {
         if (this.files.length == FileReader.fileNames.length) return;
         const api = new Api();
         for (const fileName of FileReader.fileNames) {

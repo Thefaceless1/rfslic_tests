@@ -18,7 +18,7 @@ export class Hooks {
         })
     }
     public static afterEachProlic(prolicense : Prolicense, api : Api) : void {
-        afterEach(() => api.fillProlicenseApi(prolicense.prolicense));
+        afterEach(() => api.constructors.fillApi(prolicense.prolicense));
     }
     public static beforeLicense(prolicense : Prolicense, license : License,criterias : Criterias,api : Api) : void {
         beforeAll(async () => {
@@ -27,7 +27,7 @@ export class Hooks {
             await prolicense.catalogs.fillCatalogsData();
             await criterias.catalogs.fillCatalogsData();
             await prolicense.createTestProlicense();
-            await api.fillProlicenseApi(prolicense.prolicense);
+            await api.constructors.fillApi(prolicense.prolicense);
             await criterias.createTestCriterias(api);
         })
     }
@@ -42,17 +42,18 @@ export class Hooks {
     }
     public static afterEachAdmin(api : Api, admin : Admin) : void {
         afterEach(() => {
-            api.fillAdminApi(admin);
+            api.admin.fillApi(admin);
         })
     }
     public static beforeCommission(commission : Commission) : void {
         beforeAll(async () => {
+            await TestData.uploadFiles();
             await commission.catalogs.fillCatalogsData();
         })
     }
     public static afterEachCommission(api : Api, commission : Commission) : void {
         afterEach(() => {
-            api.fillCommissionApi(commission);
+            api.commissions.fillApi(commission);
         })
     }
 }

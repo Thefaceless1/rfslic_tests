@@ -19,6 +19,7 @@ export class Catalogs {
      * rights - Права
      * commissionType - Типы комиссий
      * commissionSolution - Возможные решения комиссий
+     * commissionMembers - Члены комиссии
      */
     public  seasons: TSeasons[]
     public  criteriaGroups: TCriteriaGroups[]
@@ -36,6 +37,7 @@ export class Catalogs {
     public rights : TRights[]
     public commissionTypes : TCommissionType[]
     public commissionDecision : commissionDecision[]
+    public commissionTypeMembers : TCommissionTypeMember[]
     constructor() {
         this.seasons =[]
         this.criteriaGroups =[]
@@ -53,6 +55,7 @@ export class Catalogs {
         this.rights=[]
         this.commissionTypes=[]
         this.commissionDecision=[]
+        this.commissionTypeMembers=[]
     }
     /**
      * ids of dictionary elements "Club workers"
@@ -101,6 +104,12 @@ export class Catalogs {
      */
     public get commissionTypesId() : number[] {
         return this.commissionTypes.map(value => value.id);
+    }
+    /**
+     * ids of dictionary elements "Commissions type members"
+     */
+    public get commissionTypeMembersId() : number[] {
+        return this.commissionTypeMembers.map(value => value.id);
     }
     /**
      * ids of dictionary elements "Rights"
@@ -165,6 +174,9 @@ export class Catalogs {
         this.commissionTypes = commission.body.data;
         const commissionDecision = await superagent.get(api.basicUrl + api.commissions.commissionDecisions);
         this.commissionDecision = commissionDecision.body.data;
+        const commissionTypeMembers = await superagent.get(api.basicUrl + api.admin.addUser).
+        query({pageNum : 0, pageSize : 10, rights : "commission.member"});
+        this.commissionTypeMembers = commissionTypeMembers.body.data;
     }
 }
 
@@ -295,4 +307,21 @@ export type commissionDecision = {
     id: number,
     name : string,
     description : string
+}
+export type TCommissionTypeMember = {
+    id: number,
+    details: {
+    id: number,
+        rfsId: number,
+        fio: string,
+        firstName: string,
+        middleName: string,
+        lastName: string,
+        birthDate: string,
+        orgName: string,
+        position: string,
+        sportRole: string
+},
+    roleId: number,
+    active: boolean
 }

@@ -4,8 +4,6 @@ import {Commission, TLicenses} from "../class/commission";
 import {Api} from "../helpers/api";
 import {Hooks} from "../helpers/hooks/hooks";
 import {TestData} from "../helpers/test-data";
-import postgres from "postgres";
-import value = postgres.toPascal.value;
 
 describe("Commissions", () => {
     const commission = new Commission();
@@ -43,6 +41,33 @@ describe("Commissions", () => {
     })
     test("Removing a request from the commission",async () => {
         const response = await superagent.delete(api.basicUrl + api.commissions.deleteRequest);
+        expect(response.body.status).toBe("SUCCESS");
+    })
+    test("Adding members for a commission type",async () => {
+        const response = await superagent.put(api.basicUrl + api.commissions.commissionTypeMembers).
+        send(commission.addMembers());
+        expect(response.body.status).toBe("SUCCESS");
+    })
+    test("Adding members for a commission", async () => {
+        const response = await superagent.put(api.basicUrl + api.commissions.commissionMembers).
+        send(commission.addMembers());
+        expect(response.body.status).toBe("SUCCESS");
+    })
+    test("Adding protocol for a commission",async () => {
+        const response = await superagent.put(api.basicUrl + api.commissions.addProtocol).
+        send(TestData.files[0]);
+        commission.fillCommission(0,response);
+        expect(commission.commission[0].protocolName).toBe(TestData.files[0].name);
+        expect(commission.commission[0].protocolStorageId).toBe(TestData.files[0].storageId);
+    })
+    test("Adding report by license type for a commission", async () => {
+        const response = await superagent.post(api.basicUrl + api.commissions.addReportByType).
+        send(commission.addReport("byType"));
+        expect(response.body.status).toBe("SUCCESS");
+    })
+    test.skip("Adding report by club for a commission", async () => {
+        const response = await superagent.post(api.basicUrl + api.commissions.addReportByClub).
+        send(commission.addReport("byClub"));
         expect(response.body.status).toBe("SUCCESS");
     })
 })
