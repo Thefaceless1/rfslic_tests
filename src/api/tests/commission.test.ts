@@ -1,6 +1,6 @@
 import {describe} from "@jest/globals";
 import superagent from "superagent";
-import {Commission, TLicenses} from "../class/commission";
+import {Commission, TLicenses} from "../helpers/commission";
 import {Api} from "../helpers/api";
 import {Hooks} from "../helpers/hooks/hooks";
 import {TestData} from "../helpers/test-data";
@@ -65,9 +65,24 @@ describe("Commissions", () => {
         send(commission.addReport("byType"));
         expect(response.body.status).toBe("SUCCESS");
     })
-    test.skip("Adding report by club for a commission", async () => {
+    test("Adding report by club for a commission", async () => {
         const response = await superagent.post(api.basicUrl + api.commissions.addReportByClub).
         send(commission.addReport("byClub"));
+        expect(response.body.status).toBe("SUCCESS");
+    })
+    test("Adding text for a license type", async () => {
+        const response = await superagent.put(api.basicUrl + api.commissions.addLicenseText).
+        send(commission.addLicTypeText());
+        expect(response.body.status).toBe("SUCCESS");
+    })
+    test("License formation", async () => {
+        const response = await superagent.put(api.basicUrl + api.commissions.formLicense).
+        send(await commission.formLicense());
+        expect(response.body.data.fileName).not.toBeNull();
+        expect(response.body.data.storageId).not.toBeNull();
+    })
+    test("Deletion a commission", async () => {
+        const response = await superagent.delete(api.basicUrl + api.commissions.getCommission);
         expect(response.body.status).toBe("SUCCESS");
     })
 })

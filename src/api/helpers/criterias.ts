@@ -1,8 +1,8 @@
 import {TDocuments} from "./prolicense";
 import {Catalogs, TClubWorkers} from "./catalogs";
-import {TestData} from "../helpers/test-data";
+import {TestData} from "./test-data";
 import superagent from "superagent";
-import {Api} from "../helpers/api";
+import {Api} from "./api";
 
 export class Criterias {
     public  criterias : TCriterias[]
@@ -11,7 +11,7 @@ export class Criterias {
         this.criterias =[]
     }
     /**
-     * Создание групп критериев
+     * Add criteria groups
      */
     public createCritGroups () : void {
         this.catalogs.criteriaGroups.forEach((value) => {
@@ -29,7 +29,7 @@ export class Criterias {
         })
     }
     /**
-     * Создание критериев и документов критериев
+     * Add criterias and criteria documents
      */
     public createCriterias () : void {
         this.criterias.forEach((criteriaGroup) => {
@@ -60,10 +60,10 @@ export class Criterias {
         )
     }
     /**
-     * Изменение критериев:
-     * 1. Номер критерия
-     * 2. Наименование
-     * 3. Разряд
+     * Change criterias:
+     * 1. Criteria number
+     * 2. Criteria name
+     * 3. Criteria rank
      */
     public changeCriterias () : void {
         this.criterias.forEach((criteriaGroup) => {
@@ -75,7 +75,7 @@ export class Criterias {
         })
     }
     /**
-     * Создание групп критериев и критериев для тестовой пролицензии сценария license.test.ts
+     * Create criteria groups and criterias for the 'license.test.ts' test scenario
      */
     public async createTestCriterias (api : Api) : Promise<void> {
         this.createCritGroups();

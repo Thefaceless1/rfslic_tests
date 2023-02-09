@@ -1,25 +1,25 @@
 import superagent from "superagent";
-import {Api} from "../helpers/api";
+import {Api} from "./api";
 
 export class Catalogs {
     /**
-     * seasons - Сезоны
-     * criteriaGroups - Группы критериев
-     * licTypes - Типы лицензий
-     * docTypes - Типы документов
-     * rankCriteria - Разряды критериев
-     * criteriaTypes - Типы критериев
-     * licStatus - Статусы заявки
-     * docStatus - Типы документов
-     * critGrpExperts - Эксперты группы критериев
-     * clubWorkers - Сотрудники клубов
-     * ofi - ОФИ
-     * organization - Организации
-     * roles - Роли
-     * rights - Права
-     * commissionType - Типы комиссий
-     * commissionSolution - Возможные решения комиссий
-     * commissionMembers - Члены комиссии
+     * seasons - catalog 'Seasons'
+     * criteriaGroups - catalog 'Criteria Groups'
+     * licTypes - catalog 'License types'
+     * docTypes - catalog 'Documents types'
+     * rankCriteria - catalog 'Criteria ranks'
+     * criteriaTypes - catalog 'Criteria types'
+     * licStatus - catalog 'License status'
+     * docStatus - catalog 'Documents status'
+     * critGrpExperts - catalog 'Criteria groups experts'
+     * clubWorkers - catalog 'Club workers'
+     * ofi - catalog 'OFI'
+     * organization - catalog 'Organizations'
+     * roles - catalog 'User roles'
+     * rights - catalog 'User rights'
+     * commissionType - catalog 'Commission types'
+     * commissionSolution - catalog 'Commission solutions'
+     * commissionMembers - catalog 'Commission members'
      */
     public  seasons: TSeasons[]
     public  criteriaGroups: TCriteriaGroups[]
@@ -58,61 +58,67 @@ export class Catalogs {
         this.commissionTypeMembers=[]
     }
     /**
-     * ids of dictionary elements "Club workers"
+     * ids of "Club workers" catalog elements
      */
     public get clubWorkersId () : number[] {
         return this.clubWorkers.map(value => value.id);
     }
     /**
-     * ids of dictionary elements "Criteria groups"
+     * ids of "Criteria groups" catalog elements
      */
     public get criteriaGrpId() : number[] {
         return this.criteriaGroups.map(value => value.id);
     }
     /**
-     * ids of dictionary elements "Criteria groups experts"
+     * ids of "Criteria groups experts" catalog elements
      */
     public get critGrpExpertsId () : number[] {
         return this.critGrpExperts.map(value => value.id);
     }
     /**
-     * id всех записей свойства ofi
+     * ids of "OFI" catalog elements
      */
     public get ofiId () : number[] {
         return this.ofi.map(value => value.id);
     }
     /**
-     * id всех записей свойства organization
+     * ids of "Organization" catalog elements
      */
     public get orgId () : number[] {
         return this.organization.map(value => value.id);
     }
     /**
-     * Получение объекта со статусом заявки "Выдана"
+     * Get "License status" catalog element with status = Issued
      */
     public get issuedLicStatus () : TLicAndDocStatus {
         return this.licStatus.find(value => value.name == 'Выдана')!;
     }
     /**
-     * ids of dictionary elements "Roles"
+     * ids of "User roles" catalog elements
      */
     public get rolesId() : number[] {
         return this.roles.map(value => value.id);
     }
     /**
-     * ids of dictionary elements "Commissions types"
+     * ids of "Commission types" catalog elements
      */
     public get commissionTypesId() : number[] {
         return this.commissionTypes.map(value => value.id);
     }
     /**
-     * ids of dictionary elements "Commissions type members"
+     * ids of "Commission types members" catalog elements
      */
     public get commissionTypeMembersId() : number[] {
         return this.commissionTypeMembers.map(value => value.id);
     }
     /**
-     * ids of dictionary elements "Rights"
+     * ids of "License types" catalog elements
+     */
+    public get licTypeIds() : number[] {
+        return this.licTypes.map(value => value.id);
+    }
+    /**
+     * ids of "User rights" catalog elements
      */
     public get rightsId() : string[] {
         const rightsId : string[] =[];
@@ -124,7 +130,7 @@ export class Catalogs {
         return rightsId;
     }
     /**
-     * Получить id всех возможных типов документов в зависимости от типа критерия
+     * Get 'Document types' catalog elements by criteria type
      */
     public docTypesForCrit (criteriaType : TCriteriaTypes) : TDocTypes[] {
         switch (criteriaType.name) {
@@ -134,7 +140,7 @@ export class Catalogs {
         }
     }
     /**
-     * Получаем данные из справочников и записываем их в свойства объектов класса
+     * Get catalogs data by api
      */
     public async fillCatalogsData () : Promise<void> {
         const api = new Api();

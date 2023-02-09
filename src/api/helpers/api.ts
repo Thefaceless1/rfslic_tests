@@ -1,6 +1,6 @@
-import {TProlicense} from "../class/prolicense";
-import {Admin} from "../class/admin";
-import {Commission} from "../class/commission";
+import {TProlicense} from "./prolicense";
+import {Admin} from "./admin";
+import {Commission} from "./commission";
 
 export class Api {
     public readonly basicUrl : string = "https://rfs-lic-test-01.fors.ru";
@@ -86,6 +86,8 @@ export class Api {
         commissionTypes : "/api/rest/commissions/types",
         commissionDecisions : "/api/rest/commissions/decisions",
         createCommission : "/api/rest/commissions",
+        addLicenseText : "/api/rest/commissions/licenseText",
+        formLicense : "/api/rest/commissions/formLicense",
         changeCommissionRequest(commission : Commission, licId : number) : string {
             return `${this.createCommission}/${commission.commission[0].id}/licenses/${licId}`;
         },
@@ -157,6 +159,8 @@ export type TCommissions = {
     commissionTypes : string,
     commissionDecisions : string,
     createCommission : string,
+    addLicenseText : string,
+    formLicense : string,
     addRequests? : string,
     getCommission? : string,
     deleteRequest? : string,

@@ -1,5 +1,5 @@
 import {Catalogs, TCriteriaGroups, TOrganization} from "./catalogs";
-import {TestData} from "../helpers/test-data";
+import {TestData} from "./test-data";
 import {Response} from "superagent";
 
 export class Admin {
@@ -20,7 +20,7 @@ export class Admin {
         return this.user[0];
     }
     /**
-     * Create new role
+     * Create a new role
      */
     public addRole() : TRole {
         this.role.push({

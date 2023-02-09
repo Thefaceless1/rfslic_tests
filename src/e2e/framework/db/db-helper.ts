@@ -7,13 +7,13 @@ export class DbHelper {
        this.sql = postgres(this.configData())
     }
     /**
-     * Удалить данные из таблиц
+     * Delete data from tables
      */
     public async delete(table : string,column : string,data : number | string) : Promise<void> {
        await this.sql`delete from ${this.sql(table)} where ${this.sql(column)} = ${data}`;
     }
     /**
-     * Получить содержимое файла db.config.json
+     * db.config.json file parser
      */
     public configData() : object {
        return JSON.parse(fs.readFileSync("./src/e2e/framework/db/db.config.json","utf-8"));

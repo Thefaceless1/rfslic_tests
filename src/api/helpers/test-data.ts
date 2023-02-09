@@ -1,5 +1,5 @@
 import {randomInt} from "crypto";
-import {TDocTypes, TLicAndDocStatus} from "../class/catalogs";
+import {TDocTypes, TLicAndDocStatus} from "./catalogs";
 import {Api} from "./api";
 import {FileReader} from "./file-reader";
 import superagent from "superagent";
@@ -9,19 +9,19 @@ export class TestData {
     public static readonly commentValue : string = "Тестовый комментарий";
     public static readonly descValue : string = "Тестовое описание";
     /**
-     * Текущая дата
+     * Current date
      */
     public static get currentDate () : string {
         return new Date().toLocaleDateString().split(".").reverse().join("-");
     }
     /**
-     * Будущая дата
+     * Future date
      */
     public static get futureDate () : string {
         return new Date(Date.now() + 5000000000).toLocaleDateString().split(".").reverse().join("-");
     }
     /**
-     * Случайный набор букв
+     * Random letters
      */
     public static get randomWord () : string {
         const alphabet: string = "абвгдеёжзийклмнопрстуфхцчшщъыьэюя";
@@ -33,13 +33,13 @@ export class TestData {
         return randomWord;
     }
     /**
-     * Заполнение свойства files
+     * Add data to the 'files' array
      */
     private static addDataToFiles (name : string, id: string) : void {
         this.files.push({name : name, storageId : id})
     }
     /**
-     * Загрузка файлов на сервер
+     * Upload files to the server
      */
     public static async uploadFiles() : Promise<void> {
         if (this.files.length == FileReader.fileNames.length) return;
@@ -52,19 +52,19 @@ export class TestData {
         }
     }
     /**
-     * Получение случайного числа для поля Минимальное количество
+     * Get random number for the 'Minimum quantity' field
      */
     public static get randomIntForMulti () : number {
         return randomInt(2,10);
     }
     /**
-     * Получение случайного числа для Типа документа пролицензии
+     * Get a random number for the 'Document type' field
      */
     public static randomIntForDocs (docTypes : TDocTypes[]) : number {
         return randomInt(0,docTypes.length);
     }
     /**
-     * Получение случайного числа для статуса документа заявки
+     * Get a random number for the 'Document status' field
      */
     public static randomIntForDocStat (docStatus : TLicAndDocStatus[]) : number {
         return randomInt(0,docStatus.length);

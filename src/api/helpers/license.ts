@@ -1,6 +1,6 @@
 import {Catalogs, TClubWorkers, TOfi, TOrganization} from "./catalogs";
-import {TestData} from "../helpers/test-data";
-import {TProlicense} from "./prolicense";
+import {TestData} from "./test-data";
+import {Templates, TProlicense} from "./prolicense";
 import {Response} from "superagent";
 
 export class License {
@@ -10,7 +10,7 @@ export class License {
         this.license = []
     }
     /**
-     * Создание заявки на получение лицензии
+     * Add a license request
      */
     public createLicense (prolicense : TProlicense[]) : TCreateLicense {
         const firstClubId : number = this.catalogs.organization[0].id;
@@ -20,13 +20,13 @@ export class License {
         }
     }
     /**
-     * Добавление тела ответа от сервера в свойство license объекта класса
+     * Add response body to the 'license' array
      */
     public fillLicense(index : number,response : Response) : void {
         this.license[index] = response.body.data;
     }
     /**
-     * Добавление документов и комментариев для заявки
+     * Add documents and comments for a license request
      */
     public addCommentsAndDocuments () : TLicense {
         this.license[0].documents.forEach((document) => {
@@ -36,7 +36,7 @@ export class License {
         return this.license[0];
     }
     /**
-     * Публикация заявки
+     * Publish a license request
      */
     public publishLicense () : TLicense {
         this.license[0].stateId = 1;
@@ -44,7 +44,7 @@ export class License {
         return this.license[0];
     }
     /**
-     * Получение наименования статуса заявки по id статуса
+     * Get license status by 'License status' catalog id
      */
     public licStatusById(stateId : number) : string | null {
         if (!stateId) return null;
@@ -54,14 +54,14 @@ export class License {
         }
     }
     /**
-     * Получение наименования статуса документа по id статуса
+     * Get document status by 'Document status' catalog id
      */
     public docStatusById(docStateId : number) : string {
         const result = this.catalogs.docStatus.find(value => value.id == docStateId);
         return (result) ? result.name : "Статус по id не найден";
     }
     /**
-     * Добавление экспертов групп критериев и сотрудников клуба для группы критериев
+     * Add criteria groups experts and club workers for a criteria group
      */
     public addClubWorkersToCritGrp () : TLicense {
         const checkedClubWorkers : number[] = this.catalogs.clubWorkersId.
@@ -73,12 +73,12 @@ export class License {
         return this.license[0];
     }
     /**
-     * Добавление для документов критериев :
-     * 1. Комментарии
-     * 2. Если Тип документа != Cписок участников, ОФИ, Организация, то добавляем файлы
-     * 3. Если Тип документа = Список участников, то добавляем участников
-     * 4. Если тип документа = ОФИ, то добавляем офи
-     * 5. Если тип документа = Организация, то добавляем организации
+     * Add for criteria documents :
+     * 1. Comments
+     * 2. If document type != List of participants, OFI, Organization - then add files
+     * 3. If document type = List of participants - then add participants
+     * 4. If document type = OFI - then add OFI
+     * 5. If document type = Organization - then add organizations
      */
     public addDataToCritDoc () {
         this.license[0].criteriaGroups.forEach((critGrp) => {
@@ -97,9 +97,9 @@ export class License {
         return this.license[0];
     }
     /**
-     * Добавление для  документов критериев :
-     * 1.Комментарии
-     * 2.Случайный статус
+     * Add for criteria documents:
+     * 1.Comments
+     * 2.Random document status
      */
     public addStatusToDocuments () : TLicense {
         this.license[0].documents.forEach((document) => {
@@ -117,7 +117,7 @@ export class License {
         return this.license[0];
     }
     /**
-     * Расчет процентов заполнения лицензии после проставления решений по документам
+     * Calculation of license filling percentages after filling out decisions on documents
      */
     public get licPercent () : number {
         let allDocsCount : number = 0;
@@ -143,7 +143,7 @@ export class License {
         return Math.round((checkedDocsCount / allDocsCount) * 100);
     }
     /**
-     * Calculation of percentages of each criteria
+     * Calculation of percentages of each criterias
      */
     public criteriaPercent(criteriaGroup : TCriteriaGroups, criteria : TCriterias) : number {
         let critPercent : number;
@@ -165,7 +165,7 @@ export class License {
         return Math.round(critPercent)
     }
     /**
-     * Get Criteria Documents
+     * Get criteria documents
      */
     public criteriaDocuments(criteriaGroup : TCriteriaGroups,criteria : TCriterias) : TDocuments[] {
         if(criteria.external == null) return criteria.documents;
@@ -184,7 +184,7 @@ export class License {
         }
     }
     /**
-     * Setting the status "Issued" for a license
+     * Set the status "Issued" for a license
      */
     public addSolutionToLicense () : TLicense {
         this.license[0].stateId = this.catalogs.issuedLicStatus.id;
@@ -195,7 +195,7 @@ export class License {
         return this.license[0];
     }
     /**
-     * Adding an Expert Report for Criteria Groups
+     * Add an expert report for criteria groups
      */
     public addExpertReport(grpId : number) : TExpertReport {
         return {
@@ -205,7 +205,7 @@ export class License {
         }
     }
     /**
-     * Adding participants and OFI for criteria with types Participant and OFI
+     * Add participants and OFI for criteria with types Participant and OFI
      */
     public addOfiAndUsers() : TLicense {
         this.license[0].criteriaGroups.forEach(critGrp => {
@@ -273,11 +273,7 @@ export type TLicense = {
             name: string,
             storageId: string
         }[],
-        files : {
-            id?: number,
-            name: string,
-            storageId: string
-        }[]
+        files : Templates[]
     }[],
     criteriaGroups : TCriteriaGroups[],
     conclusion: string,
@@ -345,10 +341,5 @@ export type TDocuments = {
         name: string,
         storageId: string
     }[],
-    files : {
-        id?: number,
-        name: string,
-        storageId: string
-    }[]
+    files : Templates[]
 }
-

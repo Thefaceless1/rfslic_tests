@@ -1,19 +1,19 @@
 import {test, expect, describe} from "@jest/globals";
 import superagent from "superagent";
 import {TestData} from "../helpers/test-data";
-import {Prolicense} from "../class/prolicense";
-import {License} from "../class/license";
-import {Criterias} from "../class/criterias";
+import {Prolicense} from "../helpers/prolicense";
+import {License} from "../helpers/license";
+import {Criterias} from "../helpers/criterias";
 import {Api} from "../helpers/api";
 import {Hooks} from "../helpers/hooks/hooks";
 
-describe("Работа с заявками", () => {
+describe("License requests", () => {
     const license = new License();
     const prolicense = new Prolicense();
     const criterias = new Criterias();
     const api = new Api();
     Hooks.beforeLicense(prolicense,license,criterias,api);
-    test("Создание заявки в статусе 'Черновик' ",async () => {
+    test("Creating a request in 'draft' status",async () => {
         const response = await superagent.put(api.basicUrl+api.request.createLicense).
         send(license.createLicense(prolicense.prolicense));
         expect(response.body.data.proLicId).toBe(prolicense.prolicense[0].id);
@@ -22,13 +22,6 @@ describe("Работа с заявками", () => {
         expect(response.body.data.docState).toBe(license.docStatusById(response.body.data.docStateId));
         license.fillLicense(0,response);
         api.request.fillApi(license.license[0].id);
-        /**
-         * Проверяем:
-         * 1. Статусы и id документов лицензии
-         * 2. Статусы и проценты заполнения групп критериев
-         * 3. Статусы и проценты заполнения критериев
-         * 4. Статусы документов критериев
-         */
         license.license[0].documents.forEach((document, index) => {
             expect(document.state).toBe(license.docStatusById(response.body.data.docStateId));
             expect(document.proDocId).toBe(prolicense.prolicense[0].documents[index].id);
@@ -46,19 +39,16 @@ describe("Работа с заявками", () => {
             })
         })
     })
-    test("Добавление документов и комментариев на вкладке Общая информация",async () => {
+    test("Adding documents and comments on the 'General Information' tab",async () => {
         const response = await superagent.put(api.basicUrl + api.request.changeLicense).
         send(license.addCommentsAndDocuments());
-        /**
-         * Проверяем наличие добавленных документов и комментариев
-         */
         license.fillLicense(0,response);
         license.license[0].documents.forEach((document) => {
             expect(document.comment).toBe(TestData.commentValue);
             expect(document.files.length).toBe(TestData.files.length);
         })
     })
-    test("Публикация лицензии", async () => {
+    test("Publish license", async () => {
         const response = await superagent.put(api.basicUrl + api.request.publishLicense).
         send(license.publishLicense());
         expect(response.body.data.state).toBe(license.license[0].state);
@@ -66,39 +56,28 @@ describe("Работа с заявками", () => {
         license.fillLicense(0,response);
         console.log(license.license[0].name);
     })
-    test("Добавление сотрудников клуба и экспертов к группе критериев", async () => {
+    test("Adding club workers and experts to the criteria group", async () => {
         const response = await superagent.put(api.basicUrl + api.request.changeLicense).
         send(license.addClubWorkersToCritGrp());
-        /**
-         * Проверяем наличие добавленных сотрудников клубов и экспертов для групп критериев
-         */
         license.license[0].criteriaGroups.forEach((criteriaGroup, index) => {
             expect(criteriaGroup.experts).toEqual(response.body.data.criteriaGroups[index].experts);
             expect(criteriaGroup.rfuExpert).toBe(response.body.data.criteriaGroups[index].rfuExpert);
         })
         license.fillLicense(0,response);
     })
-    test("Добавление участников и ОФИ для критериев с типами Участник и ОФИ",async () => {
+    test("Adding participants and OFI for criterias with Participant and OFI types",async () => {
         const response = await superagent.put(api.basicUrl + api.request.changeLicense).
         send(license.addOfiAndUsers());
         license.fillLicense(0,response);
         const criteriaCount = license.catalogs.criteriaTypes.length;
-        /**
-         * Проверяем наличие добавленных критериев
-         */
         license.license[0].criteriaGroups.forEach(critGrp => {
             expect(critGrp.criterias.length).toBeGreaterThan(criteriaCount);
         })
     })
-    test("Добавление документов, сотрудников клуба, ОФИ, организаций и комментариев для документов критериев", async () => {
+    test("Adding documents, club workers, OFI, organizations and comments for criteria documents", async () => {
         const response = await superagent.put(api.basicUrl + api.request.changeLicense).
         send(license.addDataToCritDoc());
         license.fillLicense(0,response);
-        /**
-         * Проверяем значения добавленных комментариев
-         * Проверяем , если тип документа = Файл или Документ клуба то массив файлов документа должен быть заполнен,
-         * иначе должен быть пуст
-         */
         license.license[0].criteriaGroups.forEach((criteriaGroup) => {
             criteriaGroup.criterias.forEach((criteria) => {
                 criteria.documents.forEach((document) => {
@@ -111,13 +90,10 @@ describe("Работа с заявками", () => {
             })
         })
     })
-    test("Проставление статусов и комментариев для документов",async () => {
+    test("Setting statuses and comments for documents",async () => {
         const response = await superagent.put(api.basicUrl + api.request.changeLicense).
         send(license.addStatusToDocuments());
         license.fillLicense(0,response);
-        /**
-         * Проверяем проценты заполнения и статусы заявки, групп критериев, критериев
-         */
         expect(license.licPercent).toBe(Math.round(license.license[0].percent));
         license.license[0].criteriaGroups.forEach((criteriaGroup) => {
             const grpPercent = criteriaGroup.criterias.reduce((accum,value) =>accum+value.percent,0)/criteriaGroup.criterias.length;
@@ -156,7 +132,7 @@ describe("Работа с заявками", () => {
             })
         })
     })
-    test("Создание отчета эксперта", async () => {
+    test("Creating an expert report", async () => {
         const groupsCount : number = license.catalogs.criteriaGroups.length;
         const firstGrpId : number = license.catalogs.criteriaGroups[0].id;
         for(let i = firstGrpId; i<=groupsCount; i++) {
@@ -166,7 +142,7 @@ describe("Работа с заявками", () => {
             expect(response.body.data.storageId).toBeTruthy();
         }
     })
-    test("Вынесение решения по заявке",async () => {
+    test("Making a decision on the license request",async () => {
         const response = await superagent.put(api.basicUrl + api.request.changeLicense).
         send(license.addSolutionToLicense());
         expect(response.body.data.stateId).toBe(license.catalogs.issuedLicStatus.id);

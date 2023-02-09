@@ -1,7 +1,7 @@
-import {TestData} from "../helpers/test-data";
+import {TestData} from "./test-data";
 import {Catalogs} from "./catalogs";
 import superagent, {Response} from "superagent";
-import {Api} from "../helpers/api";
+import {Api} from "./api";
 
 export class Prolicense {
     public  prolicense : TProlicense[];
@@ -10,7 +10,7 @@ export class Prolicense {
         this.prolicense =[]
     }
     /**
-     * Создание пролицензии
+     * Add a prolicense
      */
     public createProlicense() : TProlicense {
         const docArray : TDocuments[] = [...Array(5)].fill(
@@ -40,11 +40,11 @@ export class Prolicense {
         return this.prolicense[0];
     }
     /**
-     * Изменение пролицензии:
-     * 1. Наименование
-     * 2. Тип
-     * 3. Сезон
-     * 4. Добавление документа
+     * Change prolicense attributes:
+     * 1. Name
+     * 2. Type
+     * 3. Season
+     * 4. Add document
      */
     public changeProlicense () : TProlicense {
         this.prolicense[0].name = TestData.randomWord;
@@ -61,7 +61,7 @@ export class Prolicense {
         return this.prolicense[0];
     }
     /**
-     * Создание пролицензии по образцу
+     * Copy prolicense
      */
     public createSampleProlicense () : TSampleLicense {
         return {
@@ -71,13 +71,13 @@ export class Prolicense {
         }
     }
     /**
-     * Добавление тела ответа в массив свойства prolicense
+     * Add response body to the 'prolicense' array
      */
     public fillProlicense (index : number,response : Response) : void {
         this.prolicense[index] = response.body.data;
     }
     /**
-     * Создание тестовой пролицензии для сценария license.test.ts
+     * Create prolicense for the 'license.test.ts' test scenario
      */
     public async createTestProlicense () : Promise<void> {
         const api = new Api();

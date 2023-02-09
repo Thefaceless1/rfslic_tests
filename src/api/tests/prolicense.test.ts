@@ -1,19 +1,19 @@
 import {test, expect, describe} from "@jest/globals";
 import superagent from "superagent";
 import {TestData} from "../helpers/test-data";
-import {Prolicense, TDocuments} from "../class/prolicense";
-import {Criterias, TCriterias} from "../class/criterias";
+import {Prolicense, TDocuments} from "../helpers/prolicense";
+import {Criterias, TCriterias} from "../helpers/criterias";
 import {ProlicenseStatus} from "../helpers/enums/prolicense-status";
 import {Api} from "../helpers/api";
 import {Hooks} from "../helpers/hooks/hooks";
 
-describe("Пролицензия", () => {
+describe("Prolicense", () => {
     const prolicense = new Prolicense();
     const criterias = new Criterias();
     const api = new Api();
     Hooks.beforeProlic(prolicense,criterias);
     Hooks.afterEachProlic(prolicense,api);
-    test("Создание проекта лицензии", async () => {
+    test("Creating a license project", async () => {
         const response = await superagent.put(api.basicUrl + api.constructors.createProlicense).
         send(prolicense.createProlicense());
         expect(response.body.data.id).toBeTruthy();
@@ -27,12 +27,12 @@ describe("Пролицензия", () => {
 
         prolicense.fillProlicense(0,response);
     })
-    test("Изменение проекта лицензии", async () => {
+    test("Changing the license project", async () => {
         const response = await superagent.put(api.basicUrl + api.constructors.changeProlicense).
         send(prolicense.changeProlicense());
         expect(response.body.status).toBe("SUCCESS");
     })
-    test("Получение проекта лицензии по ID", async () => {
+    test("Getting the license project by ID", async () => {
         const response = await superagent.get(api.basicUrl + api.constructors.changeProlicense);
         expect(response.body.data.id).toBe(prolicense.prolicense[0].id);
         expect(response.body.data.type).toBe(prolicense.prolicense[0].type);
@@ -41,7 +41,7 @@ describe("Пролицензия", () => {
         expect(response.body.data.documents.length).toBe(prolicense.prolicense[0].documents.length);
         prolicense.fillProlicense(0,response);
     })
-    test("Создание группы критериев пролицензии", async () => {
+    test("Creating prolicense criteria groups", async () => {
         criterias.createCritGroups();
         for (const criteriaGroup of criterias.criterias) {
             const response = await superagent.put(api.basicUrl + api.constructors.createCriteriaGrp).
@@ -49,7 +49,7 @@ describe("Пролицензия", () => {
             expect(response.body.status).toBe("SUCCESS");
         }
     })
-    test("Создание критерия пролицензии", async () => {
+    test("Creating prolicense criterias", async () => {
         criterias.createCriterias();
         for(const criteriaGroup of criterias.criterias){
             for(let criteria of criteriaGroup.criterias) {
@@ -63,7 +63,7 @@ describe("Пролицензия", () => {
             }
         }
     })
-    test("Изменение критериев пролицензии", async () => {
+    test("Changing prolicense criterias", async () => {
         criterias.changeCriterias();
         for (const criteriaGroup of criterias.criterias) {
             for (const criteria of criteriaGroup.criterias) {
@@ -73,7 +73,7 @@ describe("Пролицензия", () => {
             }
         }
     })
-    test("Получение полной информации о критериях пролицензии", async () => {
+    test("Getting full information about prolicense criterias", async () => {
         const response = await superagent.get(api.basicUrl + api.constructors.createCriterias);
         expect(response.body.data.groups.length).toBeGreaterThan(0);
         response.body.data.groups.forEach((criteriaGroup: TCriterias, index: number) => {
@@ -86,7 +86,7 @@ describe("Пролицензия", () => {
             })
         })
     })
-    test("Создание пролицензии по образцу", async () => {
+    test("Copy the prolicense", async () => {
         const response = await superagent.put(api.basicUrl + api.constructors.cloneProlicense).
         send(prolicense.createSampleProlicense());
         expect(response.body.data.id).not.toBe(prolicense.prolicense[0].id);
@@ -106,12 +106,12 @@ describe("Пролицензия", () => {
     })
         prolicense.prolicense.push(response.body.data);
     })
-    test("Удаление пролицензии", async () => {
+    test("Removal the prolicense", async () => {
         const response = await superagent.delete(api.basicUrl + api.constructors.deleteProlicense);
         expect(response.body.status).toBe("SUCCESS");
         prolicense.prolicense.pop();
     })
-    test("Удаление критерия пролицензии", async () => {
+    test("Removal prolicense criterias", async () => {
         for (const criteriaGroup of criterias.criterias) {
             if (criteriaGroup.id % 2 == 0) {
                 for (const criteria of criteriaGroup.criterias) {
@@ -122,7 +122,7 @@ describe("Пролицензия", () => {
             }
         }
     })
-    test("Удаление группы критериев", async () => {
+    test("Removal criteria groups", async () => {
         for (let i = 0; i<criterias.criterias.length; i++) {
             if (criterias.criterias[i].id % 2 == 0) {
                 const response = await superagent.delete(api.basicUrl + api.constructors.deleteCriteriasGrp + criterias.criterias[i].id);
@@ -131,12 +131,12 @@ describe("Пролицензия", () => {
             }
         }
     })
-    test("Публикация проекта лицензии",async () => {
+    test("Publish prolicense",async () => {
         const response = await superagent.put(api.basicUrl+api.constructors.publishProlicense);
         expect(response.body.status).toBe("SUCCESS");
         prolicense.prolicense[0].stateId = ProlicenseStatus.published;
     })
-    test("Снятие с публикации проекта лицензии", async () => {
+    test("Removal of the prolicense from publication", async () => {
         const response = await superagent.put(api.basicUrl + api.constructors.unpublishProlicense);
         expect(response.body.status).toBe("SUCCESS");
         prolicense.prolicense[0].stateId = ProlicenseStatus.unpublished;

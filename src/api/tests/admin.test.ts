@@ -1,7 +1,7 @@
 import {test, expect, describe} from "@jest/globals";
 import superagent from "superagent";
 import {Api} from "../helpers/api";
-import {Admin} from "../class/admin";
+import {Admin} from "../helpers/admin";
 import {Hooks} from "../helpers/hooks/hooks";
 
 describe("Administration",() => {

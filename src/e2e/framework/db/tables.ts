@@ -13,3 +13,11 @@ export const operationsLog = {
         userId : "user_id"
     }
 }
+export const issuedLicense = {
+    tableName : "rfslic.issued_licences",
+    columns : {
+        licId : "lic_id",
+        number : "number",
+        storageId : "storage_id"
+    }
+}

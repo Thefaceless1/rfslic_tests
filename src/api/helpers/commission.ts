@@ -1,10 +1,12 @@
 import {Templates} from "./prolicense";
 import {Catalogs, TClubWorkers, TLicAndDocStatus} from "./catalogs";
-import {TestData} from "../helpers/test-data";
+import {TestData} from "./test-data";
 import superagent, {Response} from "superagent";
-import {Api} from "../helpers/api";
+import {Api} from "./api";
 import {TLicense} from "./license";
 import {randomInt} from "crypto";
+import {DbHelper} from "../../e2e/framework/db/db-helper";
+import {issuedLicense} from "../../e2e/framework/db/tables";
 
 export class Commission {
     public commission : TCommission[]
@@ -59,12 +61,17 @@ export class Commission {
         return {userIds : this.catalogs.commissionTypeMembersId}
     }
     /**
-     * Add report by license type for a commission
+     * Add report by license type or by club for a commission
      */
-    public addReport(type : "byType" | "byClub") : TReport {
-        const licTypes : {licType : string, count : number}[] =[];
-        let mostPopLicType : {licType : string, count : number} = {licType: "", count: 0};
+    public addReport(type : "byType" | "byClub") : TLicTypeReport | TClubReport {
+        type TLicType = {licType : string, count : number};
+        type TClub = {clubId : number, count : number};
+        const licTypes : TLicType[] = [];
+        const clubs : TClub[] = [];
+        const mostPopLicType : TLicType = {licType: "", count: 0};
+        const mostPopClub : TClub = {clubId : 0, count: 0};
         const mostPopLicTypeIds : number[] = [];
+        const mostPopLicIds : number[] = []
         this.commission[0].licenses!.forEach(license => {
             if(licTypes.find(value => value.licType == license.licType)) {
                 const foundType = licTypes.find(value => value.licType == license.licType);
@@ -72,7 +79,15 @@ export class Commission {
                 licTypes[index].count++;
             }
             else {
-                licTypes.push({licType : license.licType,count : 0})
+                licTypes.push({licType : license.licType, count : 0})
+            }
+            if(clubs.find(value => value.clubId == license.clubId)) {
+                const foundClub = clubs.find(value => value.clubId == license.clubId);
+                const index = clubs.indexOf(foundClub!);
+                clubs[index].count++;
+            }
+            else {
+                clubs.push({clubId : license.clubId, count : 0})
             }
         })
         licTypes.forEach((value, index) => {
@@ -81,10 +96,34 @@ export class Commission {
                 mostPopLicType.count = value.count
             }
         })
+        clubs.forEach((value, index) => {
+            if(index == 0 || mostPopClub.count < value.count) {
+                mostPopClub.clubId= value.clubId;
+                mostPopClub.count = value.count
+            }
+        })
         this.commission[0].licenses!.forEach(license => {
             if(license.licType == mostPopLicType.licType) mostPopLicTypeIds.push(license.licId);
+            if(license.clubId == mostPopClub.clubId) mostPopLicIds.push(license.licId);
         })
-        return {licIds : mostPopLicTypeIds, licType : mostPopLicType.licType};
+        return (type == "byType") ?
+            {licIds : mostPopLicTypeIds, licType : mostPopLicType.licType} :
+            {licIds : mostPopLicIds, clubId : mostPopClub.clubId};
+    }
+    /**
+     * Add text for a license type
+     */
+    public addLicTypeText() : TLicTypeText {
+        return {licType : this.catalogs.licTypeIds[0], text : TestData.commentValue};
+    }
+    /**
+     * Form license
+     */
+    public async formLicense() : Promise<{ licId: number }> {
+        const dbHelper = new DbHelper();
+        await dbHelper.delete(issuedLicense.tableName,issuedLicense.columns.licId,this.commission[0].licenses![0].licId);
+        await dbHelper.sql.end();
+        return {licId : this.commission[0].licenses![0].licId};
     }
 }
 export type TCommission = {
@@ -124,7 +163,15 @@ export type TMembers = {
 export type TRequests = {
     licIds : number[]
 }
-export type TReport = {
+export type TLicTypeReport = {
     licIds : number[],
     licType : string
+}
+export type TClubReport = {
+    licIds : number[],
+    clubId : number
+}
+export type TLicTypeText = {
+    licType : number,
+    text : string
 }
