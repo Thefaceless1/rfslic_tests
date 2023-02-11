@@ -8,19 +8,19 @@ export class RolesPage extends MainPage {
         super(page);
     }
     /**
-     * Кнопка "Сохранить как"
+     * Button "Save as"
      */
     private saveAsButton : Locator = Elements.getElement(this.page,"//button[text()='Сохранить как...']");
     /**
-     * Поле "Название роли"
+     * Field "Role name"
      */
     private enterRole : Locator = Elements.getElement(this.page,"//input[@placeholder='Введите название роли']");
     /**
-     * Поле "Описание роли"
+     * Field "Role description"
      */
     private roleDescription : Locator = Elements.getElement(this.page,"//textarea[@placeholder='Введите описание роли']");
     /**
-     * Добавить роль
+     * Add a role
      */
     public async addRole() : Promise<void> {
         await this.selectRole.click();
@@ -36,7 +36,7 @@ export class RolesPage extends MainPage {
         await this.saveButton.last().click();
     }
     /**
-     * Удаление роли
+     * Delete a role
      */
     public async deleteRole() : Promise<void> {
         await this.deleteButton.click();

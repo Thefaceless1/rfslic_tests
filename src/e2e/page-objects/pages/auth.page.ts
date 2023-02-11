@@ -66,7 +66,7 @@ export class AuthPage extends BasePage {
         await this.saveButton.click();
     }
     /**
-     * Check for the button 'Select user' button
+     * Check for the 'Select user' button
      */
     private async checkSelectUserButton() : Promise<void> {
         await this.authAvatar.click();

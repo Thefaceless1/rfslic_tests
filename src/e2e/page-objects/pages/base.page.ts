@@ -9,95 +9,95 @@ export class BasePage extends PlaywrightDevPage{
         super(page);
     }
     /**
-     * Поле "Выберите роль"
+     * Field "Select a role"
      */
     protected selectRole : Locator = Elements.getElement(this.page,"//*[contains(@class,'role__control')]");
     /**
-     * Значения выпадающего списка поля "Выберите роль"
+     * Values of the drop-down list of the field "Select a role"
      */
     protected rolesList : Locator = Elements.getElement(this.page,"//*[contains(@class,'role__option')]");
     /**
-     * Кнопка "Добавить" (+)
+     * Button "Add" (+)
      */
     protected plusButton : Locator = Elements.getElement(this.page,"//button[contains(@class,'Button_view_secondary')][.//span[contains(@class,'IconAdd')]]");
     /**
-     * Кнопка "Сохранить"
+     * Button "Save"
      */
     protected saveButton = Elements.getElement(this.page,"//button[text()='Сохранить']");
     /**
-     * Кнопка "Удалить"
+     * Button "Delete"
      */
     protected deleteButton = Elements.getElement(this.page,"//button[text()='Удалить']");
     /**
-     * Кнопка "Отменить"
+     * Button "Cancel"
      */
     protected cancelButton = Elements.getElement(this.page,"//button[text()='Отменить']");
     /**
-     * Кнопка "Редактировать" (карандаш)
+     * Button "Edit"
      */
     protected editButton : Locator = Elements.getElement(this.page,"//button[contains(@class,'Button_view_secondary')][.//span[contains(@class,'IconEdit')]]");
     /**
-     * Поле "Выберите экспертов"
+     * Field "Select experts"
      */
     protected experts : Locator = Elements.getElement(this.page,"//*[contains(@class,'experts__indicators')]");
     /**
-     * Значения выпадающего списка поля "Выберите экспертов"
+     * Values of the drop-down list of the field "Select experts"
      */
     protected expertsList :Locator = Elements.getElement(this.page,"//*[contains(@class,'experts__option')]");
     /**
-     * Поле "Шаблоны документов"
+     * Field "Document Templates"
      */
     protected templates : Locator = Elements.getElement(this.page,"//input[@type='file']");
     /**
-     * Иконка загруженного doc файла
+     * Downloaded "doc" file picture
      */
     protected docIcon : Locator = Elements.getElement(this.page,"//*[contains(@class,'FileIconDoc')]");
     /**
-     * Иконка загруженного xlsx файла
+     * Downloaded "xlsx" file picture
      */
     protected xlsxIcon : Locator = Elements.getElement(this.page,"//*[contains(@class,'FileIconXls')]");
     /**
-     * Список текущих уведомлений на экране
+     * List of current notifications on the screen
      */
     protected notifications : Locator = Elements.getElement(this.page,"//div[contains(@class,'notice-message')]");
     /**
-     * Поле ввода значения в фильтре поля "Название пролицензии"
+     * Value input field in the "Prolicense name" field filter
      */
     protected searchInput : Locator = Elements.getElement(this.page,"//input[contains(@class,'Table_filterElement')]");
     /**
-     * Кнопка "Найти" в фильтре столбца таблицы
+     * "Find" button in table column filter
      */
     protected searchButton : Locator = Elements.getElement(this.page,"//span[text()='Найти']");
     /**
-     * Текстовое поле "Комментарий"
+     * Field "Comment"
      */
     protected comment : Locator = Elements.getElement(this.page,"//textarea[@name='comment']")
     /**
-     * Кнопка "Добавить"
+     * Button "Add"
      */
     protected addButton : Locator = Elements.getElement(this.page,"//button[text()='Добавить']");
     /**
-     * Чекбоксы
+     * Checkboxes
      */
     public checkbox : Locator = Elements.getElement(this.page,"//input[@type='checkbox']");
     /**
-     * Кнопка поиска для вызова модального окна выбора сотрудников клуба, организаций, офи
+     * Search button to call a modal window for club workers, organizations, ofi
      */
     protected searchDataButton : Locator = Elements.getElement(this.page,"//button//span[contains(@class,'IconSearch')]");
     /**
-     * Получение уведомления по enum
+     * Get notification by enum
      */
     public notifyByEnum (enumValue : Notifications) : Locator {
         return this.notifications.filter({hasText : enumValue});
     }
     /**
-     * Получить кнопку "Фильтр" по названию столбца таблиц
+     * Get "Filter" button by table column name
      */
     public filterButtonByEnum(columnValue : Columns) : Locator {
         return Elements.getElement(this.page,`//span[contains(text(),'${columnValue}')]//following-sibling::span`);
     }
     /**
-     * Изменение прав роли
+     * Change role rights
      */
     public async changeRoleRights() : Promise<void> {
         await Elements.waitForVisible(this.checkbox.first());

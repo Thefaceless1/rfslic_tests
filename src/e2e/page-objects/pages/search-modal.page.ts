@@ -7,19 +7,19 @@ export class SearchModalPage extends BasePage {
         super(page);
     }
     /**
-     * Кнопка поиска на модальном окне поиска сотрудников клуба, организаций, офи
+     * Button "Search"
      */
     public findButton : Locator = Elements.getElement(this.page,"//button[contains(@class,'SearchModal_searchBtn')]");
     /**
-     * Кнопка "Выбрать" на модальном окне поиска сотрудников клуба, организаций, офи
+     * Button "Select"
      */
     public selectButton : Locator = Elements.getElement(this.page,"//button[text()='Выбрать']");
     /**
-     * Индикатор ожидания получения записей таблицы
+     * Waiting indicator for table records
      */
     public loadIndicator : Locator = Elements.getElement(this.page,"//span[contains(@class,'ant-spin-dot-spin')]");
     /**
-     * Радиобаттоны таблицы с найденными значениями
+     * Table radio buttons with found values
      */
     public radio : Locator = Elements.getElement(this.page,"//input[@type='radio']");
 }

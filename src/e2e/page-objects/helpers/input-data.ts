@@ -2,15 +2,15 @@ import {randomInt} from "crypto";
 
 export class InputData {
     /**
-     * Получение сегодняшней даты
+     * Get current date
      */
     public static todayDate  : string = new Date().toDateString();
     /**
-     * Случайное число для поля "Минимальное количество"
+     * Random number for the "Minimum quantity" field
      */
     public static randomIntForMulti : string = String(randomInt(2,10));
     /**
-     * Случайное слово до 20 символов
+     * Random set of letters
      */
     public static get randomWord () : string {
         const alphabet: string = "абвгдеёжзийклмнопрстуфхцчшщъыьэюя";

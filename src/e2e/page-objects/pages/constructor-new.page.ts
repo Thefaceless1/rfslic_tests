@@ -14,123 +14,123 @@ export class ConstructorNewPage extends ConstructorPage {
         super(page);
     }
     /**
-     * Поле "Название пролицензии"
+     * Field "Prolicense name"
      */
     private prolicenseName : Locator = Elements.getElement(this.page,"//input[@name='name']");
     /**
-     * Название созданной пролицензии
+     * The name of the created prolicense
      */
     public createdProlicName : Locator = Elements.getElement(this.page,"//*[text()='Название пролицензии:']//following-sibling::*");
     /**
-     * Поле "Сезон"
+     * Field "Season"
      */
     private season : Locator = Elements.getElement(this.page,"//*[contains(@class,'season__control')]");
     /**
-     * Поле "Тип лицензии"
+     * Field "License type"
      */
     private licType : Locator = Elements.getElement(this.page,"//*[contains(@class,'type__control')]");
     /**
-     * Поле "Название документа"
+     * Field "Document name"
      */
     private docName : Locator = Elements.getElement(this.page,"//input[@placeholder='Введите название документа']");
     /**
-     * Кнопка "Добавить документ"
+     * Field "Add document"
      */
     private addDocButton : Locator = Elements.getElement(this.page,"//span[text()='Добавить документ']");
     /**
-     * Поля с датами блока "Общая информация"
+     * Fields with dates in the "General information" block
      */
     private dates : Locator = Elements.getElement(this.page,"//*[contains(@class,'datepicker')]//input");
     /**
-     * Кнопка вызова действий для пролицензии
+     * Action call button for prolicense
      */
     private  actionButton : Locator = Elements.getElement(this.page,"//button[@name='proLic_btn_details']");
     /**
-     * Кнопка "Добавить группу критериев"
+     * Button "Add criteria groups"
      */
     private addGrpCritButton : Locator = Elements.getElement(this.page,"//button[contains(@class,'CriteriasMain_add_btn')]");
     /**
-     * Поле "Название группы критериев"
+     * Field "Criteria group name"
      */
     private grpCrit = Elements.getElement(this.page,"//*[contains(@class,'groupName__placeholder')]");
     /**
-     * Значения выпадающего списка поля "Название группы критериев"
+     * Values of the drop-down list of the field "Criteria group name"
      */
     private grpCritList : Locator = Elements.getElement(this.page,"//*[contains(@class,'groupName__option')]");
     /**
-     * Созданные группы критериев
+     * Created criteria groups
      */
     private createdGroups : Locator = Elements.getElement(this.page,"//*[contains(text(),'критерии')]");
     /**
-     * Значения выпадающего списка действий
+     * Action dropdown values
      */
     private actionsList : Locator = Elements.getElement(this.page,"//*[contains(@class,'ContextMenuLevelCanary-Item')]");
     /**
-     * Выпадающий список значений поля "Сезон"
+     * Values of the drop-down list of the "Season" field
      */
     private seasons : Locator = Elements.getElement(this.page,"//*[contains(@class,'season__option')]");
     /**
-     * Выпадающий список значений поля "Тип лицензий"
+     * Values of the drop-down list of the "License type" field
      */
     private licenseTypes : Locator = Elements.getElement(this.page,"//*[contains(@class,'type__option')]");
     /**
-     * Поле "Номер" (критерия)
+     * Field "Criteria number"
      */
     private criteriaNumber : Locator = Elements.getElement(this.page,"//input[@placeholder='Введите номер критерия']");
     /**
-     * Поле "Разряд"
+     * Field "Rank"
      */
     private rankCriteria : Locator = Elements.getElement(this.page,"//*[contains(@class,'category__control')]");
     /**
-     * Значения выпадающего списка поля "Разряд"
+     * Values of the drop-down list of the field "Rank"
      */
     private rankList : Locator = Elements.getElement(this.page,"//*[contains(@class,'category__option')]");
     /**
-     * Поле "Название" (критерия)
+     * Field "Criteria name"
      */
     private criteriaName : Locator = Elements.getElement(this.page,"//input[@placeholder='Введите название критерия']");
     /**
-     * Поле "Тип критерия"
+     * Field "Criteria type"
      */
     private criteriaType : Locator = Elements.getElement(this.page,"//*[contains(@class,'type__control')]");
     /**
-     * Значения выпадающего списка поля "Тип критерия"
+     * Values of the drop-down list of the field "Criteria type"
      */
     private criteriaTypeList : Locator = Elements.getElement(this.page,"//*[contains(@class,'type__option')]");
     /**
-     * Чекбокс "Множественный критерий"
+     * Checkbox "Multiple criteria"
      */
     private multi : Locator = Elements.getElement(this.page,"//input[@name='isMulti']");
     /**
-     * Поле "Минимальное количество"
+     * Field "Minimum quantity"
      */
     private minCount : Locator = Elements.getElement(this.page,"//input[@name='minCount']");
     /**
-     * Поле "Описание"
+     * Field "Description"
      */
     private description : Locator = Elements.getElement(this.page,"//textarea[@name='description']");
     /**
-     * Поле "Дополнительный тип данных"
+     * Field "Additional data type"
      */
     private additionalDataType : Locator = Elements.getElement(this.page,"//*[contains(@class,'additionalDocType__control')]");
     /**
-     * Значения выпадающего списка поля "Дополнительный тип данных"
+     * Values of the drop-down list of the field "Additional data type"
      */
     private additionalDataTypeList : Locator = Elements.getElement(this.page,"//*[contains(@class,'additionalDocType__option')]");
     /**
-     * Кнопка "Опубликовать"
+     * Button "Publish"
      */
     private publishButton : Locator = Elements.getElement(this.page,"//button[text()='Опубликовать']");
     /**
-     * Кнопка "Снять с публикации"
+     * Button "Unpublish"
      */
     private unpublishButton : Locator = Elements.getElement(this.page,"//button[text()='Снять с публикации']");
     /**
-     * Поле "Описание документа"
+     * Field "Document description"
      */
     private docDescription : Locator = Elements.getElement(this.page,"//textarea[@placeholder='Добавьте описание документа']");
     /**
-     * Перейти к списку созданных пролицензий и нажать "Создать пролицензию"
+     * Open Prolicense constructor
      */
     public async openConstructor () : Promise<void> {
         await Elements.waitForVisible(this.menuOptionByEnum(MainMenuOptions.constructor));
@@ -138,7 +138,7 @@ export class ConstructorNewPage extends ConstructorPage {
         await this.createProlicButton.click();
     }
     /**
-     * Получение действия для пролицензии по enum
+     * Get an action for a prolicense by enum
      */
     private async actionByEnum (enumValue : ProlicenseActions) {
         const actionArray = await this.actionsList.all();
@@ -147,7 +147,7 @@ export class ConstructorNewPage extends ConstructorPage {
         }
     }
     /**
-     * Заполнение полей блока "Общая информация"
+     * Fill in the fields of the block "General information"
      */
     private async fillBasicInfo() : Promise<void> {
         await this.prolicenseName.type(InputData.randomWord);
@@ -161,7 +161,7 @@ export class ConstructorNewPage extends ConstructorPage {
         }
     }
     /**
-     * Изменение значений в полях блока "Общая информация"
+     * Change the values in the fields of the "General information" block
      */
     public async changeBasicInfo() : Promise<void> {
         await this.editButton.first().click();
@@ -173,7 +173,7 @@ export class ConstructorNewPage extends ConstructorPage {
         await this.saveButton.click();
     }
     /**
-     * Заполнение полей блока "Документы для подачи заявки"
+     * Fill in the fields of the block "Documents for filing an application"
      */
     private async fillDocs() : Promise<void> {
         const docsCount : number = 3;
@@ -187,7 +187,7 @@ export class ConstructorNewPage extends ConstructorPage {
         }
     }
     /**
-     * Создание пролицензии
+     * Create a prolicense
      */
     public async createProlicense() : Promise<void> {
          await this.fillBasicInfo();
@@ -195,7 +195,7 @@ export class ConstructorNewPage extends ConstructorPage {
          await this.saveButton.click();
     }
     /**
-     * Создание пролицензии по образцу
+     * Copy a prolicense
      */
     public async cloneProlicense() : Promise<void> {
         await this.actionButton.click();
@@ -204,7 +204,7 @@ export class ConstructorNewPage extends ConstructorPage {
         await this.saveButton.click();
     }
     /**
-     * Публикация пролицензии
+     * Publication of a prolicense
      */
     public async publishProlicense() : Promise<void> {
         await this.actionButton.click();
@@ -212,7 +212,7 @@ export class ConstructorNewPage extends ConstructorPage {
         await this.publishButton.click();
     }
     /**
-     * Удаление пролицензии
+     * Remove a prolicense
      */
     public async deleteProlicense() : Promise<void> {
         await this.actionButton.click();
@@ -223,7 +223,7 @@ export class ConstructorNewPage extends ConstructorPage {
         }
     }
     /**
-     * Создание групп критериев
+     * Create criteria groups
      */
     public async createGrpCrit() : Promise<void> {
         let groupsCount : number;
@@ -246,7 +246,7 @@ export class ConstructorNewPage extends ConstructorPage {
         while (groupsCount > 5);
     }
     /**
-     * Заполнение полей критерия
+     * Fill in the criteria fields
      */
     private async fillCriteriaInfo(index : number) : Promise<void> {
         await this.plusButton.nth(index).click();
@@ -259,7 +259,7 @@ export class ConstructorNewPage extends ConstructorPage {
         await this.criteriaTypeList.filter({hasText : "Документы"}).click();
     }
     /**
-     * Заполнение полей документов критерия
+     * Fill in the fields of criteria documents
      */
     private async fillCriteriaDocs() : Promise<void> {
         await this.addDocButton.click();
@@ -277,7 +277,7 @@ export class ConstructorNewPage extends ConstructorPage {
         }
     }
     /**
-     * Проверка нужно ли добавлять выбранному типу документа критерия файлы
+     * Checking whether to add files to the selected criteria document type
      */
     private checkDocType(randomNumb : number) : boolean {
         return (
@@ -287,7 +287,7 @@ export class ConstructorNewPage extends ConstructorPage {
         )
     }
     /**
-     * Создание критериев
+     * Create criterias
      */
     public async createCriteria() : Promise<void> {
         const groupsCount = await this.createdGroups.count();

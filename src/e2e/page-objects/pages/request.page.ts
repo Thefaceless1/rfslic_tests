@@ -14,81 +14,81 @@ export class RequestPage extends RequestNewPage {
         super(page);
     }
     /**
-     * Вкладки с группами критериев
+     * Tabs with criteria groups
      */
     private criteriaGroups : Locator = Elements.getElement(this.page,"//button[contains(text(),'критерии')]");
     /**
-     * Список выбранных сотрудников клуба или ОФИ или организаций
+     * List of selected club workers or OFI or organizations
      */
     private selectedData : Locator = Elements.getElement(this.page,"//*[contains(@class,'multi-value__label')]");
     /**
-     * Поле с информацией о критерии
+     * Criteria information field
      */
     private criteriaInfo : Locator = Elements.getElement(this.page,"//span[contains(@class,'CriteriasInfoItem_collapse_title')]");
     /**
-     * Кнопка подтверждения статуса документа
+     * Document status confirmation button
      */
     private checkButton : Locator = Elements.getElement(this.page,"//button[.//span[contains(@class,'IconCheck')]]");
     /**
-     * Поле выбора статуса документа
+     * Document status selection field
      */
     private docStates : Locator = Elements.getElement(this.page,"//*[contains(@class,'docState__control')]");
     /**
-     * Значения выпадающего списка в поле "Решение по документу"
+     * Drop-down list values in the "Document Decision" field
      */
     private docStatesList : Locator = Elements.getElement(this.page,"//*[contains(@class,'docState__option')]");
     /**
-     * Выбранный статус около наименования документа
+     * Selected status near the document name
      */
     private statusNearDoc : Locator = Elements.getElement(this.page,"//*[contains(@class,'DocumentInfo')]//*[contains(@class,'Badge_view_filled')]");
     /**
-     * Выбранный статус в поле "Решение по документу"
+     * Selected status in the "Document Decision" field
      */
     private selectedStatus : Locator = Elements.getElement(this.page,"//*[contains(@class,'docState__single-value')]");
     /**
-     * Комментарий эксперта
+     * Expert comment
      */
     private reviewComment : Locator = Elements.getElement(this.page,"//textarea[@name='reviewComment']");
     /**
-     * Поле "Принятие решения по лицензии"
+     * Field "License decision"
      */
     private selectLicStatus : Locator = Elements.getElement(this.page,"//*[contains(@class,'requestState__control')]");
     /**
-     * Кнопка "Подтвердить"
+     * Button "Confirm"
      */
     private submitButton : Locator = Elements.getElement(this.page,"//button[text()='Подтвердить']");
     /**
-     * Поле "Вывод"
+     * Field "Conclusion"
      */
     private conclusion : Locator = Elements.getElement(this.page,"//textarea[@name='conclusion']");
     /**
-     * Поле "Рекомендации"
+     * Field "Recommendation"
      */
     private recommendation : Locator = Elements.getElement(this.page,"//textarea[@name='recommendation']");
     /**
-     * Кнопка "Сформировать отчет эксперта"
+     * Button "Create a report"
      */
     private createReport : Locator = Elements.getElement(this.page,"//button[text()='Сформировать отчет эксперта']");
     /**
-     * Получить значение выпадающего списка поля 'Принятие решения по лицензии' по enum
+     * Get the drop-down list value of the 'License decision' field by enum
      */
     private licStatusByEnum(statusValue : LicStatus ) : Locator {
         return Elements.getElement(this.page,`//*[contains(@class,'requestState__option') and text()='${statusValue}']`);
     }
     /**
-     * Получение ячейки с наименованием пролицензии в таблице по наименованию пролицензии
+     * Get a cell with the name of the prolicense in the table by the name of the prolicense
      */
     private licenseRow(prolicName : string) : Locator {
         return Elements.getElement(this.page,`//td[text()='${prolicName}']`);
     }
     /**
-     * Получение вкладок по enum
+     * Get tabs by enum
      */
     private sectionByEnum(section : RequestSections) : Locator {
         return Elements.getElement(this.page,`//button[text()='${section}']`);
     }
     /**
-     * Открыть опубликованную лицензию
+     * Open published license
      */
     public async openPublishedLic() : Promise<void> {
         await this.goto(Pages.requestPage);
@@ -96,7 +96,7 @@ export class RequestPage extends RequestNewPage {
         await this.licenseRow(this.prolicenseName).click();
     }
     /**
-     * Заполнение экспертов и сотрудников клуба для групп критериев
+     * Fill in experts and club workers for criteria groups
      */
     public async addExperts() : Promise<void> {
         await this.sectionByEnum(RequestSections.criterias).click();
@@ -118,7 +118,7 @@ export class RequestPage extends RequestNewPage {
         }
     }
     /**
-     * Добавить экспертов к группе критериев
+     * Add experts to a criteria group
      */
     private async fillExperts() : Promise<void> {
         await this.experts.click();
@@ -128,7 +128,7 @@ export class RequestPage extends RequestNewPage {
         await Elements.waitForHidden(this.saveButton);
     }
     /**
-     * Добавить данные из модального окна поиска сотрудников клуба, организаций, офи
+     * Add data from the modal search window for club workers, organizations, ofi
      */
     private async fillSearchModalData () : Promise<void> {
         const searchModal = new SearchModalPage(this.page);
@@ -142,7 +142,7 @@ export class RequestPage extends RequestNewPage {
         await Elements.waitForHidden(this.saveButton);
     }
     /**
-     * Добавить документы критериев
+     * Add criteria documents
      */
     public async addCritDocs () : Promise<void> {
         const groupsCount = await this.criteriaGroups.count();
@@ -164,7 +164,7 @@ export class RequestPage extends RequestNewPage {
         }
     }
     /**
-     * Заполнение полей "Комментарий" и "Решение по документу"
+     * Fill in the fields "Comment" and "Decision on the document"
      */
     private async fillStatusAndComment (iterationCount : number) : Promise<void> {
         for (let i = 0; i <iterationCount; i++) {
@@ -178,7 +178,7 @@ export class RequestPage extends RequestNewPage {
         }
     }
     /**
-     * Добавить комментарии и проставить статусы документам
+     * Add comments and put down statuses to documents
      */
     public async addExpertInfo () : Promise<void> {
         await this.sectionByEnum(RequestSections.generalInfo).click();
@@ -196,7 +196,7 @@ export class RequestPage extends RequestNewPage {
         }
     }
     /**
-     * Ожидание обновления статуса около наименования документа в соответствии с выбранным статусом
+     * Waiting for a status update near the document name in accordance with the selected status
      */
     private async waitForDisplayStatus (statusNumb : number) : Promise<void> {
         const selectedStatusText : string = await this.selectedStatus.nth(statusNumb).innerText();
@@ -204,7 +204,7 @@ export class RequestPage extends RequestNewPage {
         if (selectedStatusText.toLowerCase() != nearDocStatusText.toLowerCase()) await this.waitForDisplayStatus(statusNumb);
     }
     /**
-     * Принятие решения по заявке
+     * Make a decision on the request
      */
     public async chooseLicStatus () : Promise<void> {
         await this.sectionByEnum(RequestSections.commissions).click()
@@ -214,7 +214,7 @@ export class RequestPage extends RequestNewPage {
         await this.submitButton.click();
     }
     /**
-     * Добавление отчета эксперта
+     * Add an expert report
      */
     private async fillExpertSolution() : Promise<void> {
         await this.conclusion.type(InputData.randomWord);

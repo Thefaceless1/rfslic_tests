@@ -6,7 +6,7 @@ export class PlaywrightDevPage {
         this.page = page
     }
     /**
-     * Переход по указанному url
+     * Go to specified url
      */
     public async goto (url : string)  {
         await this.page.goto(url);

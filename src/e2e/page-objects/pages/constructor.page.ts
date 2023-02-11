@@ -7,7 +7,7 @@ export class ConstructorPage extends MainPage {
         super(page);
     }
     /**
-     * Кнопка "Создать пролицензию"
+     * Button "Create a prolicense"
      */
     protected createProlicButton: Locator = Elements.getElement(this.page, "//button[text()='Создать пролицензию']");
 }

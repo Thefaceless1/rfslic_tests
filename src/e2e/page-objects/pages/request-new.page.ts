@@ -14,32 +14,32 @@ export class RequestNewPage extends MainPage {
         this.prolicenseName = ''
     }
     /**
-     * Кнопка "->" в левом углу таблицы
+     * Button "->" in the left corner of the table
      */
     private arrow  : Locator = Elements.getElement(this.page,"(//td[contains(@class,'fix-left')]/button)[1]");
 
     /**
-     * Кнопка "Перейти к заявке"
+     * Button "Go to request"
      */
     private goToRequest : Locator = Elements.getElement(this.page,"//span[text()='Перейти к заявке']");
     /**
-     * Кнопка "Подать заявку"
+     * Button "Publish a request"
      */
     private publishReqButton : Locator = Elements.getElement(this.page,"//button[text()='Подать заявку']");
     /**
-     * Поле "Выберите клуб"
+     * Field "Select a club"
      */
     private selectClub : Locator = Elements.getElement(this.page,"//*[contains(@class,'club__control')]");
     /**
-     * Выпадающий список значений поля "Выберите клуб"
+     * Values of the drop-down list of the field "Select a club"
      */
     private selectClubList : Locator = Elements.getElement(this.page,"//*[contains(@class,'club__option')]");
     /**
-     * Заголовок страницы "Заявка на лицензирование клуба"
+     * Page title "Request for club licensing"
      */
     public requestTitle : Locator = Elements.getElement(this.page,"//*[text()='Заявка на лицензирование клуба']");
     /**
-     * Выбрать клуб из выпадающего списка значений
+     * Select a club from the drop down list of values
      */
     public async chooseClub() : Promise<void> {
         await Elements.waitForVisible(this.selectClub);
@@ -48,7 +48,7 @@ export class RequestNewPage extends MainPage {
         await this.selectClubList.first().click();
     }
     /**
-     * Создание пролицензии с заполненными группами критериев и критериями
+     * Create a prolicense with filled criteria groups and criterias
      */
     public async createTestProlicense() : Promise<void> {
         const constructor = new ConstructorNewPage(this.page);
@@ -62,7 +62,7 @@ export class RequestNewPage extends MainPage {
         await constructor.page.waitForNavigation({url : Pages.constructorPage,waitUntil : "load"});
     }
     /**
-     * Установить в таблице фильтр по заданному столбцу
+     * Set a table filter by a given column
      */
     public async filterByColumn(column : Locator) : Promise<void> {
         await column.click();
@@ -70,14 +70,14 @@ export class RequestNewPage extends MainPage {
         await this.searchButton.click();
     }
     /**
-     * Создать заявку в статусе "Черновик"
+     * Create a request in the status "Draft"
      */
     public async createDraft() : Promise<void> {
         await this.arrow.click();
         await this.goToRequest.click();
     }
     /**
-     * Подача заявки
+     * Publish a license
      */
     public async publishLic(): Promise<void> {
         await Elements.waitForVisible(this.plusButton.last());
@@ -89,7 +89,7 @@ export class RequestNewPage extends MainPage {
         await this.publishReqButton.click();
     }
     /**
-     * Создание тестовой поданной заявки для дальнейших действий с ней
+     * Create a test request
      */
     public async createTestLic() : Promise<void> {
         await this.goto(Pages.requestNewPage);
@@ -99,7 +99,7 @@ export class RequestNewPage extends MainPage {
         await this.publishLic();
     }
     /**
-     * Добавить файлы и комментарии для документов лицензии
+     * Add files and comments for license documents
      */
     protected async fillDocsAndComment () : Promise<void> {
         await Input.uploadFiles(this.templates.first());

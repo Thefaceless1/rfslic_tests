@@ -3,7 +3,7 @@ import {Locator} from "@playwright/test";
 
 export class Date extends Elements {
     /**
-     * Заполнение поля с типом Date
+     * Fill a field with "Date" type
      */
     public static async fillDateInput (element: Locator, inputData : string) {
         await element.clear()

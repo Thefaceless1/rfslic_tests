@@ -12,33 +12,33 @@ export class UsersPage extends MainPage {
         super(page);
     }
     /**
-     * Кнопка "Добавить" (+)
+     * Button "Add" (+)
      */
     private plusAddButton : Locator = Elements.getElement(this.page,"//*[text()='Список пользователей']//following-sibling::button");
     /**
-     * Кнопка "Изменить роль"
+     * Button "Edit a role"
      */
     private editRoleButton : Locator = Elements.getElement(this.page,"//span[text()='Изменить роль']");
     /**
-     * Кнопка "Изменить роль"
+     * Button "Change a role"
      */
     private changeRoleButton : Locator = Elements.getElement(this.page,"//button[text()='Сменить роль']");
     /**
-     * Поле "Выберите группы"
+     * Field "Select groups"
      */
     private selectGroups : Locator = Elements.getElement(this.page,"//*[contains(@class,'groups__control')]");
     /**
-     * Значения выпадающего списка поля "Выберите группы"
+     * Values of the drop-down list of the field "Select groups"
      */
     private selectGroupsList : Locator = Elements.getElement(this.page,"//*[contains(@class,'groups__option')]");
     /**
-     * Получить элемента табов пользователя по enum
+     * Get user tab elements by enum
      */
     private userTabsByEnum(tabName : string) : Locator {
         return Elements.getElement(this.page,`//button[text()='${tabName}']`);
     }
     /**
-     * Добавить пользователя
+     * Add a user
      */
     public async addUser() : Promise<void> {
         const searchModal = new SearchModalPage(this.page);
@@ -55,7 +55,7 @@ export class UsersPage extends MainPage {
         await this.addButton.click();
     }
     /**
-     * Изменить роль пользоваетеля
+     * Change a user role
      */
     public async changeUserRole() : Promise<void> {
         await this.editRoleButton.click();
@@ -66,7 +66,7 @@ export class UsersPage extends MainPage {
         await this.changeRoleButton.click();
     }
     /**
-     * Изменить группы критериев для пользователя
+     * Change criteria groups for a user
      */
     public async changeUserGrpCrit() : Promise<void> {
         await this.userTabsByEnum(UserTabs.grpCriterias).click();
@@ -79,7 +79,7 @@ export class UsersPage extends MainPage {
         await this.saveButton.click();
     }
     /**
-     * Удалить первую запись найденного списка пользователей из БД
+     * Delete the first record of the found list of users from the database
      */
     public async deleteFirstUser() : Promise<void> {
         const response = await this.page.request.get(Api.clubWorkers);

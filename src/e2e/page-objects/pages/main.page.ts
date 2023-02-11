@@ -9,13 +9,13 @@ export class MainPage extends AuthPage {
         super(page);
     }
     /**
-     * Получить значения пунктов меню главной страницы по enum
+     * Get main page menu item values by enum
      */
     public menuOptionByEnum (menuOption : MainMenuOptions) : Locator {
         return Elements.getElement(this.page,`//*[contains(@class,'HomePage_title') and text()='${menuOption}']`);
     }
     /**
-     * Получить значения пунктов меню блока "Администрирование" по enum
+     * Get the values of the menu items of the "Administration" block by enum
      */
     public adminMenuByEnum (menuOption : AdminOptions) : Locator {
         return Elements.getElement(this.page,`//*[text()='${menuOption}']`);
