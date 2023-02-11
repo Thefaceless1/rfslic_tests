@@ -13,6 +13,12 @@ export class DbHelper {
        await this.sql`delete from ${this.sql(table)} where ${this.sql(column)} = ${data}`;
     }
     /**
+     * Select data from tables
+     */
+    public async select(table : string,column : string,data : number | string | boolean) : Promise<postgres.RowList<postgres.Row[]>> {
+        return this.sql`select * from ${this.sql(table)} where ${this.sql(column)} = ${data}`
+    }
+    /**
      * db.config.json file parser
      */
     public configData() : object {

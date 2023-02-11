@@ -2,10 +2,10 @@ import {MainPage} from "./main.page.js";
 import {Locator, Page} from "@playwright/test";
 import {Elements} from "../../framework/elements/elements.js";
 import {SearchModalPage} from "./search-modal.page.js";
-import {Pages} from "../helpers/enums/pages.js";
 import {DbHelper} from "../../framework/db/db-helper.js";
 import {operationsLog, workUsers} from "../../framework/db/tables.js";
 import {UserTabs} from "../helpers/enums/usertabs.js";
+import {Api} from "../helpers/enums/api.js";
 
 export class UsersPage extends MainPage {
     constructor(page : Page) {
@@ -82,7 +82,7 @@ export class UsersPage extends MainPage {
      * Удалить первую запись найденного списка пользователей из БД
      */
     public async deleteFirstUser() : Promise<void> {
-        const response = await this.page.request.get(Pages.clubWorkers);
+        const response = await this.page.request.get(Api.clubWorkers);
         const firstUserId : number  = await response.json().then(value => value.data[0].id);
         const dbHelper = new DbHelper()
         await dbHelper.delete(operationsLog.tableName,operationsLog.columns.userId,firstUserId);

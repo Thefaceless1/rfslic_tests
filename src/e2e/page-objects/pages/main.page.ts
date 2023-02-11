@@ -1,10 +1,10 @@
-import {BasePage} from "./base.page.js";
 import {Locator, Page} from "@playwright/test";
 import {Elements} from "../../framework/elements/elements.js";
 import {MainMenuOptions} from "../helpers/enums/main-menu-options.js";
 import {AdminOptions} from "../helpers/enums/admin-options.js";
+import {AuthPage} from "./auth.page.js";
 
-export class MainPage extends BasePage {
+export class MainPage extends AuthPage {
     constructor(page : Page) {
         super(page);
     }

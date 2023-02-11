@@ -3,7 +3,14 @@ import {Notifications} from "../../page-objects/helpers/enums/notifications.js";
 import {test} from "../../page-objects/helpers/fixtures/fixtures.js";
 
 test.describe("Пролицензия", () => {
+    test.beforeAll(async ({setUser}) => {
+        await setUser.createUser();
+    })
     test("Создание пролицензии",async ({constructor}) => {
+        await expect(constructor.notifyByEnum(Notifications.prolicenseCreated)).toBeVisible();
+    })
+    test("Удаление пролицензии",async ({constructor}) => {
+        await constructor.deleteProlicense();
         await expect(constructor.notifyByEnum(Notifications.prolicenseCreated)).toBeVisible();
     })
     test("Изменение общей информации пролицензии", async ({constructor}) => {
@@ -17,10 +24,6 @@ test.describe("Пролицензия", () => {
     test("Публикация пролицензии",async ({constructor}) => {
         await constructor.publishProlicense();
         await expect(constructor.notifyByEnum(Notifications.prolicensePublished)).toBeVisible();
-    })
-    test("Снятие с публикации пролицензии",async ({constructor}) => {
-        await constructor.unpublishProlicense();
-        await expect(constructor.notifyByEnum(Notifications.prolicenseUnpublished)).toBeVisible();
     })
     test("Создание групп критериев",async ({constructor}) => {
         await constructor.createGrpCrit();

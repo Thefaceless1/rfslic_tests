@@ -8,7 +8,6 @@ import {randomInt} from "crypto";
 import {NonFilesDoctypes} from "../helpers/enums/non-files-doctypes.js";
 import {ConstructorPage} from "./constructor.page.js";
 import {MainMenuOptions} from "../helpers/enums/main-menu-options.js";
-import {LicStatus} from "../helpers/enums/licstatus.js";
 
 export class ConstructorNewPage extends ConstructorPage {
     constructor(page : Page) {
@@ -45,7 +44,7 @@ export class ConstructorNewPage extends ConstructorPage {
     /**
      * Кнопка вызова действий для пролицензии
      */
-    private  actionButton : Locator = Elements.getElement(this.page,"//button[.//span[contains(@class,'IconMeatball')]]");
+    private  actionButton : Locator = Elements.getElement(this.page,"//button[@name='proLic_btn_details']");
     /**
      * Кнопка "Добавить группу критериев"
      */
@@ -127,9 +126,14 @@ export class ConstructorNewPage extends ConstructorPage {
      */
     private unpublishButton : Locator = Elements.getElement(this.page,"//button[text()='Снять с публикации']");
     /**
+     * Поле "Описание документа"
+     */
+    private docDescription : Locator = Elements.getElement(this.page,"//textarea[@placeholder='Добавьте описание документа']");
+    /**
      * Перейти к списку созданных пролицензий и нажать "Создать пролицензию"
      */
     public async openConstructor () : Promise<void> {
+        await Elements.waitForVisible(this.menuOptionByEnum(MainMenuOptions.constructor));
         await this.menuOptionByEnum(MainMenuOptions.constructor).click();
         await this.createProlicButton.click();
     }
@@ -176,6 +180,7 @@ export class ConstructorNewPage extends ConstructorPage {
         for(let i = 1 ; i<=docsCount ; i++) {
             if (i != 1) await this.addDocButton.click();
             await this.docName.last().type(InputData.randomWord);
+            await this.docDescription.last().type(InputData.randomWord);
             await Input.uploadFiles(this.templates.last());
             await Elements.waitForVisible(this.docIcon.last());
             await Elements.waitForVisible(this.xlsxIcon.last());
@@ -205,15 +210,6 @@ export class ConstructorNewPage extends ConstructorPage {
         await this.actionButton.click();
         await this.actionsList.filter({hasText : ProlicenseActions.publish}).click();
         await this.publishButton.click();
-    }
-    /**
-     * Снятие с публикации пролицензии
-     */
-    public async unpublishProlicense() : Promise<void> {
-        await this.publishProlicense();
-        await this.actionButton.click();
-        await this.actionsList.filter({hasText : ProlicenseActions.unpublish}).click();
-        await this.unpublishButton.click();
     }
     /**
      * Удаление пролицензии
@@ -268,6 +264,7 @@ export class ConstructorNewPage extends ConstructorPage {
     private async fillCriteriaDocs() : Promise<void> {
         await this.addDocButton.click();
         await this.docName.last().type(InputData.randomWord);
+        await this.docDescription.last().type(InputData.randomWord);
         await this.additionalDataType.last().click();
         await Elements.waitForVisible(this.additionalDataTypeList.last());
         const dataTypeCount : number = await this.additionalDataTypeList.count();

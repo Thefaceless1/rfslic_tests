@@ -7,8 +7,10 @@ import {Columns} from "../enums/columns.js";
 import {RolesPage} from "../../pages/roles.page.js";
 import {AdminOptions} from "../enums/admin-options.js";
 import {UsersPage} from "../../pages/users.page.js";
+import {AuthPage} from "../../pages/auth.page.js";
 
 type Fixtures = {
+    setUser : AuthPage,
     constructor : ConstructorNewPage,
     newRequest :  RequestNewPage,
     requests : RequestPage,
@@ -18,14 +20,14 @@ type Fixtures = {
 export const test = base.extend<Fixtures>({
     constructor : async ({page},use) => {
         const constructor = new ConstructorNewPage(page);
-        await constructor.goto(Pages.mainPage);
+        await constructor.login();
         await constructor.openConstructor();
         await constructor.createProlicense();
         await use(constructor);
-        await constructor.deleteProlicense();
     },
     newRequest : async ({page},use) => {
         const newRequest = new RequestNewPage(page);
+        await newRequest.login();
         await newRequest.createTestProlicense();
         await newRequest.goto(Pages.requestNewPage);
         await newRequest.chooseClub();
@@ -52,5 +54,11 @@ export const test = base.extend<Fixtures>({
         await users.deleteFirstUser();
         await users.adminMenuByEnum(AdminOptions.users).click();
         await use(users);
+    },
+    setUser : async ({browser},use) => {
+        const page = await browser.newPage();
+        const authPage = new AuthPage(page);
+        await use(authPage);
+        await page.close();
     }
 })

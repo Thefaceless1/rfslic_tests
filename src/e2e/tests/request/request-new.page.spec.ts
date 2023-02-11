@@ -3,6 +3,9 @@ import {Notifications} from "../../page-objects/helpers/enums/notifications.js";
 import {test} from "../../page-objects/helpers/fixtures/fixtures.js";
 
 test.describe("Подача заявки", () => {
+    test.beforeAll(async ({setUser}) => {
+        await setUser.createUser();
+    })
     test("Создание заявки в статусе 'Черновик' ",async ({newRequest}) => {
         await newRequest.createDraft();
         await expect(newRequest.requestTitle).toBeVisible();

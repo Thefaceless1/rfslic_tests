@@ -1,4 +1,3 @@
-import {BasePage} from "./base.page.js";
 import {Locator, Page} from "@playwright/test";
 import {ConstructorNewPage} from "./constructor-new.page.js";
 import {Elements} from "../../framework/elements/elements.js";
@@ -6,8 +5,9 @@ import {Pages} from "../helpers/enums/pages.js";
 import {Columns} from "../helpers/enums/columns.js";
 import {Input} from "../../framework/elements/input.js";
 import {InputData} from "../helpers/input-data.js";
+import {MainPage} from "./main.page.js";
 
-export class RequestNewPage extends BasePage {
+export class RequestNewPage extends MainPage {
     public prolicenseName : string
     constructor(page : Page) {
         super(page);
@@ -52,13 +52,14 @@ export class RequestNewPage extends BasePage {
      */
     public async createTestProlicense() : Promise<void> {
         const constructor = new ConstructorNewPage(this.page);
-        await constructor.goto(Pages.mainPage);
         await constructor.openConstructor();
         await constructor.createProlicense();
+        await Elements.waitForVisible(constructor.createdProlicName);
+        this.prolicenseName = await constructor.createdProlicName.innerText();
         await constructor.createGrpCrit();
         await constructor.createCriteria();
         await constructor.publishProlicense();
-        this.prolicenseName = await constructor.createdProlicName.innerText();
+        await constructor.page.waitForNavigation({url : Pages.constructorPage,waitUntil : "load"});
     }
     /**
      * Установить в таблице фильтр по заданному столбцу
