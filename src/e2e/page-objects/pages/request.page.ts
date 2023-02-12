@@ -66,6 +66,10 @@ export class RequestPage extends RequestNewPage {
      */
     private recommendation : Locator = Elements.getElement(this.page,"//textarea[@name='recommendation']");
     /**
+     * Field "RPS criterias"
+     */
+    private rplCriterias : Locator = Elements.getElement(this.page,"//textarea[@name='rplCriterias']");
+    /**
      * Button "Create a report"
      */
     private createReport : Locator = Elements.getElement(this.page,"//button[text()='Сформировать отчет эксперта']");
@@ -75,6 +79,14 @@ export class RequestPage extends RequestNewPage {
     private licStatusByEnum(statusValue : LicStatus ) : Locator {
         return Elements.getElement(this.page,`//*[contains(@class,'requestState__option') and text()='${statusValue}']`);
     }
+    /**
+     * Button "Edit license status"
+     */
+    private licEditButton : Locator = Elements.getElement(this.page,"//span[contains(@class,'iconEditReqStatus')]");
+    /**
+     * Button "Generate license"
+     */
+    private generateLicenseButton : Locator = Elements.getElement(this.page,"//button[text()='Сформировать Лицензию']");
     /**
      * Get a cell with the name of the prolicense in the table by the name of the prolicense
      */
@@ -162,6 +174,17 @@ export class RequestPage extends RequestNewPage {
                 }
             }
         }
+        await this.editLicStatus(LicStatus.checkExpert);
+    }
+    /**
+     * Edit license status by enum
+     */
+    private async editLicStatus(statusValue: LicStatus) : Promise<void> {
+        await this.licEditButton.click();
+        await this.selectLicStatus.click();
+        await Elements.waitForVisible(this.licStatusByEnum(statusValue));
+        await this.licStatusByEnum(statusValue).click();
+        await this.saveButton.click()
     }
     /**
      * Fill in the fields "Comment" and "Decision on the document"
@@ -184,6 +207,7 @@ export class RequestPage extends RequestNewPage {
         await this.sectionByEnum(RequestSections.generalInfo).click();
         let docsCount : number = await this.checkButton.count();
         await this.fillStatusAndComment(docsCount);
+        await this.fillGeneralInfo();
         await this.sectionByEnum(RequestSections.criterias).click();
         const groupsCount : number = await this.criteriaGroups.count();
         for(let i = 0; i<groupsCount;i++) {
@@ -196,6 +220,15 @@ export class RequestPage extends RequestNewPage {
         }
     }
     /**
+     * Fill the fields "Conclusion of the RFS manager", "Recommendations on sanctions", "RPL criterias"
+     */
+    private async fillGeneralInfo() : Promise<void> {
+        await this.conclusion.type(InputData.randomWord);
+        await this.recommendation.type(InputData.randomWord);
+        await this.rplCriterias.type(InputData.randomWord);
+        await this.saveButton.click();
+    }
+    /**
      * Waiting for a status update near the document name in accordance with the selected status
      */
     private async waitForDisplayStatus (statusNumb : number) : Promise<void> {
@@ -204,14 +237,15 @@ export class RequestPage extends RequestNewPage {
         if (selectedStatusText.toLowerCase() != nearDocStatusText.toLowerCase()) await this.waitForDisplayStatus(statusNumb);
     }
     /**
-     * Make a decision on the request
+     * Make a decision on the request by enum
      */
-    public async chooseLicStatus () : Promise<void> {
+    public async chooseLicStatus (statusValue : LicStatus) : Promise<void> {
         await this.sectionByEnum(RequestSections.commissions).click()
         await this.selectLicStatus.click();
-        await Elements.waitForVisible(this.licStatusByEnum(LicStatus.issued));
-        await this.licStatusByEnum(LicStatus.issued).click();
+        await Elements.waitForVisible(this.licStatusByEnum(statusValue));
+        await this.licStatusByEnum(statusValue).click();
         await this.submitButton.click();
+        await this.generateLicenseButton.click();
     }
     /**
      * Add an expert report

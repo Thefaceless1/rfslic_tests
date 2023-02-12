@@ -36,6 +36,7 @@ export const test = base.extend<Fixtures>({
     },
     requests : async ({page},use) => {
         const request = new RequestPage(page);
+        await request.login();
         await request.createTestProlicense();
         await request.createTestLic();
         await request.openPublishedLic();
@@ -43,15 +44,15 @@ export const test = base.extend<Fixtures>({
     },
     roles : async ({page},use) => {
         const roles = new RolesPage(page);
-        await roles.goto(Pages.mainPage);
+        await roles.login();
         await roles.adminMenuByEnum(AdminOptions.roles).click();
         await use(roles);
         await roles.deleteRole();
     },
     users : async ({page},use) => {
         const users = new UsersPage(page);
-        await users.goto(Pages.mainPage);
-        await users.deleteFirstUser();
+        await users.login();
+        await users.deleteUser();
         await users.adminMenuByEnum(AdminOptions.users).click();
         await use(users);
     },

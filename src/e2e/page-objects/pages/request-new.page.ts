@@ -59,7 +59,7 @@ export class RequestNewPage extends MainPage {
         await constructor.createGrpCrit();
         await constructor.createCriteria();
         await constructor.publishProlicense();
-        await constructor.page.waitForNavigation({url : Pages.constructorPage,waitUntil : "load"});
+        await constructor.page.waitForNavigation({url : Pages.constructorPage,waitUntil : "domcontentloaded"});
     }
     /**
      * Set a table filter by a given column

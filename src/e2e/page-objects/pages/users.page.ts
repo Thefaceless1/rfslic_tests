@@ -8,6 +8,7 @@ import {UserTabs} from "../helpers/enums/usertabs.js";
 import {Api} from "../helpers/enums/api.js";
 
 export class UsersPage extends MainPage {
+    private readonly createdUserNumber : number = 1
     constructor(page : Page) {
         super(page);
     }
@@ -47,7 +48,7 @@ export class UsersPage extends MainPage {
         await this.searchDataButton.click();
         await searchModal.findButton.click();
         await Elements.waitForHidden(searchModal.loadIndicator.first());
-        await searchModal.radio.first().click();
+        await searchModal.radio.nth(this.createdUserNumber).click();
         await searchModal.selectButton.click();
         await this.selectRole.click();
         await Elements.waitForVisible(this.rolesList.first());
@@ -81,11 +82,15 @@ export class UsersPage extends MainPage {
     /**
      * Delete the first record of the found list of users from the database
      */
-    public async deleteFirstUser() : Promise<void> {
+    public async deleteUser() : Promise<void> {
         const response = await this.page.request.get(Api.clubWorkers);
-        const firstUserId : number  = await response.json().then(value => value.data[0].id);
+        const userId : number  = await response.json().then(value => value.data[this.createdUserNumber].id);
         const dbHelper = new DbHelper()
-        await dbHelper.delete(operationsLog.tableName,operationsLog.columns.userId,firstUserId);
-        await dbHelper.delete(workUsers.tableName,workUsers.columns.userId,firstUserId);
+        const userData = await dbHelper.select(workUsers.tableName,workUsers.columns.userId,userId);
+        if(userData.length == 0) return ;
+        else {
+            await dbHelper.delete(operationsLog.tableName,operationsLog.columns.userId,userId);
+            await dbHelper.delete(workUsers.tableName,workUsers.columns.userId,userId);
+        }
     }
 }

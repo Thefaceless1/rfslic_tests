@@ -7,7 +7,7 @@ import {Api} from "../helpers/enums/api.js";
 import {Roles} from "../helpers/enums/roles.js";
 
 export class AuthPage extends BasePage {
-    private userNumber : number = 1;
+    private readonly userNumber : number = 0;
     constructor(page : Page) {
         super(page)
     }
@@ -33,10 +33,10 @@ export class AuthPage extends BasePage {
     public async createUser() : Promise<void> {
         const dbHelper = new DbHelper();
         const response = await this.page.request.get(Api.clubWorkers);
-        const secondUserId : number = await response.json().then(value => value.data[this.userNumber].id);
-        const userData  = await dbHelper.select(workUsers.tableName,workUsers.columns.userId,secondUserId);
+        const userId : number = await response.json().then(value => value.data[this.userNumber].id);
+        const userData  = await dbHelper.select(workUsers.tableName,workUsers.columns.userId,userId);
         if(userData.length == 0) {
-            await this.page.request.put(Api.addUser,{params: {userId : secondUserId, roleId :Roles.admin}});
+            await this.page.request.put(Api.addUser,{params: {userId : userId, roleId :Roles.admin}});
             return;
         }
         else {
@@ -44,10 +44,10 @@ export class AuthPage extends BasePage {
             const secondUserRole = secondUserData[secondUserData.length-1];
             if(secondUserRole == Roles.admin) return;
             else {
-                await dbHelper.delete(operationsLog.tableName,operationsLog.columns.userId,secondUserId);
-                await dbHelper.delete(workUsers.tableName,workUsers.columns.userId,secondUserId);
+                await dbHelper.delete(operationsLog.tableName,operationsLog.columns.userId,userId);
+                await dbHelper.delete(workUsers.tableName,workUsers.columns.userId,userId);
                 await dbHelper.sql.end();
-                await this.page.request.put(Api.addUser,{params: {userId : secondUserId, roleId :Roles.admin}});
+                await this.page.request.put(Api.addUser,{params: {userId : userId, roleId :Roles.admin}});
             }
         }
     }

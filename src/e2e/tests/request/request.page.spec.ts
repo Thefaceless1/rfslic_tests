@@ -1,8 +1,12 @@
 import {expect} from "@playwright/test";
 import {Notifications} from "../../page-objects/helpers/enums/notifications.js";
 import {test} from "../../page-objects/helpers/fixtures/fixtures.js";
+import {LicStatus} from "../../page-objects/helpers/enums/licstatus.js";
 
 test.describe("Work with requests", () => {
+    test.beforeAll(async ({setUser}) => {
+        await setUser.createUser();
+    })
     test("Filling in experts and club members for criteria groups",async ({requests}) => {
         await requests.addExperts();
         await expect(requests.notifyByEnum(Notifications.changedClubWorkers).last()).toBeVisible();
@@ -23,7 +27,7 @@ test.describe("Work with requests", () => {
         await requests.addExperts();
         await requests.addCritDocs();
         await requests.addExpertInfo();
-        await requests.chooseLicStatus();
+        await requests.chooseLicStatus(LicStatus.issued);
         await expect(requests.notifyByEnum(Notifications.licStatusSelected).last()).toBeVisible();
     })
 })
