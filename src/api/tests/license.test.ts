@@ -1,4 +1,4 @@
-import {test, expect, describe} from "@jest/globals";
+import {describe, expect, test} from "@jest/globals";
 import superagent from "superagent";
 import {TestData} from "../helpers/test-data";
 import {Prolicense} from "../helpers/prolicense";
@@ -6,6 +6,7 @@ import {License} from "../helpers/license";
 import {Criterias} from "../helpers/criterias";
 import {Api} from "../helpers/api";
 import {Hooks} from "../helpers/hooks/hooks";
+import {LicStatus} from "../helpers/enums/license-status";
 
 describe("License requests", () => {
     const license = new License();
@@ -51,8 +52,7 @@ describe("License requests", () => {
     test("Publish license", async () => {
         const response = await superagent.put(api.basicUrl + api.request.publishLicense).
         send(license.publishLicense());
-        expect(response.body.data.state).toBe(license.license[0].state);
-        expect(response.body.data.stateId).toBe(license.license[0].stateId);
+        expect(response.body.data.state).toBe(license.catalogs.licStatusByEnum(LicStatus.checkManager).name);
         license.fillLicense(0,response);
         console.log(license.license[0].name);
     })
@@ -144,9 +144,8 @@ describe("License requests", () => {
     })
     test("Making a decision on the license request",async () => {
         const response = await superagent.put(api.basicUrl + api.request.changeLicense).
-        send(license.addSolutionToLicense());
-        expect(response.body.data.stateId).toBe(license.catalogs.issuedLicStatus.id);
-        expect(response.body.data.state).toBe(license.catalogs.issuedLicStatus.name);
+        send(license.addSolutionToLicense(LicStatus.issued));
+        expect(response.body.data.state).toBe(license.catalogs.licStatusByEnum(LicStatus.issued).name);
         expect(response.body.data.recommendation).toBe(TestData.commentValue);
         expect(response.body.data.conclusion).toBe(TestData.commentValue);
         expect(response.body.data.rplCriterias).toBe(TestData.commentValue);

@@ -1,5 +1,6 @@
 import superagent from "superagent";
 import {Api} from "./api";
+import {LicStatus} from "./enums/license-status";
 
 export class Catalogs {
     /**
@@ -88,10 +89,10 @@ export class Catalogs {
         return this.organization.map(value => value.id);
     }
     /**
-     * Get "License status" catalog element with status = Issued
+     * Get "License status" by enum
      */
-    public get issuedLicStatus () : TLicAndDocStatus {
-        return this.licStatus.find(value => value.name == 'Выдана')!;
+    public licStatusByEnum (statusValue : LicStatus) : TLicAndDocStatus {
+        return this.licStatus.find(value => value.name == statusValue)!;
     }
     /**
      * ids of "User roles" catalog elements

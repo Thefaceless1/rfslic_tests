@@ -2,6 +2,7 @@ import {Catalogs, TClubWorkers, TOfi, TOrganization} from "./catalogs";
 import {TestData} from "./test-data";
 import {Templates, TProlicense} from "./prolicense";
 import {Response} from "superagent";
+import {LicStatus} from "./enums/license-status";
 
 export class License {
     public license : TLicense[]
@@ -184,11 +185,11 @@ export class License {
         }
     }
     /**
-     * Set the status "Issued" for a license
+     * Set the status  for a license
      */
-    public addSolutionToLicense () : TLicense {
-        this.license[0].stateId = this.catalogs.issuedLicStatus.id;
-        this.license[0].state = this.catalogs.issuedLicStatus.name;
+    public addSolutionToLicense (statusValue : LicStatus) : TLicense {
+        this.license[0].stateId = this.catalogs.licStatusByEnum(statusValue).id;
+        this.license[0].state = this.catalogs.licStatusByEnum(statusValue).name;
         this.license[0].recommendation = TestData.commentValue;
         this.license[0].conclusion = TestData.commentValue;
         this.license[0].rplCriterias = TestData.commentValue;
