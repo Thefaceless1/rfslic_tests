@@ -7,11 +7,9 @@ test.describe("Roles",() => {
         await setUser.createUser();
     })
     test("Adding a role",async ({roles}) => {
-        await roles.addRole();
         await expect(roles.notifyByEnum(Notifications.roleSaved)).toBeVisible();
     })
     test("Changing role rights", async ({roles}) => {
-        await roles.addRole();
         await roles.changeRoleRights();
         await expect(roles.notifyByEnum(Notifications.roleRightsChanged)).toBeVisible();
     })

@@ -21,5 +21,8 @@ export enum Notifications {
     userAdded = "Пользователь добавлен",
     userRightsChanged = "Права пользователя изменены",
     userRoleChanged = "Роль пользователя изменена",
-    userGrpCritChanged = "Группы критериев пользователя изменены"
+    userGrpCritChanged = "Группы критериев пользователя изменены",
+    savedLicenseText = "Текст лицензии сохранен",
+    commissionCreated = "Заседание добавлено",
+    requestsAdded = "Заявки добавлены"
 }

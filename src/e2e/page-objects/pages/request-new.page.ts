@@ -54,10 +54,9 @@ export class RequestNewPage extends MainPage {
         const constructor = new ConstructorNewPage(this.page);
         await constructor.openConstructor();
         await constructor.createProlicense();
-        await Elements.waitForVisible(constructor.createdProlicName);
-        this.prolicenseName = await constructor.createdProlicName.innerText();
         await constructor.createGrpCrit();
         await constructor.createCriteria();
+        this.prolicenseName = await constructor.createdProlicName.innerText();
         await constructor.publishProlicense();
         await constructor.page.waitForNavigation({url : Pages.constructorPage,waitUntil : "domcontentloaded"});
     }

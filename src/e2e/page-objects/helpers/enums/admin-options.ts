@@ -1,5 +1,6 @@
 export enum AdminOptions {
     roles = "Роли",
     experts = "Эксперты",
-    users = "Пользователи"
+    users = "Пользователи",
+    licenseText = "Тексты лицензий"
 }

@@ -61,7 +61,7 @@ export class Hooks {
         })
     }
     /**
-     * Actions before all tests in 'commission.test.ts' file
+     * Actions before all tests in 'commission.spec.ts' file
      */
     public static beforeCommission(commission : Commission) : void {
         beforeAll(async () => {
@@ -70,7 +70,7 @@ export class Hooks {
         })
     }
     /**
-     * Actions after each test in 'commission.test.ts' file
+     * Actions after each test in 'commission.spec.ts' file
      */
     public static afterEachCommission(api : Api, commission : Commission) : void {
         afterEach(() => {

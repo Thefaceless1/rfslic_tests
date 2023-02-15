@@ -4,7 +4,7 @@ export class InputData {
     /**
      * Get current date
      */
-    public static todayDate  : string = new Date().toDateString();
+    public static currentDate  : string = new Date().toDateString();
     /**
      * Random number for the "Minimum quantity" field
      */

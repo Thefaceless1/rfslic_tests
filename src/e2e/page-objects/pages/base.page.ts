@@ -85,6 +85,22 @@ export class BasePage extends PlaywrightDevPage{
      */
     protected searchDataButton : Locator = Elements.getElement(this.page,"//button//span[contains(@class,'IconSearch')]");
     /**
+     * Field "License type"
+     */
+    protected licType : Locator = Elements.getElement(this.page,"//*[contains(@class,'type__control')]");
+    /**
+     * Field "Name"
+     */
+    protected name : Locator = Elements.getElement(this.page,"//input[@name='name']");
+    /**
+     * Fields with date type
+     */
+    protected dates : Locator = Elements.getElement(this.page,"//*[contains(@class,'datepicker')]//input");
+    /**
+     * Values of the drop-down list of the "License type" field
+     */
+    protected licenseTypes : Locator = Elements.getElement(this.page,"//*[contains(@class,'type__option')]");
+    /**
      * Get notification by enum
      */
     public notifyByEnum (enumValue : Notifications) : Locator {

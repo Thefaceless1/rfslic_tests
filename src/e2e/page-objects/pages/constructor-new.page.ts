@@ -14,10 +14,6 @@ export class ConstructorNewPage extends ConstructorPage {
         super(page);
     }
     /**
-     * Field "Prolicense name"
-     */
-    private prolicenseName : Locator = Elements.getElement(this.page,"//input[@name='name']");
-    /**
      * The name of the created prolicense
      */
     public createdProlicName : Locator = Elements.getElement(this.page,"//*[text()='Название пролицензии:']//following-sibling::*");
@@ -26,10 +22,6 @@ export class ConstructorNewPage extends ConstructorPage {
      */
     private season : Locator = Elements.getElement(this.page,"//*[contains(@class,'season__control')]");
     /**
-     * Field "License type"
-     */
-    private licType : Locator = Elements.getElement(this.page,"//*[contains(@class,'type__control')]");
-    /**
      * Field "Document name"
      */
     private docName : Locator = Elements.getElement(this.page,"//input[@placeholder='Введите название документа']");
@@ -37,10 +29,6 @@ export class ConstructorNewPage extends ConstructorPage {
      * Field "Add document"
      */
     private addDocButton : Locator = Elements.getElement(this.page,"//span[text()='Добавить документ']");
-    /**
-     * Fields with dates in the "General information" block
-     */
-    private dates : Locator = Elements.getElement(this.page,"//*[contains(@class,'datepicker')]//input");
     /**
      * Action call button for prolicense
      */
@@ -69,10 +57,6 @@ export class ConstructorNewPage extends ConstructorPage {
      * Values of the drop-down list of the "Season" field
      */
     private seasons : Locator = Elements.getElement(this.page,"//*[contains(@class,'season__option')]");
-    /**
-     * Values of the drop-down list of the "License type" field
-     */
-    private licenseTypes : Locator = Elements.getElement(this.page,"//*[contains(@class,'type__option')]");
     /**
      * Field "Criteria number"
      */
@@ -150,14 +134,14 @@ export class ConstructorNewPage extends ConstructorPage {
      * Fill in the fields of the block "General information"
      */
     private async fillBasicInfo() : Promise<void> {
-        await this.prolicenseName.type(InputData.randomWord);
+        await this.name.type(InputData.randomWord);
         await this.season.click();
         await this.seasons.last().click();
         await this.licType.click();
         await this.licenseTypes.last().click();
         const allDates = await this.dates.all();
         for (const date of allDates) {
-            await Date.fillDateInput(date,InputData.todayDate);
+            await Date.fillDateInput(date,InputData.currentDate);
         }
     }
     /**
@@ -165,10 +149,10 @@ export class ConstructorNewPage extends ConstructorPage {
      */
     public async changeBasicInfo() : Promise<void> {
         await this.editButton.first().click();
-        await this.prolicenseName.type(InputData.randomWord);
+        await this.name.type(InputData.randomWord);
         const allDates = await this.dates.all();
         for (const date of allDates) {
-            await Date.fillDateInput(date,InputData.todayDate);
+            await Date.fillDateInput(date,InputData.currentDate);
         }
         await this.saveButton.click();
     }
@@ -200,7 +184,7 @@ export class ConstructorNewPage extends ConstructorPage {
     public async cloneProlicense() : Promise<void> {
         await this.actionButton.click();
         await this.actionsList.filter({hasText : ProlicenseActions.clone}).click();
-        await this.prolicenseName.type(InputData.randomWord);
+        await this.name.type(InputData.randomWord);
         await this.saveButton.click();
     }
     /**

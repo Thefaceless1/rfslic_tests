@@ -8,6 +8,9 @@ import {RolesPage} from "../../pages/roles.page.js";
 import {AdminOptions} from "../enums/admin-options.js";
 import {UsersPage} from "../../pages/users.page.js";
 import {AuthPage} from "../../pages/auth.page.js";
+import {LicTextPage} from "../../pages/lictext.page.js";
+import {CommissionPage} from "../../pages/commission.page.js";
+import {CommissionMenuOptions} from "../enums/Commission-menu-options.js";
 
 type Fixtures = {
     setUser : AuthPage,
@@ -15,7 +18,9 @@ type Fixtures = {
     newRequest :  RequestNewPage,
     requests : RequestPage,
     roles : RolesPage,
-    users : UsersPage
+    users : UsersPage,
+    licenseText : LicTextPage,
+    commission : CommissionPage
 }
 export const test = base.extend<Fixtures>({
     constructor : async ({page},use) => {
@@ -46,6 +51,7 @@ export const test = base.extend<Fixtures>({
         const roles = new RolesPage(page);
         await roles.login();
         await roles.adminMenuByEnum(AdminOptions.roles).click();
+        await roles.addRole();
         await use(roles);
         await roles.deleteRole();
     },
@@ -54,6 +60,7 @@ export const test = base.extend<Fixtures>({
         await users.login();
         await users.deleteUser();
         await users.adminMenuByEnum(AdminOptions.users).click();
+        await users.addUser();
         await use(users);
     },
     setUser : async ({browser},use) => {
@@ -61,5 +68,17 @@ export const test = base.extend<Fixtures>({
         const authPage = new AuthPage(page);
         await use(authPage);
         await page.close();
+    },
+    licenseText : async ({page},use) => {
+        const licenseText = new LicTextPage(page);
+        await licenseText.login();
+        await use(licenseText);
+    },
+    commission : async ({page},use) => {
+        const commission = new CommissionPage(page);
+        await commission.login();
+        await commission.commissionMenuByEnum(CommissionMenuOptions.meetings).click();
+        await commission.createCommission();
+        await use(commission);
     }
 })
