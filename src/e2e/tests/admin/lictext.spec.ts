@@ -5,7 +5,8 @@ test.describe("License texts", () => {
     /**
      * 1. Adding a license text
      */
-    test("License texts scenario", async ({licenseText}) => {
+    test("License texts scenario", async ({licenseText},testInfo) => {
         await licenseText.addLicText();
+        expect(testInfo.status).toBe("passed");
     })
 })

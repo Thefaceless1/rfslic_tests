@@ -9,10 +9,11 @@ test.describe("Work with requests", () => {
      * 3. Adding expert information (comments, statuses, reports)
      * 4. Making a decision on a request
      */
-    test("Work with requests scenario",async ({requests}) => {
+    test("Work with requests scenario",async ({requests},testInfo) => {
         await requests.addExperts();
         await requests.addCritDocs();
         await requests.addExpertInfo();
         await requests.chooseLicStatus(LicStatus.issued);
+        expect(testInfo.status).toBe("passed");
     })
 })

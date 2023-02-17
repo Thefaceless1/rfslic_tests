@@ -12,7 +12,7 @@ test.describe("Prolicense", () => {
      * 7. Publication a prolicense
      * 8. Unpublish a prolicense
      */
-    test("Prolicense scenario",async ({constructor}) => {
+    test("Prolicense scenario",async ({constructor},testInfo) => {
         await constructor.createProlicense();
         await constructor.changeBasicInfo();
         await constructor.createGrpCrit();
@@ -21,5 +21,6 @@ test.describe("Prolicense", () => {
         await constructor.deleteProlicense();
         await constructor.publishProlicense("prolic");
         await constructor.unpublishProlicense();
+        expect(testInfo.status).toBe("passed");
     })
 })

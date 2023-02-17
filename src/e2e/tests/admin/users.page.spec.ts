@@ -8,10 +8,11 @@ test.describe("Users",() => {
      * 3. Changing the role assigned to a user
      * 4. Editing user criteria groups
      */
-    test("Users scenario",async ({users}) => {
+    test("Users scenario",async ({users},testInfo) => {
         await users.addUser();
         await users.changeRoleRights();
         await users.changeUserRole();
         await users.changeUserGrpCrit();
+        expect(testInfo.status).toBe("passed");
     })
 })
