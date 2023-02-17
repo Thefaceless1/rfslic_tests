@@ -8,6 +8,7 @@ import {randomInt} from "crypto";
 import {NonFilesDoctypes} from "../helpers/enums/non-files-doctypes.js";
 import {ConstructorPage} from "./constructor.page.js";
 import {MainMenuOptions} from "../helpers/enums/main-menu-options.js";
+import {Columns} from "../helpers/enums/columns.js";
 
 export class ConstructorNewPage extends ConstructorPage {
     constructor(page : Page) {
@@ -152,7 +153,7 @@ export class ConstructorNewPage extends ConstructorPage {
         await this.name.type(InputData.randomWord);
         const allDates = await this.dates.all();
         for (const date of allDates) {
-            await Date.fillDateInput(date,InputData.currentDate);
+            await Date.fillDateInput(date,InputData.futureDate);
         }
         await this.saveButton.click();
     }
@@ -190,10 +191,26 @@ export class ConstructorNewPage extends ConstructorPage {
     /**
      * Publication of a prolicense
      */
-    public async publishProlicense() : Promise<void> {
+    public async publishProlicense(scenario : "lic" | "prolic") : Promise<void> {
+        if(scenario == "prolic") {
+            await this.filterByColumn(this.filterButtonByEnum(Columns.licName));
+            await this.waitForColumnFilter();
+            await this.tableRow.click();
+        }
         await this.actionButton.click();
         await this.actionsList.filter({hasText : ProlicenseActions.publish}).click();
         await this.publishButton.click();
+    }
+    /**
+     * Unpublish of a prolicense
+     */
+    public async unpublishProlicense() : Promise<void> {
+        await this.filterByColumn(this.filterButtonByEnum(Columns.licName));
+        await this.waitForColumnFilter();
+        await this.tableRow.click();
+        await this.actionButton.click();
+        await this.actionsList.filter({hasText : ProlicenseActions.unpublish}).click();
+        await this.unpublishButton.click();
     }
     /**
      * Remove a prolicense
@@ -283,5 +300,14 @@ export class ConstructorNewPage extends ConstructorPage {
             }
             await this.saveButton.click();
         }
+        this.prolicenseName = await this.createdProlicName.innerText();
+    }
+    /**
+     * waiting for the filtered record to be displayed
+     */
+    private async waitForColumnFilter() : Promise<void> {
+        const rowCount : number = await this.tableRow.count();
+        if(rowCount > 1) await this.waitForColumnFilter();
+        return;
     }
 }

@@ -5,8 +5,10 @@ import {Notifications} from "../helpers/enums/notifications.js";
 import {Columns} from "../helpers/enums/columns.js";
 
 export class BasePage extends PlaywrightDevPage{
+    protected prolicenseName : string
     constructor(page : Page) {
-        super(page);
+        super(page)
+        this.prolicenseName = ''
     }
     /**
      * Field "Select a role"
@@ -101,6 +103,10 @@ export class BasePage extends PlaywrightDevPage{
      */
     protected licenseTypes : Locator = Elements.getElement(this.page,"//*[contains(@class,'type__option')]");
     /**
+     * Prolicense or License table row
+     */
+    protected tableRow : Locator = Elements.getElement(this.page,"//tr[contains(@class,'ant-table-row')]");
+    /**
      * Get notification by enum
      */
     public notifyByEnum (enumValue : Notifications) : Locator {
@@ -109,7 +115,7 @@ export class BasePage extends PlaywrightDevPage{
     /**
      * Get "Filter" button by table column name
      */
-    public filterButtonByEnum(columnValue : Columns) : Locator {
+    filterButtonByEnum(columnValue : Columns) : Locator {
         return Elements.getElement(this.page,`//span[contains(text(),'${columnValue}')]//following-sibling::span`);
     }
     /**
@@ -122,5 +128,13 @@ export class BasePage extends PlaywrightDevPage{
             if(i%2 == 0) await this.checkbox.nth(i).click();
         }
         await this.saveButton.click();
+    }
+    /**
+     * Set a table filter by a given column
+     */
+    async filterByColumn(column : Locator) : Promise<void> {
+        await column.click();
+        await this.searchInput.type(this.prolicenseName);
+        await this.searchButton.click();
     }
 }

@@ -1,16 +1,15 @@
 import {expect} from "@playwright/test";
-import {Notifications} from "../../page-objects/helpers/enums/notifications.js";
 import {test} from "../../page-objects/helpers/fixtures/fixtures.js";
 
 test.describe("Roles",() => {
-    test.beforeAll(async ({setUser}) => {
-        await setUser.createUser();
-    })
-    test("Adding a role",async ({roles}) => {
-        await expect(roles.notifyByEnum(Notifications.roleSaved)).toBeVisible();
-    })
-    test("Changing role rights", async ({roles}) => {
+    /**
+     * 1. Adding a role
+     * 2. Changing role rights
+     * 3. Removing a role
+     */
+    test("Roles scenario",async ({roles}) => {
+        await roles.addRole();
         await roles.changeRoleRights();
-        await expect(roles.notifyByEnum(Notifications.roleRightsChanged)).toBeVisible();
+        await roles.deleteRole();
     })
 })

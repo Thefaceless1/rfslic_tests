@@ -74,12 +74,6 @@ export class RequestPage extends RequestNewPage {
      */
     private createReport : Locator = Elements.getElement(this.page,"//button[text()='Сформировать отчет эксперта']");
     /**
-     * Get the drop-down list value of the 'License decision' field by enum
-     */
-    private licStatusByEnum(statusValue : LicStatus ) : Locator {
-        return Elements.getElement(this.page,`//*[contains(@class,'requestState__option') and text()='${statusValue}']`);
-    }
-    /**
      * Button "Edit license status"
      */
     private licEditButton : Locator = Elements.getElement(this.page,"//span[contains(@class,'iconEditReqStatus')]");
@@ -90,8 +84,15 @@ export class RequestPage extends RequestNewPage {
     /**
      * Get a cell with the name of the prolicense in the table by the name of the prolicense
      */
+
     private licenseRow(prolicName : string) : Locator {
         return Elements.getElement(this.page,`//td[text()='${prolicName}']`);
+    }
+    /**
+     * Get the drop-down list value of the 'License decision' field by enum
+     */
+    private licStatusByEnum(statusValue : LicStatus ) : Locator {
+        return Elements.getElement(this.page,`//*[contains(@class,'requestState__option') and text()='${statusValue}']`);
     }
     /**
      * Get tabs by enum

@@ -6,6 +6,12 @@ export class InputData {
      */
     public static currentDate  : string = new Date().toDateString();
     /**
+     * Future date
+     */
+    public static get futureDate () : string {
+        return new Date(Date.now() + 5000000000).toDateString();
+    }
+    /**
      * Random number for the "Minimum quantity" field
      */
     public static randomIntForMulti : string = String(randomInt(2,10));

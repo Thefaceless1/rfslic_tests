@@ -34,15 +34,16 @@ export class AuthPage extends BasePage {
         const dbHelper = new DbHelper();
         const response = await this.page.request.get(Api.clubWorkers);
         const userId : number = await response.json().then(value => value.data[this.userNumber].id);
-        const userData  = await dbHelper.select(workUsers.tableName,workUsers.columns.userId,userId);
-        if(userData.length == 0) {
+        const dbUserData  = await dbHelper.select(workUsers.tableName,workUsers.columns.userId,userId);
+        if(dbUserData.length == 0) {
+            console.log(userId)
             await this.page.request.put(Api.addUser,{params: {userId : userId, roleId :Roles.admin}});
             return;
         }
         else {
-            const secondUserData  = Object.values(userData[0]);
-            const secondUserRole = secondUserData[secondUserData.length-1];
-            if(secondUserRole == Roles.admin) return;
+            const userData  = Object.values(dbUserData[0]);
+            const userRole = userData[userData.length-1];
+            if(userRole == Roles.admin) return;
             else {
                 await dbHelper.delete(operationsLog.tableName,operationsLog.columns.userId,userId);
                 await dbHelper.delete(workUsers.tableName,workUsers.columns.userId,userId);

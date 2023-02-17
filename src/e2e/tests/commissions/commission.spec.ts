@@ -1,16 +1,18 @@
 import {expect} from "@playwright/test";
-import {Notifications} from "../../page-objects/helpers/enums/notifications.js";
 import {test} from "../../page-objects/helpers/fixtures/fixtures.js";
 
 test.describe("Commissions", () => {
-    test.beforeAll(async ({setUser}) => {
-        await setUser.createUser();
-    })
-    test("Creating a commission", async ({commission}) => {
-        await expect(commission.notifyByEnum(Notifications.commissionCreated)).toBeVisible();
-    })
-    test("Adding requests to a commission", async ({commission}) => {
-        await commission.addRequestsToCommission();
-        await expect(commission.notifyByEnum(Notifications.requestsAdded)).toBeVisible();
+    /**
+     * 1. Creating a meeting
+     * 2. Adding requests to a meeting
+     * 3. Adding requests to the meeting
+     * 4. Adding decisions on requests
+     * 5. Adding a report and protocol for the commission
+     * 6. Removing the meeting
+     */
+    test("Commission scenario", async ({commission}) => {
+        await commission.createMeeting();
+        await commission.addRequestsToMeeting();
+        await commission.addRequestDecision();
     })
 })

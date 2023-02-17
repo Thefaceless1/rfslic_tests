@@ -25,13 +25,14 @@ type Fixtures = {
 export const test = base.extend<Fixtures>({
     constructor : async ({page},use) => {
         const constructor = new ConstructorNewPage(page);
+        await constructor.createUser();
         await constructor.login();
         await constructor.openConstructor();
-        await constructor.createProlicense();
         await use(constructor);
     },
     newRequest : async ({page},use) => {
         const newRequest = new RequestNewPage(page);
+        await newRequest.createUser();
         await newRequest.login();
         await newRequest.createTestProlicense();
         await newRequest.goto(Pages.requestNewPage);
@@ -41,6 +42,7 @@ export const test = base.extend<Fixtures>({
     },
     requests : async ({page},use) => {
         const request = new RequestPage(page);
+        await request.createUser();
         await request.login();
         await request.createTestProlicense();
         await request.createTestLic();
@@ -49,18 +51,17 @@ export const test = base.extend<Fixtures>({
     },
     roles : async ({page},use) => {
         const roles = new RolesPage(page);
+        await roles.createUser();
         await roles.login();
         await roles.adminMenuByEnum(AdminOptions.roles).click();
-        await roles.addRole();
         await use(roles);
-        await roles.deleteRole();
     },
     users : async ({page},use) => {
         const users = new UsersPage(page);
+        await users.createUser();
         await users.login();
         await users.deleteUser();
         await users.adminMenuByEnum(AdminOptions.users).click();
-        await users.addUser();
         await use(users);
     },
     setUser : async ({browser},use) => {
@@ -71,14 +72,15 @@ export const test = base.extend<Fixtures>({
     },
     licenseText : async ({page},use) => {
         const licenseText = new LicTextPage(page);
+        await licenseText.createUser();
         await licenseText.login();
         await use(licenseText);
     },
     commission : async ({page},use) => {
         const commission = new CommissionPage(page);
+        await commission.createUser();
         await commission.login();
         await commission.commissionMenuByEnum(CommissionMenuOptions.meetings).click();
-        await commission.createCommission();
         await use(commission);
     }
 })

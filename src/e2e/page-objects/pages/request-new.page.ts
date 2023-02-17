@@ -8,10 +8,8 @@ import {InputData} from "../helpers/input-data.js";
 import {MainPage} from "./main.page.js";
 
 export class RequestNewPage extends MainPage {
-    public prolicenseName : string
     constructor(page : Page) {
         super(page);
-        this.prolicenseName = ''
     }
     /**
      * Button "->" in the left corner of the table
@@ -57,16 +55,8 @@ export class RequestNewPage extends MainPage {
         await constructor.createGrpCrit();
         await constructor.createCriteria();
         this.prolicenseName = await constructor.createdProlicName.innerText();
-        await constructor.publishProlicense();
+        await constructor.publishProlicense("lic");
         await constructor.page.waitForNavigation({url : Pages.constructorPage,waitUntil : "domcontentloaded"});
-    }
-    /**
-     * Set a table filter by a given column
-     */
-    public async filterByColumn(column : Locator) : Promise<void> {
-        await column.click();
-        await this.searchInput.type(this.prolicenseName);
-        await this.searchButton.click();
     }
     /**
      * Create a request in the status "Draft"

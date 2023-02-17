@@ -4,6 +4,8 @@ import {Elements} from "../../framework/elements/elements.js";
 import {Date} from "../../framework/elements/date.js";
 import {InputData} from "../helpers/input-data.js";
 import {SearchModalPage} from "./search-modal.page.js";
+import {randomInt} from "crypto";
+import {LicStatus} from "../helpers/enums/licstatus.js";
 
 export class CommissionPage extends MainPage {
     constructor(page : Page) {
@@ -12,7 +14,7 @@ export class CommissionPage extends MainPage {
     /**
      * Button "Create a commission"
      */
-    private createCommissionButton : Locator = Elements.getElement(this.page,"//button[text()='Создать заседание']");
+    private createMeetingButton : Locator = Elements.getElement(this.page,"//button[text()='Создать заседание']");
     /**
      * Button "Create"
      */
@@ -26,10 +28,22 @@ export class CommissionPage extends MainPage {
      */
     private editDecisionButton : Locator = Elements.getElement(this.page,"//*[contains(@class,'CommissionLicensesTab_endStateWrapper')]//button");
     /**
-     * Create a commission
+     * Field "Select a decision"
      */
-    public async createCommission() : Promise<void> {
-        await this.createCommissionButton.click();
+    private selectDecision : Locator = Elements.getElement(this.page,"//*[contains(@class,'newLicState__control')]");
+    /**
+     * Get the drop-down list value of the 'Select a decision' field
+     */
+    private selectDecisionList : Locator = Elements.getElement(this.page,"//*[contains(@class,'newLicState__option')]");
+    /**
+     * Button "Delete meeting"
+     */
+    private deleteMeeting : Locator = Elements.getElement(this.page,"//button[text()='Удалить заседание']");
+    /**
+     * Create a meeting
+     */
+    public async createMeeting() : Promise<void> {
+        await this.createMeetingButton.click();
         await this.licType.click();
         await Elements.waitForVisible(this.licenseTypes.first());
         await this.licenseTypes.first().click();
@@ -38,9 +52,9 @@ export class CommissionPage extends MainPage {
         await this.createButton.click();
     }
     /**
-     * Add requests to a commission
+     * Add requests to a meeting
      */
-    public async addRequestsToCommission() : Promise<void> {
+    public async addRequestsToMeeting() : Promise<void> {
         await this.addRequestsButton.click();
         const searchModal = new SearchModalPage(this.page);
         await Elements.waitForHidden(searchModal.loadIndicator);
@@ -51,6 +65,21 @@ export class CommissionPage extends MainPage {
      * add decision on requests
      */
     public async addRequestDecision() : Promise<void> {
-
+        await Elements.waitForVisible(this.editDecisionButton.first());
+        const requestCount : number = await this.editDecisionButton.count();
+        for(let i = 0; i < requestCount; i++) {
+            await this.editDecisionButton.nth(i).click();
+            await this.selectDecision.click();
+            await Elements.waitForVisible(this.selectDecisionList.first());
+            const decisionCount : number = await this.selectDecisionList.count();
+            const randomNumb : number = randomInt(0,decisionCount);
+            const selectedDecisionName : string = await this.selectDecisionList.nth(randomNumb).innerText();
+            await this.selectDecisionList.nth(randomNumb).click();
+            if(selectedDecisionName == LicStatus.issuedWithConditions) {
+                await Date.fillDateInput(this.dates,InputData.futureDate);
+            }
+            await this.comment.type(InputData.randomWord);
+            await this.saveButton.click();
+        }
     }
 }
