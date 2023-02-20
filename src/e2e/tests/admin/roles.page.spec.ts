@@ -7,7 +7,7 @@ test.describe("Roles",() => {
      * 2. Changing role rights
      * 3. Removing a role
      */
-    test.only("Roles scenario",async ({roles},testInfo) => {
+    test("Roles scenario",async ({roles},testInfo) => {
         await roles.addRole();
         await roles.changeRoleRights();
         await roles.deleteRole();

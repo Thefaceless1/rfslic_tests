@@ -166,7 +166,7 @@ export class ConstructorNewPage extends ConstructorPage {
             if (i != 1) await this.addDocButton.click();
             await this.docName.last().type(InputData.randomWord);
             await this.docDescription.last().type(InputData.randomWord);
-            await Input.uploadFiles(this.templates.last());
+            await Input.uploadFiles(this.templates.last(),"all");
             await Elements.waitForVisible(this.docIcon.last());
             await Elements.waitForVisible(this.xlsxIcon.last());
         }
@@ -272,7 +272,7 @@ export class ConstructorNewPage extends ConstructorPage {
         const randomNumb : number = randomInt(0,dataTypeCount);
         await this.additionalDataTypeList.nth(randomNumb).click();
         if (this.checkDocType(randomNumb)) {
-            await Input.uploadFiles(this.templates.last());
+            await Input.uploadFiles(this.templates.last(),"all");
             await Elements.waitForVisible(this.docIcon.last());
             await Elements.waitForVisible(this.xlsxIcon.last());
         }

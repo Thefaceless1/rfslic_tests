@@ -6,6 +6,7 @@ import {InputData} from "../helpers/input-data.js";
 import {SearchModalPage} from "./search-modal.page.js";
 import {randomInt} from "crypto";
 import {LicStatus} from "../helpers/enums/licstatus.js";
+import {Input} from "../../framework/elements/input.js";
 
 export class CommissionPage extends MainPage {
     constructor(page : Page) {
@@ -32,13 +33,37 @@ export class CommissionPage extends MainPage {
      */
     private selectDecision : Locator = Elements.getElement(this.page,"//*[contains(@class,'newLicState__control')]");
     /**
-     * Get the drop-down list value of the 'Select a decision' field
+     * Get the drop-down list values of the 'Select a decision' field
      */
     private selectDecisionList : Locator = Elements.getElement(this.page,"//*[contains(@class,'newLicState__option')]");
     /**
      * Button "Delete meeting"
      */
-    private deleteMeeting : Locator = Elements.getElement(this.page,"//button[text()='Удалить заседание']");
+    private deleteMeetingButton : Locator = Elements.getElement(this.page,"//button[text()='Удалить заседание']");
+    /**
+     * Button "Materials"
+     */
+    private materialsButton : Locator = Elements.getElement(this.page,"//button[text()='Материалы']");
+    /**
+     * Field "Report type"
+     */
+    private reportType : Locator = Elements.getElement(this.page,"//*[contains(@class,'reportType__control')]");
+    /**
+     * Get the drop-down list values of the 'Report type' field
+     */
+    private reportTypeList : Locator = Elements.getElement(this.page,"//*[contains(@class,'reportType__option')]");
+    /**
+     * Field "Requests"
+     */
+    private requests : Locator = Elements.getElement(this.page,"//*[contains(@class,'requests__control')]");
+    /**
+     * Get the drop-down list values of the 'Requests' field
+     */
+    private requestsList : Locator = Elements.getElement(this.page,"//*[contains(@class,'requests__option')]");
+    /**
+     * Button "Form"
+     */
+    private formButton : Locator = Elements.getElement(this.page,"//button[text()='Сформировать']");
     /**
      * Create a meeting
      */
@@ -62,7 +87,7 @@ export class CommissionPage extends MainPage {
         await searchModal.selectButton.click();
     }
     /**
-     * add decision on requests
+     * Add decision on requests
      */
     public async addRequestDecision() : Promise<void> {
         await Elements.waitForVisible(this.editDecisionButton.first());
@@ -81,5 +106,42 @@ export class CommissionPage extends MainPage {
             await this.comment.type(InputData.randomWord);
             await this.saveButton.click();
         }
+    }
+    /**
+     * Add protocol and report for commission
+     */
+    public async addReport() : Promise<void> {
+        await this.materialsButton.click();
+        const plusButtonCount : number = await this.plusButton.count();
+        for(let i = 0; i < plusButtonCount; i++) {
+            await this.plusButton.nth(i).click();
+            if(i == 0) {
+                await this.reportType.click();
+                await Elements.waitForVisible(this.reportTypeList.first());
+                await this.reportTypeList.first().click();
+                await this.licType.click();
+                await Elements.waitForVisible(this.licenseTypes.first());
+                await this.licenseTypes.last().click();
+                await this.requests.click()
+                await Elements.waitForVisible(this.requestsList.first());
+                const requestCount : number = await this.requestsList.count();
+                for(let c = 0; c<requestCount; c++) {
+                    await this.requestsList.first().click()
+                }
+                await this.formButton.click();
+            }
+            else {
+                await Input.uploadFiles(this.templates,"one");
+                await Elements.waitForVisible(this.docIcon);
+                await this.saveButton.click();
+            }
+        }
+    }
+    /**
+     * Delete a meeting
+     */
+    public async deleteMeeting() : Promise<void> {
+        await this.deleteMeetingButton.click();
+        await this.deleteButton.click();
     }
 }

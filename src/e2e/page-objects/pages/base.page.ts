@@ -1,7 +1,6 @@
 import {PlaywrightDevPage} from "../../framework/helpers/playwright-dev-page.js";
 import {Locator, Page} from "@playwright/test";
 import {Elements} from "../../framework/elements/elements.js";
-import {Notifications} from "../helpers/enums/notifications.js";
 import {Columns} from "../helpers/enums/columns.js";
 
 export class BasePage extends PlaywrightDevPage{
@@ -89,7 +88,7 @@ export class BasePage extends PlaywrightDevPage{
     /**
      * Field "License type"
      */
-    protected licType : Locator = Elements.getElement(this.page,"//*[contains(@class,'type__control')]");
+    protected licType : Locator = Elements.getElement(this.page,"//*[contains(@class,'type__control') or contains(@class,'licType__control')]");
     /**
      * Field "Name"
      */
@@ -101,17 +100,11 @@ export class BasePage extends PlaywrightDevPage{
     /**
      * Values of the drop-down list of the "License type" field
      */
-    protected licenseTypes : Locator = Elements.getElement(this.page,"//*[contains(@class,'type__option')]");
+    protected licenseTypes : Locator = Elements.getElement(this.page,"//*[contains(@class,'type__option') or contains(@class,'licType__option')]");
     /**
      * Prolicense or License table row
      */
     protected tableRow : Locator = Elements.getElement(this.page,"//tr[contains(@class,'ant-table-row')]");
-    /**
-     * Get notification by enum
-     */
-    public notifyByEnum (enumValue : Notifications) : Locator {
-        return this.notifications.filter({hasText : enumValue});
-    }
     /**
      * Get "Filter" button by table column name
      */

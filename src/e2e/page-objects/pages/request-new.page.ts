@@ -91,7 +91,7 @@ export class RequestNewPage extends MainPage {
      * Add files and comments for license documents
      */
     protected async fillDocsAndComment () : Promise<void> {
-        await Input.uploadFiles(this.templates.first());
+        await Input.uploadFiles(this.templates.first(),"all");
         await Elements.waitForVisible(this.docIcon);
         await Elements.waitForVisible(this.xlsxIcon);
         await this.comment.type(InputData.randomWord);
