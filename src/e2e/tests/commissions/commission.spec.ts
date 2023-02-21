@@ -10,7 +10,7 @@ test.describe("Commissions", () => {
      * 5. Adding a report and protocol for the commission
      * 6. Removing the meeting
      */
-    test.only("Commission scenario", async ({commission},testInfo) => {
+    test("Commission scenario", async ({commission},testInfo) => {
         await commission.createMeeting();
         await commission.addRequestsToMeeting();
         await commission.addRequestDecision();

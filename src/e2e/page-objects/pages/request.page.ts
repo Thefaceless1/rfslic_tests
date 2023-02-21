@@ -8,6 +8,8 @@ import {randomInt} from "crypto";
 import {Pages} from "../helpers/enums/pages.js";
 import {LicStatus} from "../helpers/enums/licstatus.js";
 import {Columns} from "../helpers/enums/columns.js";
+import {CriteriaTypes} from "../helpers/enums/criteriatypes.js";
+import {DocStatus} from "../helpers/enums/docstatus.js";
 
 export class RequestPage extends RequestNewPage {
     constructor(page : Page) {
@@ -25,6 +27,14 @@ export class RequestPage extends RequestNewPage {
      * Criteria information field
      */
     private criteriaInfo : Locator = Elements.getElement(this.page,"//span[contains(@class,'CriteriasInfoItem_collapse_title')]");
+    /**
+     * Member criteria information field
+     */
+    private memberCriteriaInfo : Locator = Elements.getElement(this.page,"//*[text()='ФИО Участника:']");
+    /**
+     * OFI criteria information field
+     */
+    private ofiCriteriaInfo : Locator = Elements.getElement(this.page,"//*[text()='Наименование ОФИ:']");
     /**
      * Document status confirmation button
      */
@@ -44,7 +54,7 @@ export class RequestPage extends RequestNewPage {
     /**
      * Selected status in the "Document Decision" field
      */
-    private selectedStatus : Locator = Elements.getElement(this.page,"//*[contains(@class,'docState__single-value')]");
+    private selectedStatus : Locator = Elements.getElement(this.page,"//*[contains(@class,'docState__single-value') or contains(@class,'docState__placeholder')]");
     /**
      * Expert comment
      */
@@ -82,9 +92,24 @@ export class RequestPage extends RequestNewPage {
      */
     private generateLicenseButton : Locator = Elements.getElement(this.page,"//button[text()='Сформировать Лицензию']");
     /**
+     * "Criteria type" field value
+     */
+    private critTypeValue : Locator = Elements.getElement(this.page,"//*[text()='Тип критерия:']//following-sibling::*");
+    /**
+     * Button "submit a document for review"
+     */
+    private submitReviewButton : Locator = Elements.getElement(this.page,"//span[contains(@class,'IconSendMessage')]");
+    /**
+     * Button "Edit OFI"
+     */
+    private editOfiButton : Locator = Elements.getElement(this.page,"//button[@name='editButtonOfi']");
+    /**
+     * Button "Edit Member"
+     */
+    private editMemberButton : Locator = Elements.getElement(this.page,"//button[@name='editButtonMember']");
+    /**
      * Get a cell with the name of the prolicense in the table by the name of the prolicense
      */
-
     private licenseRow(prolicName : string) : Locator {
         return Elements.getElement(this.page,`//td[text()='${prolicName}']`);
     }
@@ -121,12 +146,7 @@ export class RequestPage extends RequestNewPage {
             const editCount = await this.editButton.count();
             for(let c = 0;c<editCount; c++) {
                 await this.editButton.nth(c).click();
-                if(c == 0) {
-                    await this.fillExperts();
-                }
-                else {
-                    await this.fillSearchModalData();
-                }
+                await this.fillExperts();
             }
         }
     }
@@ -135,7 +155,7 @@ export class RequestPage extends RequestNewPage {
      */
     private async fillExperts() : Promise<void> {
         await this.experts.click();
-        await Elements.waitForVisible(this.expertsList.last());
+        await Elements.waitForVisible(this.expertsList.first());
         await this.expertsList.first().click();
         await this.saveButton.click();
         await Elements.waitForHidden(this.saveButton);
@@ -148,30 +168,41 @@ export class RequestPage extends RequestNewPage {
         await this.searchDataButton.click();
         await searchModal.findButton.click();
         await Elements.waitForHidden(searchModal.loadIndicator);
-        await this.checkbox.last().check();
+        await searchModal.radio.first().click();
         await searchModal.selectButton.click();
-        await Elements.waitForVisible(this.selectedData);
         await this.saveButton.click();
         await Elements.waitForHidden(this.saveButton);
     }
     /**
-     * Add criteria documents
+     * Add ofi and participants to criterias and fill criteria documents
      */
-    public async addCritDocs () : Promise<void> {
+    public async addCritInfo () : Promise<void> {
         const groupsCount = await this.criteriaGroups.count();
-        for(let i = groupsCount-1; i>=0; i--) {
+        for(let i = groupsCount-1; i >= 0; i--) {
             await this.criteriaGroups.nth(i).click();
-            await this.criteriaInfo.click();
-            await Elements.waitForVisible(this.checkButton.last());
-            const docsCount : number = await this.checkButton.count();
-            for(let c = 0;c<docsCount; c++) {
-                await this.plusButton.nth(c).click();
-                await Elements.waitForVisible(this.cancelButton);
-                if(await this.searchDataButton.isVisible()) {
-                    await this.fillSearchModalData();
-                }
-                else {
-                    await this.fillDocsAndComment();
+            await Elements.waitForVisible(this.criteriaInfo.first())
+            const criteriaCount : number = await this.criteriaInfo.count();
+            let currMaxDocNumb : number = await this.checkButton.count()/criteriaCount;
+            const step : number = currMaxDocNumb;
+            let currDocNumb : number = 0;
+            for (let x = 0; x < criteriaCount; x++) {
+                await this.criteriaInfo.nth(x).click();
+                await Elements.waitForVisible(this.critTypeValue.nth(x));
+                const critTypeName : string = await this.critTypeValue.nth(x).innerText();
+                switch (critTypeName) {
+                    case CriteriaTypes.documents : {
+                        await this.sendForVerification(currDocNumb,currMaxDocNumb);
+                        currDocNumb+=step;
+                        currMaxDocNumb+=step;
+                        break;
+                    }
+                    default : {
+                        (critTypeName == CriteriaTypes.member) ? await this.editMemberButton.click() : await this.editOfiButton.click();
+                        await this.fillSearchModalData();
+                        await this.sendForVerification(currDocNumb,currMaxDocNumb);
+                        currDocNumb+=step;
+                        currMaxDocNumb+=step;
+                    }
                 }
             }
         }
@@ -202,9 +233,9 @@ export class RequestPage extends RequestNewPage {
         }
     }
     /**
-     * Add comments and put down statuses to documents
+     * Add comments and statuses for documents
      */
-    public async addExpertInfo () : Promise<void> {
+    public async addExpertInfo() : Promise<void> {
         await this.sectionByEnum(RequestSections.generalInfo).click();
         let docsCount : number = await this.checkButton.count();
         await this.fillStatusAndComment(docsCount);
@@ -213,8 +244,13 @@ export class RequestPage extends RequestNewPage {
         const groupsCount : number = await this.criteriaGroups.count();
         for(let i = 0; i<groupsCount;i++) {
             await this.criteriaGroups.nth(i).click();
-            await this.criteriaInfo.click();
-            await Elements.waitForVisible(this.checkButton.last());
+            const criteriaCount : number = await this.criteriaInfo.count();
+            for(let c = 0; c < criteriaCount; c++) {
+                await this.criteriaInfo.nth(c).click();
+                const criteriaType : string = await this.critTypeValue.nth(c).innerText();
+                if(criteriaType == CriteriaTypes.member) await this.memberCriteriaInfo.click();
+                else if(criteriaType == CriteriaTypes.ofi) await this.ofiCriteriaInfo.click();
+            }
             docsCount = await this.checkButton.count();
             await this.fillStatusAndComment(docsCount);
             await this.fillExpertSolution();
@@ -235,7 +271,10 @@ export class RequestPage extends RequestNewPage {
     private async waitForDisplayStatus (statusNumb : number) : Promise<void> {
         const selectedStatusText : string = await this.selectedStatus.nth(statusNumb).innerText();
         const nearDocStatusText : string = await this.statusNearDoc.nth(statusNumb).innerText();
-        if (selectedStatusText.toLowerCase() != nearDocStatusText.toLowerCase()) await this.waitForDisplayStatus(statusNumb);
+        if ((selectedStatusText == DocStatus.selectSolution && nearDocStatusText.toLowerCase() != DocStatus.underReview.toLowerCase()) ||
+            (selectedStatusText.toLowerCase() != nearDocStatusText.toLowerCase() && selectedStatusText != DocStatus.selectSolution)) {
+            await this.waitForDisplayStatus(statusNumb);
+        }
     }
     /**
      * Make a decision on the request by enum
@@ -256,5 +295,17 @@ export class RequestPage extends RequestNewPage {
         await this.recommendation.type(InputData.randomWord);
         await this.createReport.click();
         await Elements.waitForVisible(this.createReport);
+    }
+    /**
+     * Send documents for verification
+     */
+    private async sendForVerification(currDocNumb : number,currMaxDocNumb : number) : Promise<void> {
+        for(let c = currDocNumb;c < currMaxDocNumb; c++) {
+            await this.plusButton.nth(c).click();
+            await Elements.waitForVisible(this.cancelButton);
+            await this.fillDocsAndComment();
+            await this.submitReviewButton.nth(c).click();
+            await this.waitForDisplayStatus(c);
+        }
     }
 }

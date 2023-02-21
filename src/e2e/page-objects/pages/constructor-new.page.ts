@@ -9,6 +9,7 @@ import {NonFilesDoctypes} from "../helpers/enums/non-files-doctypes.js";
 import {ConstructorPage} from "./constructor.page.js";
 import {MainMenuOptions} from "../helpers/enums/main-menu-options.js";
 import {Columns} from "../helpers/enums/columns.js";
+import {CriteriaTypes} from "../helpers/enums/criteriatypes.js";
 
 export class ConstructorNewPage extends ConstructorPage {
     constructor(page : Page) {
@@ -150,6 +151,7 @@ export class ConstructorNewPage extends ConstructorPage {
      */
     public async changeBasicInfo() : Promise<void> {
         await this.editButton.first().click();
+        await this.name.clear();
         await this.name.type(InputData.randomWord);
         const allDates = await this.dates.all();
         for (const date of allDates) {
@@ -244,12 +246,12 @@ export class ConstructorNewPage extends ConstructorPage {
             }
             await this.saveButton.click();
         }
-        while (groupsCount > 5);
+        while (groupsCount > 4);
     }
     /**
      * Fill in the criteria fields
      */
-    private async fillCriteriaInfo(index : number) : Promise<void> {
+    private async fillCriteriaInfo(index : number, critType : string) : Promise<void> {
         await this.plusButton.nth(index).click();
         await this.criteriaNumber.type(InputData.randomWord)
         await this.rankCriteria.click();
@@ -257,7 +259,7 @@ export class ConstructorNewPage extends ConstructorPage {
         await this.criteriaName.type(InputData.randomWord)
         await this.description.type(InputData.randomWord)
         await this.criteriaType.click();
-        await this.criteriaTypeList.filter({hasText : "Документы"}).click();
+        await this.criteriaTypeList.filter({hasText : critType}).click();
     }
     /**
      * Fill in the fields of criteria documents
@@ -292,13 +294,16 @@ export class ConstructorNewPage extends ConstructorPage {
      */
     public async createCriteria() : Promise<void> {
         const groupsCount = await this.createdGroups.count();
+        const criteriaTypes : string[] = [`${CriteriaTypes.documents}`,`${CriteriaTypes.member}`,`${CriteriaTypes.ofi}`];
         const docCount = 2;
         for(let i = 0; i < groupsCount; i++) {
-            await this.fillCriteriaInfo(i);
-            for(let i=0; i < docCount; i++) {
-                await this.fillCriteriaDocs()
+            for (const type of criteriaTypes) {
+                await this.fillCriteriaInfo(i,type);
+                for(let c = 0; c < docCount; c++) {
+                    await this.fillCriteriaDocs()
+                }
+                await this.saveButton.click();
             }
-            await this.saveButton.click();
         }
         this.prolicenseName = await this.createdProlicName.innerText();
     }

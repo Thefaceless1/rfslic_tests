@@ -37,7 +37,7 @@ export class RequestNewPage extends MainPage {
      */
     public requestTitle : Locator = Elements.getElement(this.page,"//*[text()='Заявка на лицензирование клуба']");
     /**
-     * Select a club from the drop down list of values
+     * Select a club from the dropdown list of values
      */
     public async chooseClub() : Promise<void> {
         await Elements.waitForVisible(this.selectClub);
@@ -56,7 +56,7 @@ export class RequestNewPage extends MainPage {
         await constructor.createCriteria();
         this.prolicenseName = await constructor.createdProlicName.innerText();
         await constructor.publishProlicense("lic");
-        await constructor.page.waitForNavigation({url : Pages.constructorPage,waitUntil : "domcontentloaded"});
+        await Elements.waitForVisible(constructor.createProlicButton);
     }
     /**
      * Create a request in the status "Draft"

@@ -36,7 +36,7 @@ export class BasePage extends PlaywrightDevPage{
     /**
      * Button "Edit"
      */
-    protected editButton : Locator = Elements.getElement(this.page,"//button[contains(@class,'Button_view_secondary')][.//span[contains(@class,'IconEdit')]]");
+    protected editButton : Locator = Elements.getElement(this.page,"//button[contains(@class,'Button_view_secondary') and not(contains(@name,'editButton'))][.//span[contains(@class,'IconEdit')]]");
     /**
      * Field "Select experts"
      */
@@ -57,10 +57,6 @@ export class BasePage extends PlaywrightDevPage{
      * Downloaded "xlsx" file picture
      */
     protected xlsxIcon : Locator = Elements.getElement(this.page,"//*[contains(@class,'FileIconXls')]");
-    /**
-     * List of current notifications on the screen
-     */
-    protected notifications : Locator = Elements.getElement(this.page,"//div[contains(@class,'notice-message')]");
     /**
      * Value input field in the "Prolicense name" field filter
      */
@@ -108,14 +104,14 @@ export class BasePage extends PlaywrightDevPage{
     /**
      * Get "Filter" button by table column name
      */
-    filterButtonByEnum(columnValue : Columns) : Locator {
+    protected filterButtonByEnum(columnValue : Columns) : Locator {
         return Elements.getElement(this.page,`//span[contains(text(),'${columnValue}')]//following-sibling::span`);
     }
     /**
      * Change role rights
      */
     public async changeRoleRights() : Promise<void> {
-        await Elements.waitForVisible(this.checkbox.first());
+        await this.waitCheckboxCount();
         const checkboxCount : number = await this.checkbox.count()-1;
         for(let i = 1; i<checkboxCount;i++) {
             if(i%2 == 0) await this.checkbox.nth(i).click();
@@ -125,9 +121,16 @@ export class BasePage extends PlaywrightDevPage{
     /**
      * Set a table filter by a given column
      */
-    async filterByColumn(column : Locator) : Promise<void> {
+    protected async filterByColumn(column : Locator) : Promise<void> {
         await column.click();
         await this.searchInput.type(this.prolicenseName);
         await this.searchButton.click();
+    }
+    /**
+     * Waiting for checkboxes to be visible
+     */
+    private async waitCheckboxCount() : Promise<void> {
+        const checkboxCount : number = await this.checkbox.count();
+        if(checkboxCount <= 0) await this.waitCheckboxCount();
     }
 }
