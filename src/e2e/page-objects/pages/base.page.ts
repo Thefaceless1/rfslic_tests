@@ -131,6 +131,6 @@ export class BasePage extends PlaywrightDevPage{
      */
     private async waitCheckboxCount() : Promise<void> {
         const checkboxCount : number = await this.checkbox.count();
-        if(checkboxCount <= 0) await this.waitCheckboxCount();
+        if(checkboxCount <= 1) await this.waitCheckboxCount();
     }
 }

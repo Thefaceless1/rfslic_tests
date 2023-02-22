@@ -163,7 +163,7 @@ export class ConstructorNewPage extends ConstructorPage {
      * Fill in the fields of the block "Documents for filing an application"
      */
     private async fillDocs() : Promise<void> {
-        const docsCount : number = 3;
+        const docsCount : number = 2;
         for(let i = 1 ; i<=docsCount ; i++) {
             if (i != 1) await this.addDocButton.click();
             await this.docName.last().type(InputData.randomWord);

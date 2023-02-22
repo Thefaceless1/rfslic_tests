@@ -21,3 +21,10 @@ export const issuedLicense = {
         storageId : "storage_id"
     }
 }
+export const userRights = {
+    tableName : "rfslic.work_user_rights",
+    columns : {
+        userId : "user_id",
+        rightId : "right_id"
+    }
+}

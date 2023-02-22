@@ -32,24 +32,17 @@ export class AuthPage extends BasePage {
      */
     public async createUser() : Promise<void> {
         const dbHelper = new DbHelper();
-        const response = await this.page.request.get(Api.clubWorkers);
+        const response = await this.page.request.get(Api.users);
         const userId : number = await response.json().then(value => value.data[this.userNumber].id);
         const dbUserData  = await dbHelper.select(workUsers.tableName,workUsers.columns.userId,userId);
-        if(dbUserData.length == 0) {
-            console.log(userId)
-            await this.page.request.put(Api.addUser,{params: {userId : userId, roleId :Roles.admin}});
-            return;
-        }
+        if (dbUserData[0][workUsers.columns.roleId] == Roles.admin) return;
         else {
-            const userData  = Object.values(dbUserData[0]);
-            const userRole = userData[userData.length-1];
-            if(userRole == Roles.admin) return;
-            else {
-                await dbHelper.delete(operationsLog.tableName,operationsLog.columns.userId,userId);
-                await dbHelper.delete(workUsers.tableName,workUsers.columns.userId,userId);
-                await dbHelper.sql.end();
-                await this.page.request.put(Api.addUser,{params: {userId : userId, roleId :Roles.admin}});
-            }
+            await dbHelper.delete(operationsLog.tableName,operationsLog.columns.userId,userId);
+            await dbHelper.delete(workUsers.tableName,workUsers.columns.userId,userId);
+            await dbHelper.insertUser(userId);
+            await dbHelper.insertUserRights(userId);
+            await dbHelper.sql.end();
+            //await this .page.request.put(Api.addUser,{params: {userId : userId, roleId :Roles.admin}});
         }
     }
     /**
