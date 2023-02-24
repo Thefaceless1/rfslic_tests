@@ -1,8 +1,8 @@
 import {Locator, Page} from "@playwright/test";
 import {BasePage} from "./base.page.js";
 import {Elements} from "../../framework/elements/elements.js";
-import {DbHelper} from "../../framework/db/db-helper.js";
-import {operationsLog, workUsers} from "../../framework/db/tables.js";
+import {DbHelper} from "../../../db/db-helper.js";
+import {operationsLog, workUsers} from "../../../db/tables.js";
 import {Api} from "../helpers/enums/api.js";
 import {Roles} from "../helpers/enums/roles.js";
 
@@ -42,7 +42,6 @@ export class AuthPage extends BasePage {
             await dbHelper.insertUser(userId);
             await dbHelper.insertUserRights(userId);
             await dbHelper.sql.end();
-            //await this .page.request.put(Api.addUser,{params: {userId : userId, roleId :Roles.admin}});
         }
     }
     /**

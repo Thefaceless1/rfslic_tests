@@ -1,12 +1,14 @@
 import {Catalogs, TCriteriaGroups, TOrganization} from "./catalogs";
 import {TestData} from "./test-data";
 import {Response} from "superagent";
+import {DbHelper} from "../../db/db-helper";
+import {operationsLog, workUsers} from "../../db/tables";
 
-export class Admin {
+export class Admin extends Catalogs {
     public user: TUser[]
     public role: TRole[]
-    public catalogs = new Catalogs()
     constructor() {
+        super();
         this.user = []
         this.role = []
     }
@@ -15,8 +17,8 @@ export class Admin {
      * 2. if user role have property value isClub=true then add clubs
      */
     public changeUser() : TUser {
-        this.user[0].groups = [...this.catalogs.criteriaGrpId];
-        if(this.catalogs.roles[1].isClub) this.user[0].clubs = [...this.catalogs.orgId];
+        this.user[0].groups = [...this.criteriaGrpId];
+        if(this.roles[1].isClub) this.user[0].clubs = [...this.orgId];
         return this.user[0];
     }
     /**
@@ -27,7 +29,7 @@ export class Admin {
             name : TestData.randomWord,
             isClub : true,
             description : TestData.descValue,
-            rights : [...this.catalogs.rightsId]
+            rights : [...this.rightsId]
         })
         return this.role[0];
     }
@@ -42,6 +44,18 @@ export class Admin {
      */
     public fillRole(index : number, response : Response) : void {
         this.role[index] = response.body.data;
+    }
+    /**
+     * Check if the user exists in the database
+     */
+    public async checkUser() : Promise<void> {
+        const dbHelper = new DbHelper();
+        const dbUserData = await dbHelper.select(workUsers.tableName,workUsers.columns.userId,this.clubWorkersId[0]);
+        if (dbUserData.length != 0) {
+            await dbHelper.delete(operationsLog.tableName,operationsLog.columns.userId,this.clubWorkersId[0]);
+            await dbHelper.delete(workUsers.tableName,workUsers.columns.userId,this.clubWorkersId[0]);
+        }
+        await dbHelper.sql.end();
     }
 }
 

@@ -1,8 +1,8 @@
 import postgres from "postgres";
 import fs from "fs";
 import {userRights, workUsers} from "./tables.js";
-import {Roles} from "../../page-objects/helpers/enums/roles.js";
-import {UserRights} from "../../page-objects/helpers/enums/user-rights.js";
+import {Roles} from "../e2e/page-objects/helpers/enums/roles.js";
+import {UserRights} from "../e2e/page-objects/helpers/enums/user-rights.js";
 
 export class DbHelper {
    public readonly sql : postgres.Sql<Record<string, postgres.PostgresType> extends {} ? {} : any>
@@ -21,11 +21,17 @@ export class DbHelper {
     public async select(table : string,column : string,data : number | string | boolean) : Promise<postgres.RowList<postgres.Row[]>> {
         return this.sql`SELECT * FROM ${this.sql(table)} WHERE ${this.sql(column)} = ${data}`
     }
+    /**
+     * Add a user in 'work users' table
+     */
     public async insertUser(userId : number) : Promise<void> {
         await this.sql`INSERT INTO ${this.sql(workUsers.tableName)} 
                        (${this.sql(workUsers.columns.userId)},${this.sql(workUsers.columns.isActive)},${this.sql(workUsers.columns.roleId)})
                         VALUES (${userId},true,${Roles.admin});`
     }
+    /**
+     * Add rights for a user in table 'user rights'
+     */
     public async insertUserRights(userId : number) : Promise<void> {
         await this.sql`INSERT INTO ${this.sql(userRights.tableName)} 
                        (${this.sql(userRights.columns.userId)},${this.sql(userRights.columns.rightId)}) 
@@ -62,6 +68,6 @@ export class DbHelper {
      * db.config.json file parser
      */
     public configData() : object {
-       return JSON.parse(fs.readFileSync("./src/e2e/framework/db/db.config.json","utf-8"));
+       return JSON.parse(fs.readFileSync("./src/db/db.config.json","utf-8"));
     }
 }

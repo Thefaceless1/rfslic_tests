@@ -5,13 +5,13 @@ import superagent, {Response} from "superagent";
 import {Api} from "./api";
 import {TLicense} from "./license";
 import {randomInt} from "crypto";
-import {DbHelper} from "../../e2e/framework/db/db-helper";
-import {issuedLicense} from "../../e2e/framework/db/tables";
+import {DbHelper} from "../../db/db-helper";
+import {issuedLicense} from "../../db/tables";
 
-export class Commission {
+export class Commission extends Catalogs {
     public commission : TCommission[]
-    public catalogs : Catalogs = new Catalogs()
     constructor() {
+        super();
         this.commission=[]
     }
     /**
@@ -19,7 +19,7 @@ export class Commission {
      */
     public createCommission() : TCommission {
         this.commission.push({
-            typeId : this.catalogs.commissionTypesId[0],
+            typeId : this.commissionTypesId[0],
             workDate : TestData.currentDate,
             name : TestData.randomWord
         })
@@ -37,14 +37,15 @@ export class Commission {
     public async addRequests() : Promise<TRequests> {
         const api = new Api();
         const response = await superagent.get(api.basicUrl + api.request.requestsList).
-        query({pageNum : 0, pageSize : 10});
+        query({pageNum : 0, pageSize : 10}).
+        set("cookie", `${this.cookie}`);
         return {"licIds": response.body.data.map((value: TLicense) => value.id)};
     }
     /**
      * Add decision for a commission request
      */
     public addDecision() : TDecision {
-        const filteredRequestStatus : TLicAndDocStatus[] = this.catalogs.licStatus.
+        const filteredRequestStatus : TLicAndDocStatus[] = this.licStatus.
         filter(value => value.name == "Выдана" || value.name == "Выдана с условиями" || value.name == "Отказано");
         const randomNumber : number = randomInt(0,filteredRequestStatus.length);
         const randomDecision : TLicAndDocStatus = filteredRequestStatus[randomNumber];
@@ -58,7 +59,7 @@ export class Commission {
      * Add members for a commission type or for a commission
      */
     public addMembers() : TMembers {
-        return {userIds : this.catalogs.commissionTypeMembersId}
+        return {userIds : this.commissionTypeMembersId}
     }
     /**
      * Add report by license type or by club for a commission
@@ -114,7 +115,7 @@ export class Commission {
      * Add text for a license type
      */
     public addLicTypeText() : TLicTypeText {
-        return {licType : this.catalogs.licTypeIds[0], text : TestData.commentValue};
+        return {licType : this.licTypeIds[0], text : TestData.commentValue};
     }
     /**
      * Form license

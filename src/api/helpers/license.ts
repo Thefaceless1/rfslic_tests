@@ -1,20 +1,20 @@
-import {Catalogs, TClubWorkers, TOfi, TOrganization} from "./catalogs";
+import {TClubWorkers, TOfi, TOrganization} from "./catalogs";
 import {TestData} from "./test-data";
-import {Templates, TProlicense} from "./prolicense";
+import {Prolicense, Templates, TProlicense} from "./prolicense";
 import {Response} from "superagent";
 import {LicStatus} from "./enums/license-status";
 
-export class License {
+export class License extends Prolicense {
     public license : TLicense[]
-    public catalogs = new Catalogs()
     constructor() {
+        super();
         this.license = []
     }
     /**
      * Add a license request
      */
     public createLicense (prolicense : TProlicense[]) : TCreateLicense {
-        const firstClubId : number = this.catalogs.organization[0].id;
+        const firstClubId : number = this.organization[0].id;
         return {
             proLicId : prolicense[0].id as number,
             clubId : firstClubId
@@ -32,7 +32,7 @@ export class License {
     public addCommentsAndDocuments () : TLicense {
         this.license[0].documents.forEach((document) => {
             document.comment = TestData.commentValue;
-            document.files = TestData.files;
+            document.files = this.files;
         })
         return this.license[0];
     }
@@ -50,7 +50,7 @@ export class License {
     public licStatusById(stateId : number) : string | null {
         if (!stateId) return null;
         else {
-            const result  = this.catalogs.licStatus.find(value => value.id == stateId);
+            const result  = this.licStatus.find(value => value.id == stateId);
             return (result) ? result.name : "Статус по id не найден";
         }
     }
@@ -58,18 +58,18 @@ export class License {
      * Get document status by 'Document status' catalog id
      */
     public docStatusById(docStateId : number) : string {
-        const result = this.catalogs.docStatus.find(value => value.id == docStateId);
+        const result = this.docStatus.find(value => value.id == docStateId);
         return (result) ? result.name : "Статус по id не найден";
     }
     /**
      * Add criteria groups experts and club workers for a criteria group
      */
     public addClubWorkersToCritGrp () : TLicense {
-        const checkedClubWorkers : number[] = this.catalogs.clubWorkersId.
-        filter(workerId => workerId != this.catalogs.critGrpExperts[0].id);
+        const checkedClubWorkers : number[] = this.clubWorkersId.
+        filter(workerId => workerId != this.critGrpExperts[0].id);
         this.license[0].criteriaGroups.forEach((value) => {
             value.experts = checkedClubWorkers;
-            value.rfuExpert = this.catalogs.critGrpExperts[0].id;
+            value.rfuExpert = this.critGrpExperts[0].id;
         })
         return this.license[0];
     }
@@ -87,10 +87,10 @@ export class License {
                 criterias.documents.forEach((documents) => {
                     documents.comment = TestData.commentValue;
                     switch (documents.docTypeId) {
-                        case 5 : documents.externalIds = this.catalogs.clubWorkersId; break;
-                        case 6 : documents.externalIds = this.catalogs.ofiId; break;
-                        case 9 : documents.externalIds = this.catalogs.orgId; break;
-                        default : documents.files = TestData.files;
+                        case 5 : documents.externalIds = this.clubWorkersId; break;
+                        case 6 : documents.externalIds = this.ofiId; break;
+                        case 9 : documents.externalIds = this.orgId; break;
+                        default : documents.files = this.files;
                     }
                 })
             })
@@ -105,13 +105,13 @@ export class License {
     public addStatusToDocuments () : TLicense {
         this.license[0].documents.forEach((document) => {
             document.reviewComment = TestData.commentValue;
-            document.stateId = this.catalogs.docStatus[TestData.randomIntForDocStat(this.catalogs.docStatus)].id;
+            document.stateId = this.docStatus[TestData.randomIntForDocStat(this.docStatus)].id;
         })
         this.license[0].criteriaGroups.forEach((criteriaGroup) => {
             criteriaGroup.criterias.forEach((criteria) => {
                 criteria.documents.forEach((document) => {
                     document.reviewComment = TestData.commentValue;
-                    document.stateId = this.catalogs.docStatus[TestData.randomIntForDocStat(this.catalogs.docStatus)].id;
+                    document.stateId = this.docStatus[TestData.randomIntForDocStat(this.docStatus)].id;
                 })
             })
         })
@@ -188,8 +188,8 @@ export class License {
      * Set the status  for a license
      */
     public addSolutionToLicense (statusValue : LicStatus) : TLicense {
-        this.license[0].stateId = this.catalogs.licStatusByEnum(statusValue).id;
-        this.license[0].state = this.catalogs.licStatusByEnum(statusValue).name;
+        this.license[0].stateId = this.licStatusByEnum(statusValue).id;
+        this.license[0].state = this.licStatusByEnum(statusValue).name;
         this.license[0].recommendation = TestData.commentValue;
         this.license[0].conclusion = TestData.commentValue;
         this.license[0].rplCriterias = TestData.commentValue;
@@ -210,8 +210,8 @@ export class License {
      */
     public addOfiAndUsers() : TLicense {
         this.license[0].criteriaGroups.forEach(critGrp => {
-            critGrp.criterias[1].externalId = this.catalogs.clubWorkersId[0];
-            critGrp.criterias[2].externalId = this.catalogs.ofiId[0];
+            critGrp.criterias[1].externalId = this.clubWorkersId[0];
+            critGrp.criterias[2].externalId = this.ofiId[0];
             const iterationCount : number = 5;
             critGrp.criterias[iterationCount+1] = critGrp.criterias[2];
             for(let i=1; i<iterationCount; i++) {
@@ -226,8 +226,8 @@ export class License {
                 delete newOfi.id;
                 newUser.orderNum = i;
                 newOfi.orderNum = i;
-                newUser.externalId = this.catalogs.clubWorkersId[i];
-                newOfi.externalId = this.catalogs.ofiId[i];
+                newUser.externalId = this.clubWorkersId[i];
+                newOfi.externalId = this.ofiId[i];
                 critGrp.criterias[i+1] = newUser;
                 critGrp.criterias.push(newOfi);
             }

@@ -57,7 +57,11 @@ export class Api {
     public user : TUser = {
         clubWorkers : "/api/rest/persons/findbyparams",
         critGrpExperts : "/api/rest/persons/withRights",
-        organization : "/api/rest/organizations/find"
+        organization : "/api/rest/organizations/find",
+        activeUsers : "/userChoice/list",
+        fillApi(userId: number) {
+            this.setUser = `/userChoice/set/${userId}`;
+        }
     }
     /**
      * Api infra-object-controller
@@ -94,7 +98,7 @@ export class Api {
         fillApi(commission : Commission) : void {
             this.addRequests = `${this.createCommission}/${commission.commission[0].id}/licenses`;
             this.getCommission = `${this.createCommission}/${commission.commission[0].id}`;
-            this.commissionTypeMembers = `${this.createCommission}/types/${commission.catalogs.commissionTypesId[0]}/members`;
+            this.commissionTypeMembers = `${this.createCommission}/types/${commission.commissionTypesId[0]}/members`;
             this.commissionMembers = `${this.createCommission}/${commission.commission[0].id}/members`;
             this.addProtocol = `${this.createCommission}/${commission.commission[0].id}/protocol`;
             this.addReportByType = `${this.createCommission}/${commission.commission[0].id}/files/byType`;
@@ -140,7 +144,10 @@ export type TRequest = {
 export type TUser = {
     clubWorkers : string,
     critGrpExperts : string,
-    organization : string
+    organization : string,
+    activeUsers : string,
+    setUser? : string,
+    fillApi (userId : number) : void
 }
 export type TInfraObject = {
     ofi : string

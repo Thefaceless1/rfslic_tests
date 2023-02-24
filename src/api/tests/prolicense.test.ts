@@ -1,24 +1,23 @@
 import {test, expect, describe} from "@jest/globals";
 import superagent from "superagent";
 import {TestData} from "../helpers/test-data";
-import {Prolicense, TDocuments} from "../helpers/prolicense";
-import {Criterias, TCriterias} from "../helpers/criterias";
+import {Prolicense, TCriterias, TDocuments} from "../helpers/prolicense";
 import {ProlicenseStatus} from "../helpers/enums/prolicense-status";
 import {Api} from "../helpers/api";
 import {Hooks} from "../helpers/hooks/hooks";
 
 describe("Prolicense", () => {
     const prolicense = new Prolicense();
-    const criterias = new Criterias();
     const api = new Api();
-    Hooks.beforeProlic(prolicense,criterias);
+    Hooks.beforeProlic(prolicense);
     Hooks.afterEachProlic(prolicense,api);
     test("Creating a license project", async () => {
         const response = await superagent.put(api.basicUrl + api.constructors.createProlicense).
-        send(prolicense.createProlicense());
+        send(prolicense.createProlicense()).
+        set("cookie", `${prolicense.cookie}`);
         expect(response.body.data.id).toBeTruthy();
-        expect(response.body.data.type).toBe(prolicense.catalogs.licTypes[0].name);
-        expect(response.body.data.season).toBe(prolicense.catalogs.seasons[0].name);
+        expect(response.body.data.type).toBe(prolicense.licTypes[0].name);
+        expect(response.body.data.season).toBe(prolicense.seasons[0].name);
         expect(response.body.data.stateId).toBe(ProlicenseStatus.unpublished);
         expect(response.body.data.begin && response.body.data.requestBegin).toBe(TestData.currentDate);
         expect(response.body.data.end && response.body.data.requestEnd &&
@@ -29,11 +28,13 @@ describe("Prolicense", () => {
     })
     test("Changing the license project", async () => {
         const response = await superagent.put(api.basicUrl + api.constructors.changeProlicense).
-        send(prolicense.changeProlicense());
+        send(prolicense.changeProlicense()).
+        set("cookie", `${prolicense.cookie}`);
         expect(response.body.status).toBe("SUCCESS");
     })
     test("Getting the license project by ID", async () => {
-        const response = await superagent.get(api.basicUrl + api.constructors.changeProlicense);
+        const response = await superagent.get(api.basicUrl + api.constructors.changeProlicense).
+        set("cookie", `${prolicense.cookie}`);
         expect(response.body.data.id).toBe(prolicense.prolicense[0].id);
         expect(response.body.data.type).toBe(prolicense.prolicense[0].type);
         expect(response.body.data.season).toBe(prolicense.prolicense[0].season);
@@ -42,20 +43,22 @@ describe("Prolicense", () => {
         prolicense.fillProlicense(0,response);
     })
     test("Creating prolicense criteria groups", async () => {
-        criterias.createCritGroups();
-        for (const criteriaGroup of criterias.criterias) {
+        prolicense.createCritGroups();
+        for (const criteriaGroup of prolicense.criterias) {
             const response = await superagent.put(api.basicUrl + api.constructors.createCriteriaGrp).
-            query({groupId: criteriaGroup.id, experts: criteriaGroup.experts});
+            query({groupId: criteriaGroup.id, experts: criteriaGroup.experts}).
+            set("cookie", `${prolicense.cookie}`);
             expect(response.body.status).toBe("SUCCESS");
         }
     })
     test("Creating prolicense criterias", async () => {
-        criterias.createCriterias();
-        for(const criteriaGroup of criterias.criterias){
+        prolicense.createCriterias();
+        for(const criteriaGroup of prolicense.criterias){
             for(let criteria of criteriaGroup.criterias) {
                 const index = criteriaGroup.criterias.indexOf(criteria);
                 const response = await superagent.put(api.basicUrl + api.constructors.createCriterias).
-                send(criteria);
+                send(criteria).
+                set("cookie", `${prolicense.cookie}`);
                 expect(response.body.data.id).toBeTruthy();
                 expect(response.body.data.documents.length).toEqual(criteria.documents.length);
                 expect(response.body.data.number).toBe(criteria.number);
@@ -64,31 +67,34 @@ describe("Prolicense", () => {
         }
     })
     test("Changing prolicense criterias", async () => {
-        criterias.changeCriterias();
-        for (const criteriaGroup of criterias.criterias) {
+        prolicense.changeCriterias();
+        for (const criteriaGroup of prolicense.criterias) {
             for (const criteria of criteriaGroup.criterias) {
                 const response = await superagent.put(api.basicUrl + api.constructors.changeCriterias + criteria.id).
-                send(criteria)
+                send(criteria).
+                set("cookie", `${prolicense.cookie}`);
                 expect(response.body.status).toBe("SUCCESS");
             }
         }
     })
     test("Getting full information about prolicense criterias", async () => {
-        const response = await superagent.get(api.basicUrl + api.constructors.createCriterias);
+        const response = await superagent.get(api.basicUrl + api.constructors.createCriterias).
+        set("cookie", `${prolicense.cookie}`);
         expect(response.body.data.groups.length).toBeGreaterThan(0);
         response.body.data.groups.forEach((criteriaGroup: TCriterias, index: number) => {
             criteriaGroup.criterias.forEach((criteria, criteriaIndex) => {
-                expect(criteria.name).toBe(criterias.criterias[index].criterias[criteriaIndex].name);
-                expect(criteria.number).toBe(criterias.criterias[index].criterias[criteriaIndex].number);
-                expect(criteria.categoryId).toBe(criterias.criterias[index].criterias[criteriaIndex].categoryId);
-                expect(criteria.documents).not.toEqual(criterias.criterias[index].criterias[criteriaIndex].documents);
-                criteria.documents = criterias.criterias[index].criterias[criteriaIndex].documents;
+                expect(criteria.name).toBe(prolicense.criterias[index].criterias[criteriaIndex].name);
+                expect(criteria.number).toBe(prolicense.criterias[index].criterias[criteriaIndex].number);
+                expect(criteria.categoryId).toBe(prolicense.criterias[index].criterias[criteriaIndex].categoryId);
+                expect(criteria.documents).not.toEqual(prolicense.criterias[index].criterias[criteriaIndex].documents);
+                criteria.documents = prolicense.criterias[index].criterias[criteriaIndex].documents;
             })
         })
     })
     test("Copy the prolicense", async () => {
         const response = await superagent.put(api.basicUrl + api.constructors.cloneProlicense).
-        send(prolicense.createSampleProlicense());
+        send(prolicense.createSampleProlicense()).
+        set("cookie", `${prolicense.cookie}`);
         expect(response.body.data.id).not.toBe(prolicense.prolicense[0].id);
         expect(
             response.body.data.end && response.body.data.requestEnd &&
@@ -107,15 +113,17 @@ describe("Prolicense", () => {
         prolicense.prolicense.push(response.body.data);
     })
     test("Removal the prolicense", async () => {
-        const response = await superagent.delete(api.basicUrl + api.constructors.deleteProlicense);
+        const response = await superagent.delete(api.basicUrl + api.constructors.deleteProlicense).
+        set("cookie", `${prolicense.cookie}`);
         expect(response.body.status).toBe("SUCCESS");
         prolicense.prolicense.pop();
     })
     test("Removal prolicense criterias", async () => {
-        for (const criteriaGroup of criterias.criterias) {
+        for (const criteriaGroup of prolicense.criterias) {
             if (criteriaGroup.id % 2 == 0) {
                 for (const criteria of criteriaGroup.criterias) {
-                    const response = await superagent.delete(api.basicUrl + api.constructors.changeCriterias + criteria.id);
+                    const response = await superagent.delete(api.basicUrl + api.constructors.changeCriterias + criteria.id).
+                    set("cookie", `${prolicense.cookie}`);
                     expect(response.body.status).toBe("SUCCESS");
                 }
                 criteriaGroup.criterias = [];
@@ -123,21 +131,24 @@ describe("Prolicense", () => {
         }
     })
     test("Removal criteria groups", async () => {
-        for (let i = 0; i<criterias.criterias.length; i++) {
-            if (criterias.criterias[i].id % 2 == 0) {
-                const response = await superagent.delete(api.basicUrl + api.constructors.deleteCriteriasGrp + criterias.criterias[i].id);
+        for (let i = 0; i<prolicense.criterias.length; i++) {
+            if (prolicense.criterias[i].id % 2 == 0) {
+                const response = await superagent.delete(api.basicUrl + api.constructors.deleteCriteriasGrp + prolicense.criterias[i].id).
+                set("cookie", `${prolicense.cookie}`);
                 expect(response.body.status).toBe("SUCCESS");
-                criterias.criterias.splice(i,1);
+                prolicense.criterias.splice(i,1);
             }
         }
     })
     test("Publish prolicense",async () => {
-        const response = await superagent.put(api.basicUrl+api.constructors.publishProlicense);
+        const response = await superagent.put(api.basicUrl+api.constructors.publishProlicense).
+        set("cookie", `${prolicense.cookie}`);
         expect(response.body.status).toBe("SUCCESS");
         prolicense.prolicense[0].stateId = ProlicenseStatus.published;
     })
     test("Removal of the prolicense from publication", async () => {
-        const response = await superagent.put(api.basicUrl + api.constructors.unpublishProlicense);
+        const response = await superagent.put(api.basicUrl + api.constructors.unpublishProlicense).
+        set("cookie", `${prolicense.cookie}`);
         expect(response.body.status).toBe("SUCCESS");
         prolicense.prolicense[0].stateId = ProlicenseStatus.unpublished;
     })

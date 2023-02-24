@@ -11,33 +11,38 @@ describe("Administration",() => {
     Hooks.afterEachAdmin(api, admin);
     test("Adding a user",async () => {
         const response = await superagent.put(api.basicUrl + api.admin.addUser).
-        query({roleId : admin.catalogs.rolesId[0],userId : admin.catalogs.clubWorkersId[0]});
+        query({roleId : admin.rolesId[0],userId : admin.clubWorkersId[0]}).
+        set("cookie", `${admin.cookie}`);
         admin.user.push(response.body.data);
-        expect(admin.user[0].roleId).toBe(admin.catalogs.rolesId[0]);
-        expect(admin.user[0].id).toBe(admin.catalogs.clubWorkersId[0]);
+        expect(admin.user[0].roleId).toBe(admin.rolesId[0]);
+        expect(admin.user[0].id).toBe(admin.clubWorkersId[0]);
     })
     test("Changing a user's role",async () => {
         const response = await superagent.put(api.basicUrl + api.admin.changeUserRole).
-        query({roleId : admin.catalogs.rolesId[1]});
+        query({roleId : admin.rolesId[1]}).
+        set("cookie", `${admin.cookie}`);
         admin.fillUser(0,response);
-        expect(admin.user[0].roleId).toBe(admin.catalogs.rolesId[1]);
+        expect(admin.user[0].roleId).toBe(admin.rolesId[1]);
     })
     test("User change", async () => {
         const response = await superagent.put(api.basicUrl + api.admin.changeUser).
-        send(admin.changeUser());
+        send(admin.changeUser()).
+        set("cookie", `${admin.cookie}`);
         admin.fillUser(0,response);
-        expect(admin.user[0].groups.length).toBe(admin.catalogs.criteriaGrpId.length);
-        if(admin.catalogs.roles[1].isClub) expect(admin.user[0].clubs.length).toBe(admin.catalogs.orgId.length);
+        expect(admin.user[0].groups.length).toBe(admin.criteriaGrpId.length);
+        if(admin.roles[1].isClub) expect(admin.user[0].clubs.length).toBe(admin.orgId.length);
     })
     test("Adding a role", async () => {
         const response = await superagent.put(api.basicUrl + api.admin.addRole).
-        send(admin.addRole());
+        send(admin.addRole()).
+        set("cookie", `${admin.cookie}`);
         admin.fillRole(0,response);
-        expect(admin.role[0].rights.length).toBe(admin.catalogs.rightsId.length);
+        expect(admin.role[0].rights.length).toBe(admin.rightsId.length);
         expect(admin.role[0].id).toBeTruthy();
     })
     test("Removing a role", async () => {
-        const response = await superagent.delete(api.basicUrl + api.admin.deleteRole);
+        const response = await superagent.delete(api.basicUrl + api.admin.deleteRole).
+        set("cookie", `${admin.cookie}`);
         expect(response.body.status).toBe("SUCCESS");
     })
 })

@@ -1,9 +1,13 @@
 import superagent from "superagent";
 import {Api} from "./api";
 import {LicStatus} from "./enums/license-status";
+import {Authorization} from "./authorization";
+import {FileReader} from "./file-reader";
+import {TFiles} from "./test-data";
 
-export class Catalogs {
+export class Catalogs extends Authorization {
     /**
+     * files - uploaded files
      * seasons - catalog 'Seasons'
      * criteriaGroups - catalog 'Criteria Groups'
      * licTypes - catalog 'License types'
@@ -22,6 +26,7 @@ export class Catalogs {
      * commissionSolution - catalog 'Commission solutions'
      * commissionMembers - catalog 'Commission members'
      */
+    public files : TFiles[]
     public  seasons: TSeasons[]
     public  criteriaGroups: TCriteriaGroups[]
     public  licTypes: TLicTypes[]
@@ -40,6 +45,8 @@ export class Catalogs {
     public commissionDecision : commissionDecision[]
     public commissionTypeMembers : TCommissionTypeMember[]
     constructor() {
+        super();
+        this.files=[]
         this.seasons =[]
         this.criteriaGroups =[]
         this.licTypes =[]
@@ -141,48 +148,101 @@ export class Catalogs {
         }
     }
     /**
+     * Upload files to the server
+     */
+    public async uploadFiles() : Promise<void> {
+        if (this.files.length == FileReader.fileNames.length) return;
+        const api = new Api();
+        for (const fileName of FileReader.fileNames) {
+            const files = await superagent.post(api.basicUrl + api.upload.upload).
+            set("Content-Type", "multipart/form-data; boundary=----WebKitFormBoundaryoI4AK63JZr8jUhAa").
+            set("cookie", `${this.cookie}`).
+            attach("file", FileReader.fileDir + fileName);
+            this.addDataToFiles(fileName,files.body.data);
+        }
+    }
+    /**
+     * Add data to the 'files' array
+     */
+    private addDataToFiles (name : string, id: string) : void {
+        this.files.push({name : name, storageId : id})
+    }
+    /**
      * Get catalogs data by api
      */
     public async fillCatalogsData () : Promise<void> {
         const api = new Api();
-        const seasons = await superagent.get(api.basicUrl + api.constructors.seasons);
+        const seasons = await superagent.get(api.basicUrl + api.constructors.seasons).
+        set("cookie", `${this.cookie}`);
         this.seasons = seasons.body.data;
-        const groupCriterias = await superagent.get(api.basicUrl + api.constructors.critGroups);
+
+        const groupCriterias = await superagent.get(api.basicUrl + api.constructors.critGroups).
+        set("cookie", `${this.cookie}`);
         this.criteriaGroups = groupCriterias.body.data;
-        const licenseType = await superagent.get(api.basicUrl + api.constructors.licTypes);
+
+        const licenseType = await superagent.get(api.basicUrl + api.constructors.licTypes).
+        set("cookie", `${this.cookie}`);
         this.licTypes = licenseType.body.data;
-        const docTypes = await superagent.get(api.basicUrl + api.constructors.docTypes);
+
+        const docTypes = await superagent.get(api.basicUrl + api.constructors.docTypes).
+        set("cookie", `${this.cookie}`);
         this.docTypes = docTypes.body.data;
-        const criteriaRanks = await superagent.get(api.basicUrl + api.constructors.rankCriterias);
+
+        const criteriaRanks = await superagent.get(api.basicUrl + api.constructors.rankCriterias).
+        set("cookie", `${this.cookie}`);
         this.rankCriteria = criteriaRanks.body.data;
-        const criteriaTypes = await superagent.get(api.basicUrl + api.constructors.criteriaTypes);
+
+        const criteriaTypes = await superagent.get(api.basicUrl + api.constructors.criteriaTypes).
+        set("cookie", `${this.cookie}`);
         this.criteriaTypes = criteriaTypes.body.data;
-        const requestStatus = await superagent.get(api.basicUrl + api.request.requestStatus);
-        this.licStatus = requestStatus.body.data
-        const docStatus = await superagent.get(api.basicUrl + api.request.docStatus);
+
+        const requestStatus = await superagent.get(api.basicUrl + api.request.requestStatus).
+        set("cookie", `${this.cookie}`);
+        this.licStatus = requestStatus.body.data;
+
+        const docStatus = await superagent.get(api.basicUrl + api.request.docStatus).
+        set("cookie", `${this.cookie}`);
         this.docStatus = docStatus.body.data;
+
         const clubWorkers = await superagent.get(api.basicUrl+api.user.clubWorkers).
-        query({pageNum : 2, pageSize : 10});
+        query({pageNum : 2, pageSize : 10}).
+        set("cookie", `${this.cookie}`);
         this.clubWorkers = clubWorkers.body.data;
+
         const critGrpExperts = await superagent.get(api.basicUrl+api.user.critGrpExperts).
-        query({rights : "request.checkExpert"});
+        query({rights : "request.checkExpert"}).
+        set("cookie", `${this.cookie}`);
         this.critGrpExperts = critGrpExperts.body.data;
+
         const ofi = await superagent.get(api.basicUrl + api.infraObject.ofi).
-        query({pageNum : 0, pageSize : 10});
+        query({pageNum : 0, pageSize : 10}).
+        set("cookie", `${this.cookie}`);
         this.ofi = ofi.body.data;
+
         const organization = await superagent.get(api.basicUrl + api.user.organization).
-        query({pageNum : 0, pageSize : 10});
+        query({pageNum : 0, pageSize : 10}).
+        set("cookie", `${this.cookie}`);
         this.organization = organization.body.data;
-        const roles = await superagent.get(api.basicUrl + api.admin.roles);
+
+        const roles = await superagent.get(api.basicUrl + api.admin.roles).
+        set("cookie", `${this.cookie}`);
         this.roles = roles.body.data;
-        const rights = await superagent.get(api.basicUrl + api.admin.rights);
+
+        const rights = await superagent.get(api.basicUrl + api.admin.rights).
+        set("cookie", `${this.cookie}`);
         this.rights = rights.body.data;
-        const commission = await superagent.get(api.basicUrl + api.commissions.commissionTypes);
+
+        const commission = await superagent.get(api.basicUrl + api.commissions.commissionTypes).
+        set("cookie", `${this.cookie}`);
         this.commissionTypes = commission.body.data;
-        const commissionDecision = await superagent.get(api.basicUrl + api.commissions.commissionDecisions);
+
+        const commissionDecision = await superagent.get(api.basicUrl + api.commissions.commissionDecisions).
+        set("cookie", `${this.cookie}`);
         this.commissionDecision = commissionDecision.body.data;
+
         const commissionTypeMembers = await superagent.get(api.basicUrl + api.admin.addUser).
-        query({pageNum : 0, pageSize : 10, rights : "commission.member"});
+        query({pageNum : 0, pageSize : 10, rights : "commission.member"}).
+        set("cookie", `${this.cookie}`);
         this.commissionTypeMembers = commissionTypeMembers.body.data;
     }
 }

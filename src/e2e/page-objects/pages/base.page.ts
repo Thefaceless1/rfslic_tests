@@ -104,7 +104,7 @@ export class BasePage extends PlaywrightDevPage{
     /**
      * Get "Filter" button by table column name
      */
-    protected filterButtonByEnum(columnValue : Columns) : Locator {
+    public filterButtonByEnum(columnValue : Columns) : Locator {
         return Elements.getElement(this.page,`//span[contains(text(),'${columnValue}')]//following-sibling::span`);
     }
     /**
@@ -121,7 +121,7 @@ export class BasePage extends PlaywrightDevPage{
     /**
      * Set a table filter by a given column
      */
-    protected async filterByColumn(column : Locator) : Promise<void> {
+    public async filterByColumn(column : Locator) : Promise<void> {
         await column.click();
         await this.searchInput.type(this.prolicenseName);
         await this.searchButton.click();

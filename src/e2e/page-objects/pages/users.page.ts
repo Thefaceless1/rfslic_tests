@@ -2,8 +2,8 @@ import {MainPage} from "./main.page.js";
 import {Locator, Page} from "@playwright/test";
 import {Elements} from "../../framework/elements/elements.js";
 import {SearchModalPage} from "./search-modal.page.js";
-import {DbHelper} from "../../framework/db/db-helper.js";
-import {operationsLog, workUsers} from "../../framework/db/tables.js";
+import {DbHelper} from "../../../db/db-helper.js";
+import {operationsLog, workUsers} from "../../../db/tables.js";
 import {UserTabs} from "../helpers/enums/usertabs.js";
 import {Api} from "../helpers/enums/api.js";
 

@@ -28,3 +28,13 @@ export const userRights = {
         rightId : "right_id"
     }
 }
+export const roles = {
+    tableName : "rfslic.work_roles",
+    columns : {
+        name : "name",
+        description : "description",
+        isBase : "is_base",
+        isClub : "is_club",
+        id : "id"
+    }
+}
