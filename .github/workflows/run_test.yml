@@ -1,0 +1,10 @@
+name: run tests
+on: workflow_dispatch
+jobs:
+  run_tests: 
+    runs-on: windows-latest
+    steps:
+      - name: install packages
+      - run: npm i
+      - name: run tests
+      - run: npm run test
