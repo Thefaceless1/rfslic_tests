@@ -1,8 +1,14 @@
 name: run integrations tests
 on: workflow_dispatch
 jobs:
-  run_tests: 
+  run_tests:
     runs-on: windows-latest
     steps:
-      - name: create package.json
-        run: npm init
+     - name : Setup Node.js environment
+       uses: actions/setup-node@v3
+       with:
+        node-version: 16
+        cache: 'npm'
+        cache-dependency-path: package.json
+     - run: npm install
+  
