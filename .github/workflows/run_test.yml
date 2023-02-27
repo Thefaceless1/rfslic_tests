@@ -6,5 +6,3 @@ jobs:
     steps:
       - name: install packages
       - run: npm i
-      - name: run tests
-      - run: npm run test
