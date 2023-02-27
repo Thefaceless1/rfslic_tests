@@ -5,4 +5,4 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: install packages
-      - run: npm i
+        run: npm i
