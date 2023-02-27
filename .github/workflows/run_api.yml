@@ -1,11 +1,13 @@
-name: run integrations tests
+name: Run api tests
 on: workflow_dispatch
 jobs:
-  run_tests:
+  run_api_tests:
     runs-on: windows-latest
     steps:
      - name : Get repository code
        uses: actions/checkout@v3
      - name : Install dependencies
        run: npm ci
+     - name : Run tests
+       run: npm run test
   
