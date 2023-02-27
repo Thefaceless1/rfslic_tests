@@ -1,8 +1,8 @@
-name: run test
+name: run integrations tests
 on: workflow_dispatch
 jobs:
   run_tests: 
     runs-on: windows-latest
     steps:
-      - name: install packages
-        run: npm i
+      - name: create package.json
+        run: npm init
