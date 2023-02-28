@@ -20,10 +20,6 @@ export class RequestPage extends RequestNewPage {
      */
     private criteriaGroups : Locator = Elements.getElement(this.page,"//button[contains(text(),'критерии')]");
     /**
-     * List of selected club workers or OFI or organizations
-     */
-    private selectedData : Locator = Elements.getElement(this.page,"//*[contains(@class,'multi-value__label')]");
-    /**
      * Criteria information field
      */
     private criteriaInfo : Locator = Elements.getElement(this.page,"//span[contains(@class,'CriteriasInfoItem_collapse_title')]");
@@ -87,10 +83,6 @@ export class RequestPage extends RequestNewPage {
      * Button "Edit license status"
      */
     private licEditButton : Locator = Elements.getElement(this.page,"//span[contains(@class,'iconEditReqStatus')]");
-    /**
-     * Button "Generate license"
-     */
-    private generateLicenseButton : Locator = Elements.getElement(this.page,"//button[text()='Сформировать Лицензию']");
     /**
      * "Criteria type" field value
      */
@@ -285,13 +277,11 @@ export class RequestPage extends RequestNewPage {
         await Elements.waitForVisible(this.licStatusByEnum(statusValue));
         await this.licStatusByEnum(statusValue).click();
         await this.submitButton.click();
-        await this.generateLicenseButton.click();
     }
     /**
      * Add an expert report
      */
     private async fillExpertSolution() : Promise<void> {
-        await this.conclusion.type(InputData.randomWord);
         await this.recommendation.type(InputData.randomWord);
         await this.createReport.click();
         await Elements.waitForVisible(this.createReport);

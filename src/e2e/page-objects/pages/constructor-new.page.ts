@@ -229,24 +229,22 @@ export class ConstructorNewPage extends ConstructorPage {
      * Create criteria groups
      */
     public async createGrpCrit() : Promise<void> {
-        let groupsCount : number;
-        do {
+        const groupsCount : number = 2;
+        for(let i = 0; i <groupsCount; i++) {
             await Elements.waitForVisible(this.addGrpCritButton);
             await this.addGrpCritButton.click();
             await Elements.waitForVisible(this.grpCrit);
             await this.grpCrit.click();
-            await Elements.waitForVisible(this.grpCritList.last());
-            groupsCount = await this.grpCritList.count();
+            await Elements.waitForVisible(this.grpCritList.first());
             await this.grpCritList.first().click();
             await this.experts.click();
-            await Elements.waitForVisible(this.expertsList.last());
+            await Elements.waitForVisible(this.expertsList.first());
             const expertsCount = await this.expertsList.count();
             for (let i = 0; i<expertsCount; i++) {
                 await this.expertsList.first().click();
             }
             await this.saveButton.click();
         }
-        while (groupsCount > 4);
     }
     /**
      * Fill in the criteria fields

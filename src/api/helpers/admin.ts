@@ -7,10 +7,14 @@ import {operationsLog, workUsers} from "../../db/tables";
 export class Admin extends Catalogs {
     public user: TUser[]
     public role: TRole[]
+    public critGroups : TCritGroup[]
+    public critRanks : TCritRank[]
     constructor() {
         super();
         this.user = []
         this.role = []
+        this.critGroups = []
+        this.critRanks =[]
     }
     /**
      * 1. Add criteria groups to the user
@@ -34,16 +38,15 @@ export class Admin extends Catalogs {
         return this.role[0];
     }
     /**
-     * Add response data to "user" array
+     * Add response data to "critGroups", "role", "user", "criteriaRanks" arrays
      */
-    public fillUser(index : number, response : Response) : void {
-        this.user[index] = response.body.data;
-    }
-    /**
-     * Add response data to "role" array
-     */
-    public fillRole(index : number, response : Response) : void {
-        this.role[index] = response.body.data;
+    public fillEntity(array : "user" | "role" | "criteriaGroups" | "criteriaRanks", index : number, response : Response) : void {
+        switch (array) {
+            case "user" : this.user[index] = response.body.data; break;
+            case "role" : this.role[index] = response.body.data; break;
+            case "criteriaGroups" : this.critGroups[index] = response.body.data; break;
+            default : this.critRanks[index] = response.body.data;
+        }
     }
     /**
      * Check if the user exists in the database
@@ -56,6 +59,39 @@ export class Admin extends Catalogs {
             await dbHelper.delete(workUsers.tableName,workUsers.columns.userId,this.clubWorkersId[0]);
         }
         await dbHelper.sql.end();
+    }
+    /**
+     * Add a criteria group
+     */
+    public addCriteriaGroup() : TCritGroup {
+        this.critGroups.push({name : TestData.randomWord});
+        return this.critGroups[0];
+    }
+    /**
+     * Change a criteria group
+     */
+    public changeCriteriaGroup() : TCritGroup {
+        this.critGroups[0].name = TestData.randomWord;
+        this.critGroups[0].active = !this.critGroups[0].active;
+        return this.critGroups[0];
+    }
+    /**
+     * Add a criteria rank
+     */
+    public addCriteriaRank() : TCritRank {
+        this.critRanks.push({
+            code : TestData.randomCode(this.rankCriteria),
+            description : TestData.randomWord
+        })
+        return this.critRanks[0];
+    }
+    /**
+     * Change a criteria rank
+     */
+    public changeCriteriaRank() : TCritRank {
+        this.critRanks[0].description = TestData.randomWord
+        this.critRanks[0].code = TestData.randomCode(this.rankCriteria);
+        return this.critRanks[0];
     }
 }
 
@@ -87,4 +123,14 @@ export type TRole = {
     isBase?: boolean,
     isClub: boolean,
     rights: string[]
+}
+export type TCritGroup = {
+    id? : number,
+    active? : boolean,
+    name : string
+}
+export type TCritRank = {
+    id? : number,
+    code : string,
+    description : string
 }

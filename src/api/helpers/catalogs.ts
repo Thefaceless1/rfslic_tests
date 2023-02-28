@@ -138,16 +138,6 @@ export class Catalogs extends Authorization {
         return rightsId;
     }
     /**
-     * Get 'Document types' catalog elements by criteria type
-     */
-    public docTypesForCrit (criteriaType : TCriteriaTypes) : TDocTypes[] {
-        switch (criteriaType.name) {
-            case "Документы" : return this.docTypes.filter(value => (value.id != 3 && value.id != 4 && value.id != 7 && value.id != 10));
-            case "Участник" : return this.docTypes.filter(value => (value.id <= 3));
-            default : return this.docTypes.filter(value => (value.id <= 2 || value.id == 10));
-        }
-    }
-    /**
      * Upload files to the server
      */
     public async uploadFiles() : Promise<void> {

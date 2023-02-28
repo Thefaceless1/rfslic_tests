@@ -77,10 +77,14 @@ export class Api {
         roles : "/api/rest/admin/roles",
         addRole : "/api/rest/admin/roles",
         rights : "/api/rest/admin/rights",
+        changeCritGroup : "/api/rest/admin/groups",
+        changeCritRank : "/api/rest/admin/categories",
         fillApi(admin : Admin) : void {
             this.changeUserRole = `/api/rest/admin/users/${admin.user[0].id}/newRole`;
             this.changeUser = `/api/rest/admin/users/${admin.user[0].id}`;
             if(admin.role.length == 1) this.deleteRole = `/api/rest/admin/roles/${admin.role[0].id}`;
+            if(admin.critGroups.length == 1) this.deleteCriteriaGroup = `/api/rest/admin/groups/${admin.critGroups[0].id}`;
+            if(admin.critRanks.length == 1) this.deleteCriteriaRank = `/api/rest/admin/categories/${admin.critRanks[0].id}`;
         }
     }
     /**
@@ -157,9 +161,13 @@ export type TAdmin = {
     roles : string,
     addRole : string,
     rights : string
+    changeCritGroup : string,
+    changeCritRank : string,
     changeUserRole? : string,
     changeUser? : string,
     deleteRole? : string,
+    deleteCriteriaGroup? : string,
+    deleteCriteriaRank? : string,
     fillApi(admin : Admin) : void
 }
 export type TCommissions = {

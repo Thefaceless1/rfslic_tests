@@ -1,8 +1,5 @@
 import {randomInt} from "crypto";
-import {TDocTypes, TLicAndDocStatus} from "./catalogs";
-import {Api} from "./api";
-import {FileReader} from "./file-reader";
-import superagent from "superagent";
+import {TLicAndDocStatus, TRankCriteria} from "./catalogs";
 
 export class TestData {
     //public static files: TFiles[] = [];
@@ -33,16 +30,21 @@ export class TestData {
         return randomWord;
     }
     /**
+     * Get random criteria rank "code"
+     */
+    public static randomCode(criteriaRanks : TRankCriteria[]) : string {
+        const symbols : string = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz";
+        const randomNumber : number = randomInt(0,symbols.length);
+        const codes : string[] = criteriaRanks.map(rank => rank.code);
+        return (codes.includes(symbols[randomNumber])) ?
+            this.randomCode(criteriaRanks) :
+            symbols[randomNumber];
+    }
+    /**
      * Get random number for the 'Minimum quantity' field
      */
     public static get randomIntForMulti () : number {
         return randomInt(2,10);
-    }
-    /**
-     * Get a random number for the 'Document type' field
-     */
-    public static randomIntForDocs (docTypes : TDocTypes[]) : number {
-        return randomInt(0,docTypes.length);
     }
     /**
      * Get a random number for the 'Document status' field

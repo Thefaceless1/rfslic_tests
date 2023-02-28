@@ -1,5 +1,5 @@
 import {TestData} from "./test-data";
-import {Catalogs, TClubWorkers} from "./catalogs";
+import {Catalogs, TClubWorkers, TDocTypes} from "./catalogs";
 import superagent, {Response} from "superagent";
 import {Api} from "./api";
 
@@ -15,16 +15,13 @@ export class Prolicense extends Catalogs {
      * Add a prolicense
      */
     public createProlicense() : TProlicense {
-        const docArray : TDocuments[] = [...Array(5)].fill(
-            {
+        const docArray : TDocuments[] = [...Array(5)].fill({
             name: TestData.randomWord,
             description : TestData.descValue,
             docTypeId: this.docTypes[0].id,
             templates: this.files
-        }
-        )
-        this.prolicense.push(
-            {
+        })
+        this.prolicense.push({
             name: TestData.randomWord,
             season: this.seasons[0].name,
             type: this.licTypes[0].name,
@@ -37,8 +34,7 @@ export class Prolicense extends Catalogs {
             begin: TestData.currentDate,
             end: TestData.futureDate,
             documents: docArray
-        }
-        )
+        })
         return this.prolicense[0];
     }
     /**
@@ -52,14 +48,12 @@ export class Prolicense extends Catalogs {
         this.prolicense[0].name = TestData.randomWord;
         this.prolicense[0].type = this.licTypes[this.licTypes.length-1].name;
         this.prolicense[0].season = this.seasons[this.seasons.length-1].name;
-        this.prolicense[0].documents.push(
-            {
+        this.prolicense[0].documents.push({
             name: TestData.randomWord,
             description : TestData.descValue,
             docTypeId: this.docTypes[0].id,
             templates: this.files
-        }
-        )
+        })
         return this.prolicense[0];
     }
     /**
@@ -94,8 +88,7 @@ export class Prolicense extends Catalogs {
      */
     public createCritGroups () : void {
         this.criteriaGroups.forEach((value) => {
-            this.criterias.push(
-                {
+            this.criterias.push({
                     id : value.id,
                     name : value.name,
                     experts : this.critGrpExpertsId,
@@ -103,8 +96,7 @@ export class Prolicense extends Catalogs {
                         experts : this.critGrpExperts
                     },
                     criterias : []
-                }
-            )
+            })
         })
     }
     /**
@@ -113,15 +105,14 @@ export class Prolicense extends Catalogs {
     public createCriterias () : void {
         this.criterias.forEach((criteriaGroup) => {
                 this.criteriaTypes.forEach((criteriaType,index) => {
-                    const randomDocNumber : number = TestData.randomIntForDocs(this.docTypesForCrit(criteriaType));
+                    const fileDocType : TDocTypes = this.docTypes.find(docType => docType.name == "Файл")!;
                     const docArray : TDocuments[] = [...new Array(3)].fill({
                         name: TestData.randomWord,
                         description : TestData.descValue,
-                        docTypeId: this.docTypesForCrit(criteriaType)[randomDocNumber].id,
-                        templates: (randomDocNumber != 5 && randomDocNumber != 6 && randomDocNumber != 9) ? this.files : []
+                        docTypeId: fileDocType.id,
+                        templates: this.files
                     })
-                    criteriaGroup.criterias.push(
-                        {
+                    criteriaGroup.criterias.push({
                             groupId: criteriaGroup.id,
                             number: TestData.randomWord,
                             categoryId: this.rankCriteria[0].id,
@@ -132,8 +123,7 @@ export class Prolicense extends Catalogs {
                             docSubmitDate: TestData.futureDate,
                             reviewDate: TestData.futureDate,
                             documents: docArray
-                        }
-                    )
+                    })
                 })
             }
         )
