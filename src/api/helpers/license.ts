@@ -187,9 +187,7 @@ export class License extends Prolicense {
     /**
      * Set the status  for a license
      */
-    public addSolutionToLicense (statusValue : LicStatus) : TLicense {
-        this.license[0].stateId = this.licStatusByEnum(statusValue).id;
-        this.license[0].state = this.licStatusByEnum(statusValue).name;
+    public addConclusions() : TLicense {
         this.license[0].recommendation = TestData.commentValue;
         this.license[0].conclusion = TestData.commentValue;
         this.license[0].rplCriterias = TestData.commentValue;
@@ -201,7 +199,6 @@ export class License extends Prolicense {
     public addExpertReport(grpId : number) : TExpertReport {
         return {
             groupId : grpId,
-            conclusion : TestData.commentValue,
             recommendation : TestData.commentValue
         }
     }
@@ -283,7 +280,6 @@ export type TLicense = {
 }
 export type TExpertReport = {
     groupId: number,
-    conclusion: string,
     recommendation: string
 }
 export type TCriterias = {

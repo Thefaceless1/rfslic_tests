@@ -68,7 +68,19 @@ export class BasePage extends PlaywrightDevPage{
     /**
      * Field "Comment"
      */
-    protected comment : Locator = Elements.getElement(this.page,"//textarea[@name='comment']")
+    protected comment : Locator = Elements.getElement(this.page,"//textarea[@name='comment']");
+    /**
+     * Field "Description"
+     */
+    protected description : Locator = Elements.getElement(this.page,"//textarea[@name='description' or @placeholder='Описание']");
+    /**
+     * Button "Edit group" in a table
+     */
+    protected editTableButton : Locator = Elements.getElement(this.page,"//span[contains(@class,'IconEdit')]");
+    /**
+     * Button "Delete group" in a table
+     */
+    protected deleteTableButton : Locator = Elements.getElement(this.page,"//span[contains(@class,'IconTrash')]");
     /**
      * Button "Add"
      */
@@ -89,6 +101,10 @@ export class BasePage extends PlaywrightDevPage{
      * Field "Name"
      */
     protected name : Locator = Elements.getElement(this.page,"//input[@name='name']");
+    /**
+     * Button "Add criteria groups"
+     */
+    protected addGrpCritButton : Locator = Elements.getElement(this.page,"//*[contains(text(),'Добавить группу')]");
     /**
      * Fields with date type
      */

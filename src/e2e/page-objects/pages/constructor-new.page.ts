@@ -36,10 +36,6 @@ export class ConstructorNewPage extends ConstructorPage {
      */
     private  actionButton : Locator = Elements.getElement(this.page,"//button[@name='proLic_btn_details']");
     /**
-     * Button "Add criteria groups"
-     */
-    private addGrpCritButton : Locator = Elements.getElement(this.page,"//button[contains(@class,'CriteriasMain_add_btn')]");
-    /**
      * Field "Criteria group name"
      */
     private grpCrit = Elements.getElement(this.page,"//*[contains(@class,'groupName__placeholder')]");
@@ -91,10 +87,6 @@ export class ConstructorNewPage extends ConstructorPage {
      * Field "Minimum quantity"
      */
     private minCount : Locator = Elements.getElement(this.page,"//input[@name='minCount']");
-    /**
-     * Field "Description"
-     */
-    private description : Locator = Elements.getElement(this.page,"//textarea[@name='description']");
     /**
      * Field "Additional data type"
      */

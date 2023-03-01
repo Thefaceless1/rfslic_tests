@@ -50,7 +50,7 @@ describe("Administration",() => {
         send(admin.addCriteriaGroup()).
         set("cookie", `${admin.cookie}`);
         expect(response.body.status).toBe("SUCCESS");
-        expect(response.body.data.id).toBeTruthy();
+        expect(response.body.data.id).not.toBeNull();
         admin.fillEntity("criteriaGroups", 0,response);
     })
     test("Changing a criteria group", async () => {
@@ -71,7 +71,7 @@ describe("Administration",() => {
         send(admin.addCriteriaRank()).
         set("cookie", `${admin.cookie}`);
         expect(response.body.status).toBe("SUCCESS");
-        expect(response.body.data.id).toBeTruthy();
+        expect(response.body.data.id).not.toBeNull();
         admin.fillEntity("criteriaRanks",0,response);
     })
     test("Changing a criteria rank",async () => {

@@ -11,6 +11,8 @@ import {AuthPage} from "../../pages/auth.page.js";
 import {LicTextPage} from "../../pages/lictext.page.js";
 import {CommissionPage} from "../../pages/commission.page.js";
 import {CommissionMenuOptions} from "../enums/Commission-menu-options.js";
+import {GroupsClassifierPage} from "../../pages/groups-classifier.page.js";
+import {CategoriesClassifierPage} from "../../pages/categories-classifier.page.js";
 
 type Fixtures = {
     setUser : AuthPage,
@@ -20,7 +22,9 @@ type Fixtures = {
     roles : RolesPage,
     users : UsersPage,
     licenseText : LicTextPage,
-    commission : CommissionPage
+    commission : CommissionPage,
+    groupClassifier : GroupsClassifierPage
+    categoriesClassifier : CategoriesClassifierPage
 }
 export const test = base.extend<Fixtures>({
     constructor : async ({page},use) => {
@@ -82,5 +86,19 @@ export const test = base.extend<Fixtures>({
         await commission.login();
         await commission.commissionMenuByEnum(CommissionMenuOptions.meetings).click();
         await use(commission);
+    },
+    groupClassifier : async ({page},use) => {
+        const groupClassifier = new GroupsClassifierPage(page);
+        await groupClassifier.createUser();
+        await groupClassifier.login();
+        await groupClassifier.adminMenuByEnum(AdminOptions.groupsClassifier).click();
+        await use(groupClassifier);
+    },
+    categoriesClassifier : async ({page},use) => {
+        const categoriesClassifier = new CategoriesClassifierPage(page);
+        await categoriesClassifier.createUser();
+        await categoriesClassifier.login();
+        await categoriesClassifier.adminMenuByEnum(AdminOptions.categoriesClassifier).click();
+        await use(categoriesClassifier);
     }
 })

@@ -136,20 +136,19 @@ describe("License requests", () => {
     })
     test("Creating an expert report", async () => {
         const groupsCount : number = license.criteriaGroups.length;
-        const firstGrpId : number = license.criteriaGroups[0].id;
-        for(let i = firstGrpId; i<=groupsCount; i++) {
+        for(let i = 0; i < groupsCount; i++) {
+            const groupId : number = license.criteriaGroups[i].id;
             const response = await superagent.post(api.basicUrl + api.request.createExpertReport).
-            send(license.addExpertReport(i)).
+            send(license.addExpertReport(groupId)).
             set("cookie", `${license.cookie}`);
             expect(response.body.data.fileName).toBeTruthy();
             expect(response.body.data.storageId).toBeTruthy();
         }
     })
-    test("Making a decision on the license request",async () => {
+    test("Adding conclusions for a request",async () => {
         const response = await superagent.put(api.basicUrl + api.request.changeLicense).
-        send(license.addSolutionToLicense(LicStatus.issued)).
+        send(license.addConclusions()).
         set("cookie", `${license.cookie}`);
-        expect(response.body.data.state).toBe(license.licStatusByEnum(LicStatus.issued).name);
         expect(response.body.data.recommendation).toBe(TestData.commentValue);
         expect(response.body.data.conclusion).toBe(TestData.commentValue);
         expect(response.body.data.rplCriterias).toBe(TestData.commentValue);

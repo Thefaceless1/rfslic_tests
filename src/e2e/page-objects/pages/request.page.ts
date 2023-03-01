@@ -60,10 +60,6 @@ export class RequestPage extends RequestNewPage {
      */
     private selectLicStatus : Locator = Elements.getElement(this.page,"//*[contains(@class,'requestState__control')]");
     /**
-     * Button "Confirm"
-     */
-    private submitButton : Locator = Elements.getElement(this.page,"//button[text()='Подтвердить']");
-    /**
      * Field "Conclusion"
      */
     private conclusion : Locator = Elements.getElement(this.page,"//textarea[@name='conclusion']");
@@ -267,16 +263,6 @@ export class RequestPage extends RequestNewPage {
             (selectedStatusText.toLowerCase() != nearDocStatusText.toLowerCase() && selectedStatusText != DocStatus.selectSolution)) {
             await this.waitForDisplayStatus(statusNumb);
         }
-    }
-    /**
-     * Make a decision on the request by enum
-     */
-    public async chooseLicStatus (statusValue : LicStatus) : Promise<void> {
-        await this.sectionByEnum(RequestSections.commissions).click()
-        await this.selectLicStatus.click();
-        await Elements.waitForVisible(this.licStatusByEnum(statusValue));
-        await this.licStatusByEnum(statusValue).click();
-        await this.submitButton.click();
     }
     /**
      * Add an expert report
