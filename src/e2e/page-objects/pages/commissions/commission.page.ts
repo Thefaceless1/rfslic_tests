@@ -1,12 +1,12 @@
-import {MainPage} from "./main.page.js";
+import {MainPage} from "../main.page.js";
 import {Locator, Page} from "@playwright/test";
-import {Elements} from "../../framework/elements/elements.js";
-import {Date} from "../../framework/elements/date.js";
-import {InputData} from "../helpers/input-data.js";
-import {SearchModalPage} from "./search-modal.page.js";
+import {Elements} from "../../../framework/elements/elements.js";
+import {Date} from "../../../framework/elements/date.js";
+import {InputData} from "../../helpers/input-data.js";
+import {SearchModalPage} from "../search-modal.page.js";
 import {randomInt} from "crypto";
-import {LicStatus} from "../helpers/enums/licstatus.js";
-import {Input} from "../../framework/elements/input.js";
+import {LicStatus} from "../../helpers/enums/licstatus.js";
+import {Input} from "../../../framework/elements/input.js";
 
 export class CommissionPage extends MainPage {
     constructor(page : Page) {

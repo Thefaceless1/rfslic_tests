@@ -1,11 +1,11 @@
 import {Locator, Page} from "@playwright/test";
-import {ConstructorNewPage} from "./constructor-new.page.js";
-import {Elements} from "../../framework/elements/elements.js";
-import {Pages} from "../helpers/enums/pages.js";
-import {Columns} from "../helpers/enums/columns.js";
-import {Input} from "../../framework/elements/input.js";
-import {InputData} from "../helpers/input-data.js";
-import {MainPage} from "./main.page.js";
+import {ConstructorNewPage} from "../constructor/constructor-new.page.js";
+import {Elements} from "../../../framework/elements/elements.js";
+import {Pages} from "../../helpers/enums/pages.js";
+import {Columns} from "../../helpers/enums/columns.js";
+import {Input} from "../../../framework/elements/input.js";
+import {InputData} from "../../helpers/input-data.js";
+import {MainPage} from "../main.page.js";
 
 export class RequestNewPage extends MainPage {
     constructor(page : Page) {

@@ -1,18 +1,18 @@
 import {test as base} from '@playwright/test';
-import {ConstructorNewPage} from "../../pages/constructor-new.page.js";
+import {ConstructorNewPage} from "../../pages/constructor/constructor-new.page.js";
 import {Pages} from "../enums/pages.js";
-import {RequestNewPage} from "../../pages/request-new.page.js";
-import {RequestPage} from "../../pages/request.page.js";
+import {RequestNewPage} from "../../pages/request/request-new.page.js";
+import {RequestPage} from "../../pages/request/request.page.js";
 import {Columns} from "../enums/columns.js";
-import {RolesPage} from "../../pages/roles.page.js";
+import {RolesPage} from "../../pages/admin/roles.page.js";
 import {AdminOptions} from "../enums/admin-options.js";
-import {UsersPage} from "../../pages/users.page.js";
+import {UsersPage} from "../../pages/admin/users.page.js";
 import {AuthPage} from "../../pages/auth.page.js";
-import {LicTextPage} from "../../pages/lictext.page.js";
-import {CommissionPage} from "../../pages/commission.page.js";
+import {LicTextPage} from "../../pages/admin/lictext.page.js";
+import {CommissionPage} from "../../pages/commissions/commission.page.js";
 import {CommissionMenuOptions} from "../enums/Commission-menu-options.js";
-import {GroupsClassifierPage} from "../../pages/groups-classifier.page.js";
-import {CategoriesClassifierPage} from "../../pages/categories-classifier.page.js";
+import {GroupsClassifierPage} from "../../pages/admin/groups-classifier.page.js";
+import {CategoriesClassifierPage} from "../../pages/admin/categories-classifier.page.js";
 
 type Fixtures = {
     setUser : AuthPage,

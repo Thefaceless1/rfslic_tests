@@ -2,7 +2,6 @@ import {TClubWorkers, TOfi, TOrganization} from "./catalogs";
 import {TestData} from "./test-data";
 import {Prolicense, Templates, TProlicense} from "./prolicense";
 import {Response} from "superagent";
-import {LicStatus} from "./enums/license-status";
 
 export class License extends Prolicense {
     public license : TLicense[]
@@ -185,7 +184,7 @@ export class License extends Prolicense {
         }
     }
     /**
-     * Set the status  for a license
+     * Add conclusions for a license
      */
     public addConclusions() : TLicense {
         this.license[0].recommendation = TestData.commentValue;

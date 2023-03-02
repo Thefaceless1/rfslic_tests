@@ -1,15 +1,15 @@
 import {RequestNewPage} from "./request-new.page.js";
 import {Locator, Page} from "@playwright/test";
-import {RequestSections} from "../helpers/enums/RequestSections.js";
-import {Elements} from "../../framework/elements/elements.js";
-import {SearchModalPage} from "./search-modal.page.js";
-import {InputData} from "../helpers/input-data.js";
+import {RequestSections} from "../../helpers/enums/RequestSections.js";
+import {Elements} from "../../../framework/elements/elements.js";
+import {SearchModalPage} from "../search-modal.page.js";
+import {InputData} from "../../helpers/input-data.js";
 import {randomInt} from "crypto";
-import {Pages} from "../helpers/enums/pages.js";
-import {LicStatus} from "../helpers/enums/licstatus.js";
-import {Columns} from "../helpers/enums/columns.js";
-import {CriteriaTypes} from "../helpers/enums/criteriatypes.js";
-import {DocStatus} from "../helpers/enums/docstatus.js";
+import {Pages} from "../../helpers/enums/pages.js";
+import {LicStatus} from "../../helpers/enums/licstatus.js";
+import {Columns} from "../../helpers/enums/columns.js";
+import {CriteriaTypes} from "../../helpers/enums/criteriatypes.js";
+import {DocStatus} from "../../helpers/enums/docstatus.js";
 
 export class RequestPage extends RequestNewPage {
     constructor(page : Page) {

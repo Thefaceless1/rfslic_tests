@@ -1,7 +1,7 @@
-import {MainPage} from "./main.page.js";
+import {MainPage} from "../main.page.js";
 import {Locator, Page} from "@playwright/test";
-import {Elements} from "../../framework/elements/elements.js";
-import {InputData} from "../helpers/input-data.js";
+import {Elements} from "../../../framework/elements/elements.js";
+import {InputData} from "../../helpers/input-data.js";
 
 export class RolesPage extends MainPage {
     constructor(page : Page) {

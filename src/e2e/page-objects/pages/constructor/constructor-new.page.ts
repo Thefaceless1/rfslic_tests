@@ -1,15 +1,15 @@
 import {Locator, Page} from "@playwright/test";
-import {Elements} from "../../framework/elements/elements.js";
-import {Date} from "../../framework/elements/date.js";
-import {Input} from "../../framework/elements/input.js";
-import {ProlicenseActions} from "../helpers/enums/prolicense-actions.js";
-import {InputData} from "../helpers/input-data.js";
+import {Elements} from "../../../framework/elements/elements.js";
+import {Date} from "../../../framework/elements/date.js";
+import {Input} from "../../../framework/elements/input.js";
+import {ProlicenseActions} from "../../helpers/enums/prolicense-actions.js";
+import {InputData} from "../../helpers/input-data.js";
 import {randomInt} from "crypto";
-import {NonFilesDoctypes} from "../helpers/enums/non-files-doctypes.js";
+import {NonFilesDoctypes} from "../../helpers/enums/non-files-doctypes.js";
 import {ConstructorPage} from "./constructor.page.js";
-import {MainMenuOptions} from "../helpers/enums/main-menu-options.js";
-import {Columns} from "../helpers/enums/columns.js";
-import {CriteriaTypes} from "../helpers/enums/criteriatypes.js";
+import {MainMenuOptions} from "../../helpers/enums/main-menu-options.js";
+import {Columns} from "../../helpers/enums/columns.js";
+import {CriteriaTypes} from "../../helpers/enums/criteriatypes.js";
 
 export class ConstructorNewPage extends ConstructorPage {
     constructor(page : Page) {

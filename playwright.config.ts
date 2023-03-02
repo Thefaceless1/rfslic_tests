@@ -33,7 +33,7 @@ const config: PlaywrightTestConfig = {
   reporter: [['html',{outputFolder : 'src/e2e/playwright-report/', open : "never",outputFile : "report"}]],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
-    headless : false,
+    headless : !!process.env.CI,
     viewport: null,
     /* Maximum time each action such as `click()` can take. Defaults to 0 (no limit). */
     actionTimeout: 0,
