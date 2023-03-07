@@ -1,7 +1,10 @@
 import {TClubWorkers, TOfi, TOrganization} from "./catalogs";
 import {TestData} from "./test-data";
 import {Prolicense, Templates, TProlicense} from "./prolicense";
-import {Response} from "superagent";
+import superagent, {Response} from "superagent";
+import {DocumentStatus} from "./enums/document-status";
+import {LicStatus} from "./enums/license-status";
+import {Api} from "./api";
 
 export class License extends Prolicense {
     public license : TLicense[]
@@ -39,26 +42,9 @@ export class License extends Prolicense {
      * Publish a license request
      */
     public publishLicense () : TLicense {
-        this.license[0].stateId = 1;
-        this.license[0].state = "Новая";
+        this.license[0].stateId = this.licStatusByEnum(LicStatus.new).id;
+        this.license[0].state = this.licStatusByEnum(LicStatus.new).name;
         return this.license[0];
-    }
-    /**
-     * Get license status by 'License status' catalog id
-     */
-    public licStatusById(stateId : number) : string | null {
-        if (!stateId) return null;
-        else {
-            const result  = this.licStatus.find(value => value.id == stateId);
-            return (result) ? result.name : "Статус по id не найден";
-        }
-    }
-    /**
-     * Get document status by 'Document status' catalog id
-     */
-    public docStatusById(docStateId : number) : string {
-        const result = this.docStatus.find(value => value.id == docStateId);
-        return (result) ? result.name : "Статус по id не найден";
     }
     /**
      * Add criteria groups experts and club workers for a criteria group
@@ -124,18 +110,18 @@ export class License extends Prolicense {
         let checkedDocsCount : number = 0;
         this.license[0].documents.forEach((document) => {
             allDocsCount++;
-            if (document.state == this.docStatusById(3) ||
-                document.state == this.docStatusById(4) ||
-                document.state == this.docStatusById(5))
+            if (document.state == DocumentStatus.accepted ||
+                document.state == DocumentStatus.acceptedWithCondition ||
+                document.state == DocumentStatus.declined)
                 checkedDocsCount++;
         })
         this.license[0].criteriaGroups.forEach((criteriaGroup) => {
             criteriaGroup.criterias.forEach((criteria) => {
                 criteria.documents.forEach((document) => {
                     allDocsCount++;
-                    if (document.state == this.docStatusById(3) ||
-                        document.state == this.docStatusById(4) ||
-                        document.state == this.docStatusById(5))
+                    if (document.state == DocumentStatus.accepted ||
+                        document.state == DocumentStatus.acceptedWithCondition ||
+                        document.state == DocumentStatus.declined)
                         checkedDocsCount++;
                 })
             })
@@ -229,6 +215,14 @@ export class License extends Prolicense {
             }
         })
         return this.license[0];
+    }
+    /**
+     * Get license by id
+     */
+    public async refreshLicense(api : Api) : Promise<void> {
+        const response = await superagent.get(api.basicUrl + api.request.changeLicense).
+        set("cookie", `${this.cookie}`);
+        this.fillLicense(0,response);
     }
 }
 

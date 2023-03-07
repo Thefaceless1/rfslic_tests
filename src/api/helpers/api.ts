@@ -39,10 +39,15 @@ export class Api {
         docStatus : "/api/rest/licenses/docstates",
         createLicense : "/api/rest/licenses",
         requestsList : "/api/rest/licenses/find",
-        fillApi (licenseId : number) : void {
+        fillApi (licenseId : number, groupId? : number, fileId? : number) : void {
             this.changeLicense = `/api/rest/licenses/${licenseId}`;
             this.publishLicense = `${this.changeLicense}/publish`;
             this.createExpertReport = `${this.changeLicense}/groupReport/generate`;
+            if(groupId) this.checkDocument = `${this.createLicense}/${licenseId}/groups/${groupId}/check`;
+            else if(fileId) {
+                this.deleteReqFile = `${this.createLicense}/files/${fileId}`;
+                this.deleteDocFile = `${this.createLicense}/criterias/files/${fileId}`
+            }
         }
     }
     /**
@@ -143,7 +148,10 @@ export type TRequest = {
     changeLicense? : string,
     publishLicense? : string,
     createExpertReport? : string,
-    fillApi (licenseId : number) : void
+    checkDocument? : string,
+    deleteReqFile? : string,
+    deleteDocFile? : string,
+    fillApi (licenseId : number,groupId? : number,fileId? : number) : void
 }
 export type TUser = {
     clubWorkers : string,

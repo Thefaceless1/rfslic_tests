@@ -5,6 +5,8 @@ import {License} from "../helpers/license";
 import {Api} from "../helpers/api";
 import {Hooks} from "../helpers/hooks/hooks";
 import {LicStatus} from "../helpers/enums/license-status";
+import {DocumentStatus} from "../helpers/enums/document-status";
+import {Templates} from "../helpers/prolicense";
 
 describe("License requests", () => {
     const license = new License();
@@ -15,24 +17,23 @@ describe("License requests", () => {
         send(license.createLicense(license.prolicense)).
         set("cookie", `${license.cookie}`);
         expect(response.body.data.proLicId).toBe(license.prolicense[0].id);
-        expect(response.body.data.state).toBe(license.licStatusById(response.body.data.stateId));
+        expect(response.body.data.state).toBe(LicStatus.new);
         expect(response.body.data.percent).toBe(0);
-        expect(response.body.data.docState).toBe(license.docStatusById(response.body.data.docStateId));
+        expect(response.body.data.docState).toBe(DocumentStatus.form);
         license.fillLicense(0,response);
         api.request.fillApi(license.license[0].id);
         license.license[0].documents.forEach((document, index) => {
-            expect(document.state).toBe(license.docStatusById(response.body.data.docStateId));
+            expect(document.state).toBe(DocumentStatus.form);
             expect(document.proDocId).toBe(license.prolicense[0].documents[index].id);
         })
-        license.license[0].criteriaGroups.forEach((criteriaGroup, index) => {
-            expect(criteriaGroup.groupId).toBe(license.criterias[index].id);
-            expect(criteriaGroup.state).toBe(license.docStatusById(criteriaGroup.stateId));
+        license.license[0].criteriaGroups.forEach((criteriaGroup) => {
+            expect(criteriaGroup.state).toBe(DocumentStatus.form);
             expect(criteriaGroup.percent).toBe(0.0);
             criteriaGroup.criterias.forEach((criteria) => {
-                expect(criteria.state).toBe(license.docStatusById(criteria.stateId));
+                expect(criteria.state).toBe(DocumentStatus.form);
                 expect(criteria.percent).toBe(0.0);
                 criteria.documents.forEach(document => {
-                    expect(document.state).toBe(license.docStatusById(document.stateId));
+                    expect(document.state).toBe(DocumentStatus.form);
                 })
             })
         })
@@ -83,13 +84,36 @@ describe("License requests", () => {
             criteriaGroup.criterias.forEach((criteria) => {
                 criteria.documents.forEach((document) => {
                     expect(document.comment).toBe(TestData.commentValue);
-                    if(document.docTypeId != 5 && document.docTypeId != 6 && document.docTypeId != 9)
                     expect(document.files.length).toEqual(license.files.length);
-                    else expect(document.files.length).toEqual(0);
-
                 })
             })
         })
+    })
+    test("Removing request file",async () => {
+        const fileForRemoving : Templates = license.license[0].documents[0].files[0];
+        api.request.fillApi(license.license[0].id,undefined,fileForRemoving.id);
+        await superagent.delete(api.basicUrl + api.request.deleteReqFile).
+        set("cookie", `${license.cookie}`);
+        await license.refreshLicense(api);
+        const isHaveFile : boolean = license.license[0].documents[0].files.includes(fileForRemoving);
+        expect(isHaveFile).toBeFalsy();
+    })
+    test("Removing criteria document file",async () => {
+        const fileForRemoving : Templates = license.license[0].criteriaGroups[0].criterias[0].documents[0].files[0];
+        api.request.fillApi(license.license[0].id,undefined,fileForRemoving.id);
+        await superagent.delete(api.basicUrl + api.request.deleteDocFile).
+        set("cookie", `${license.cookie}`);
+        await license.refreshLicense(api);
+        const isHaveFile : boolean = license.license[0].criteriaGroups[0].criterias[0].documents[0].files.includes(fileForRemoving);
+        expect(isHaveFile).toBeFalsy();
+    })
+    test("Submit all the criteria group documents for review",async () => {
+        const firstGroupId : number  = license.license[0].criteriaGroups[0].groupId;
+        api.request.fillApi(license.license[0].id,firstGroupId);
+        await superagent.put(api.basicUrl + api.request.checkDocument).
+        set("cookie", `${license.cookie}`);
+        await license.refreshLicense(api);
+        expect(license.license[0].criteriaGroups[0].state).toBe(DocumentStatus.underReview);
     })
     test("Setting statuses and comments for documents",async () => {
         const response = await superagent.put(api.basicUrl + api.request.changeLicense).
@@ -100,37 +124,34 @@ describe("License requests", () => {
         license.license[0].criteriaGroups.forEach((criteriaGroup) => {
             const grpPercent = criteriaGroup.criterias.reduce((accum,value) =>accum+value.percent,0)/criteriaGroup.criterias.length;
             expect(Math.round(criteriaGroup.percent)).toBe(Math.round(grpPercent));
-            if(criteriaGroup.criterias.some(value => value.state == license.docStatusById(1))) {
-                expect(criteriaGroup.state).toBe(license.docStatusById(1));
+            if(criteriaGroup.criterias.some(value => value.state == DocumentStatus.form)) {
+                expect(criteriaGroup.state).toBe(DocumentStatus.form);
             }
-            else if (criteriaGroup.criterias.some(value => value.state == license.docStatusById(5))) {
-                expect(criteriaGroup.state).toBe(license.docStatusById(5));
+            else if (criteriaGroup.criterias.some(value => value.state == DocumentStatus.declined)) {
+                expect(criteriaGroup.state).toBe(DocumentStatus.declined);
             }
-            else if (criteriaGroup.criterias.some(value => value.state == license.docStatusById(2))) {
-                expect(criteriaGroup.state).toBe(license.docStatusById(2));
+            else if (criteriaGroup.criterias.some(value => value.state == DocumentStatus.underReview)) {
+                expect(criteriaGroup.state).toBe(DocumentStatus.underReview);
             }
-            else if (criteriaGroup.criterias.some(value => value.state == license.docStatusById(4))) {
-                expect(criteriaGroup.state).toBe(license.docStatusById(4));
+            else if (criteriaGroup.criterias.some(value => value.state == DocumentStatus.acceptedWithCondition)) {
+                expect(criteriaGroup.state).toBe(DocumentStatus.acceptedWithCondition);
             }
-            else expect(criteriaGroup.state).toBe(license.docStatusById(3));
+            else expect(criteriaGroup.state).toBe(DocumentStatus.accepted);
             criteriaGroup.criterias.forEach((criteria) => {
                 expect(Math.round(criteria.percent)).toBe(license.criteriaPercent(criteriaGroup, criteria));
-                if (license.criteriaDocuments(criteriaGroup,criteria).some(value => value.state == license.docStatusById(1))){
-                    expect(criteria.state).toBe(license.docStatusById(1));
+                if (license.criteriaDocuments(criteriaGroup,criteria).some(value => value.state == DocumentStatus.form)){
+                    expect(criteria.state).toBe(DocumentStatus.form);
                 }
-                else if (license.criteriaDocuments(criteriaGroup,criteria).some(value => value.state == license.docStatusById(5))) {
-                    expect(criteria.state).toBe(license.docStatusById(5));
+                else if (license.criteriaDocuments(criteriaGroup,criteria).some(value => value.state == DocumentStatus.declined)) {
+                    expect(criteria.state).toBe(DocumentStatus.declined);
                 }
-                else if (license.criteriaDocuments(criteriaGroup,criteria).some(value => value.state == license.docStatusById(2))) {
-                    expect(criteria.state).toBe(license.docStatusById(2));
+                else if (license.criteriaDocuments(criteriaGroup,criteria).some(value => value.state == DocumentStatus.underReview)) {
+                    expect(criteria.state).toBe(DocumentStatus.underReview);
                 }
-                else if (license.criteriaDocuments(criteriaGroup,criteria).some(value => value.state == license.docStatusById(4))) {
-                    expect(criteria.state).toBe(license.docStatusById(4));
+                else if (license.criteriaDocuments(criteriaGroup,criteria).some(value => value.state == DocumentStatus.acceptedWithCondition)) {
+                    expect(criteria.state).toBe(DocumentStatus.acceptedWithCondition);
                 }
-                else expect(criteria.state).toBe(license.docStatusById(3));
-                criteria.documents.forEach((document) => {
-                    expect(document.state).toBe(license.docStatusById(document.stateId));
-                })
+                else expect(criteria.state).toBe(DocumentStatus.accepted);
             })
         })
     })

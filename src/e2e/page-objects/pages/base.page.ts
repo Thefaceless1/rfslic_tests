@@ -118,6 +118,10 @@ export class BasePage extends PlaywrightDevPage{
      */
     protected tableRow : Locator = Elements.getElement(this.page,"//tr[contains(@class,'ant-table-row')]");
     /**
+     * Button "Close notification"
+     */
+    private closeNotifyButton : Locator = Elements.getElement(this.page,"//span[contains(@class,'notice-close-icon')]");
+    /**
      * Get "Filter" button by table column name
      */
     public filterButtonByEnum(columnValue : Columns) : Locator {
@@ -148,5 +152,16 @@ export class BasePage extends PlaywrightDevPage{
     private async waitCheckboxCount() : Promise<void> {
         const checkboxCount : number = await this.checkbox.count();
         if(checkboxCount <= 1) await this.waitCheckboxCount();
+    }
+    /**
+     * Close notifications
+     */
+    protected async closeNotifications() : Promise<void> {
+        if(await this.closeNotifyButton.last().isVisible()) {
+            const notifyCount : number = await this.closeNotifyButton.count();
+            for(let i = 0; i< notifyCount; i++) {
+                await this.closeNotifyButton.nth(i).click();
+            }
+        }
     }
 }

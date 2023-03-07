@@ -1,4 +1,5 @@
 export enum LicStatus {
+    new = "Новая",
     declined = "Отказано",
     issued = "Выдана",
     issuedWithConditions = "Выдана с условиями",
