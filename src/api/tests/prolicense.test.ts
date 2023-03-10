@@ -112,13 +112,13 @@ describe("Prolicense", () => {
     })
         prolicense.prolicense.push(response.body.data);
     })
-    test("Removal the prolicense", async () => {
+    test("Removing a prolicense", async () => {
         const response = await superagent.delete(api.basicUrl + api.constructors.deleteProlicense).
         set("cookie", `${prolicense.cookie}`);
         expect(response.body.status).toBe("SUCCESS");
         prolicense.prolicense.pop();
     })
-    test("Removal prolicense criterias", async () => {
+    test("Removing prolicense criterias", async () => {
         for (const criteriaGroup of prolicense.criterias) {
             if (criteriaGroup.id % 2 == 0) {
                 for (const criteria of criteriaGroup.criterias) {
@@ -130,7 +130,7 @@ describe("Prolicense", () => {
             }
         }
     })
-    test("Removal criteria groups", async () => {
+    test("Removing criteria groups", async () => {
         for (let i = 0; i<prolicense.criterias.length; i++) {
             if (prolicense.criterias[i].id % 2 == 0) {
                 const response = await superagent.delete(api.basicUrl + api.constructors.deleteCriteriasGrp + prolicense.criterias[i].id).
@@ -146,7 +146,7 @@ describe("Prolicense", () => {
         expect(response.body.status).toBe("SUCCESS");
         prolicense.prolicense[0].stateId = ProlicenseStatus.published;
     })
-    test("Removal of the prolicense from publication", async () => {
+    test("Removing of the prolicense from publication", async () => {
         const response = await superagent.put(api.basicUrl + api.constructors.unpublishProlicense).
         set("cookie", `${prolicense.cookie}`);
         expect(response.body.status).toBe("SUCCESS");

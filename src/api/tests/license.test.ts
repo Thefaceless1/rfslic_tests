@@ -21,7 +21,7 @@ describe("License requests", () => {
         expect(response.body.data.percent).toBe(0);
         expect(response.body.data.docState).toBe(DocumentStatus.form);
         license.fillLicense(0,response);
-        api.request.fillApi(license.license[0].id);
+        api.request.fillApi(license.license[0]);
         license.license[0].documents.forEach((document, index) => {
             expect(document.state).toBe(DocumentStatus.form);
             expect(document.proDocId).toBe(license.prolicense[0].documents[index].id);
@@ -91,8 +91,7 @@ describe("License requests", () => {
     })
     test("Removing request file",async () => {
         const fileForRemoving : Templates = license.license[0].documents[0].files[0];
-        api.request.fillApi(license.license[0].id,undefined,fileForRemoving.id);
-        await superagent.delete(api.basicUrl + api.request.deleteReqFile).
+        await superagent.delete(api.basicUrl + api.request.deleteReqFile + fileForRemoving.id).
         set("cookie", `${license.cookie}`);
         await license.refreshLicense(api);
         const isHaveFile : boolean = license.license[0].documents[0].files.includes(fileForRemoving);
@@ -100,16 +99,13 @@ describe("License requests", () => {
     })
     test("Removing criteria document file",async () => {
         const fileForRemoving : Templates = license.license[0].criteriaGroups[0].criterias[0].documents[0].files[0];
-        api.request.fillApi(license.license[0].id,undefined,fileForRemoving.id);
-        await superagent.delete(api.basicUrl + api.request.deleteDocFile).
+        await superagent.delete(api.basicUrl + api.request.deleteDocFile + fileForRemoving.id).
         set("cookie", `${license.cookie}`);
         await license.refreshLicense(api);
         const isHaveFile : boolean = license.license[0].criteriaGroups[0].criterias[0].documents[0].files.includes(fileForRemoving);
         expect(isHaveFile).toBeFalsy();
     })
     test("Submit all the criteria group documents for review",async () => {
-        const firstGroupId : number  = license.license[0].criteriaGroups[0].groupId;
-        api.request.fillApi(license.license[0].id,firstGroupId);
         await superagent.put(api.basicUrl + api.request.checkDocument).
         set("cookie", `${license.cookie}`);
         await license.refreshLicense(api);

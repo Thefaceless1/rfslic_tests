@@ -7,6 +7,7 @@ import {TLicense} from "./license";
 import {randomInt} from "crypto";
 import {DbHelper} from "../../db/db-helper";
 import {issuedLicense} from "../../db/tables";
+import {LicStatus} from "./enums/license-status";
 
 export class Commission extends Catalogs {
     public commission : TCommission[]
@@ -46,12 +47,12 @@ export class Commission extends Catalogs {
      */
     public addDecision() : TDecision {
         const filteredRequestStatus : TLicAndDocStatus[] = this.licStatus.
-        filter(value => value.name == "Выдана" || value.name == "Выдана с условиями" || value.name == "Отказано");
+        filter(value => value.name == LicStatus.issued || value.name == LicStatus.issuedWithConditions || value.name == LicStatus.declined);
         const randomNumber : number = randomInt(0,filteredRequestStatus.length);
         const randomDecision : TLicAndDocStatus = filteredRequestStatus[randomNumber];
         return {
             licStateId : randomDecision.id,
-            controlDate : (randomDecision.name == "Выдана с условиями") ? TestData.futureDate : "",
+            controlDate : (randomDecision.name == LicStatus.issuedWithConditions) ? TestData.futureDate : "",
             comment : TestData.commentValue
         }
     }
@@ -125,6 +126,13 @@ export class Commission extends Catalogs {
         await dbHelper.delete(issuedLicense.tableName,issuedLicense.columns.licId,this.commission[0].licenses![0].licId);
         await dbHelper.sql.end();
         return {licId : this.commission[0].licenses![0].licId};
+    }/**
+     * Get a commission by id
+     */
+    public async refreshCommission(api : Api) : Promise<void> {
+        const response = await superagent.get(api.basicUrl + api.commissions.getCommission).
+        set("cookie", `${this.cookie}`);
+        this.fillCommission(0,response);
     }
 }
 export type TCommission = {

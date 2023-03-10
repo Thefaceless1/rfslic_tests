@@ -6,7 +6,7 @@ import {Hooks} from "../helpers/hooks/hooks";
 import {TestData} from "../helpers/test-data";
 
 describe("Commissions", () => {
-    const commission = new Commission();
+    const commission  = new Commission();
     const api = new Api();
     Hooks.beforeCommission(commission);
     Hooks.afterEachCommission(api,commission);
@@ -93,7 +93,14 @@ describe("Commissions", () => {
         expect(response.body.data.fileName).not.toBeNull();
         expect(response.body.data.storageId).not.toBeNull();
     })
-    test("Deletion a commission", async () => {
+    test("Removing commission file",async () => {
+        await commission.refreshCommission(api);
+        const fileId : number  = commission.commission[0].files![0].id!
+        const response = await superagent.delete(api.basicUrl + api.commissions.deleteFile + fileId).
+        set("cookie", `${commission.cookie}`);
+        expect(response.body.status).toBe("SUCCESS");
+    })
+    test("Removing a commission", async () => {
         const response = await superagent.delete(api.basicUrl + api.commissions.getCommission).
         set("cookie", `${commission.cookie}`);
         expect(response.body.status).toBe("SUCCESS");

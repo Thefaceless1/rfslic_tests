@@ -1,6 +1,7 @@
 import {TProlicense} from "./prolicense";
 import {Admin} from "./admin";
 import {Commission} from "./commission";
+import {TLicense} from "./license";
 
 export class Api {
     public readonly basicUrl : string = "https://rfs-lic-test-01.fors.ru";
@@ -39,15 +40,13 @@ export class Api {
         docStatus : "/api/rest/licenses/docstates",
         createLicense : "/api/rest/licenses",
         requestsList : "/api/rest/licenses/find",
-        fillApi (licenseId : number, groupId? : number, fileId? : number) : void {
-            this.changeLicense = `/api/rest/licenses/${licenseId}`;
+        deleteReqFile : "/api/rest/licenses/files/",
+        deleteDocFile : "/api/rest/licenses/criterias/files/",
+        fillApi (license : TLicense) : void {
+            this.changeLicense = `/api/rest/licenses/${license.id}`;
             this.publishLicense = `${this.changeLicense}/publish`;
             this.createExpertReport = `${this.changeLicense}/groupReport/generate`;
-            if(groupId) this.checkDocument = `${this.createLicense}/${licenseId}/groups/${groupId}/check`;
-            else if(fileId) {
-                this.deleteReqFile = `${this.createLicense}/files/${fileId}`;
-                this.deleteDocFile = `${this.createLicense}/criterias/files/${fileId}`
-            }
+            this.checkDocument = `${this.changeLicense}/groups/${license.criteriaGroups[0].groupId}/check`;
         }
     }
     /**
@@ -101,6 +100,7 @@ export class Api {
         createCommission : "/api/rest/commissions",
         addLicenseText : "/api/rest/commissions/licenseText",
         formLicense : "/api/rest/commissions/formLicense",
+        deleteFile : "/api/rest/commissions/files/",
         changeCommissionRequest(commission : Commission, licId : number) : string {
             return `${this.createCommission}/${commission.commission[0].id}/licenses/${licId}`;
         },
@@ -145,13 +145,13 @@ export type TRequest = {
     docStatus : string,
     createLicense : string,
     requestsList : string,
+    deleteReqFile : string,
+    deleteDocFile : string,
     changeLicense? : string,
     publishLicense? : string,
     createExpertReport? : string,
     checkDocument? : string,
-    deleteReqFile? : string,
-    deleteDocFile? : string,
-    fillApi (licenseId : number,groupId? : number,fileId? : number) : void
+    fillApi (license : TLicense) : void
 }
 export type TUser = {
     clubWorkers : string,
@@ -184,6 +184,7 @@ export type TCommissions = {
     createCommission : string,
     addLicenseText : string,
     formLicense : string,
+    deleteFile : string,
     addRequests? : string,
     getCommission? : string,
     deleteRequest? : string,
