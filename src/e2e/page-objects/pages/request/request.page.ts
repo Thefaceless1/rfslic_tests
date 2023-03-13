@@ -84,6 +84,10 @@ export class RequestPage extends RequestNewPage {
      */
     private critTypeValue : Locator = Elements.getElement(this.page,"//*[text()='Тип критерия:']//following-sibling::*");
     /**
+     * Field "Club worker comment"
+     */
+    private clubWorkerComment : Locator = Elements.getElement(this.page,"//*[contains(@class,'DocumentInfo') and contains(@class,'hyphens')]");
+    /**
      * Button "submit a document for review"
      */
     private submitReviewButton : Locator = Elements.getElement(this.page,"//span[contains(@class,'IconSendMessage')]");
@@ -91,6 +95,10 @@ export class RequestPage extends RequestNewPage {
      * Button "Edit OFI"
      */
     private editOfiButton : Locator = Elements.getElement(this.page,"//button[@name='editButtonOfi']");
+    /**
+     * Document tooltip
+     */
+    private docTooltip : Locator = Elements.getElement(this.page,"//span[contains(@class,'IconInfo')]");
     /**
      * Button "Edit Member"
      */
@@ -146,6 +154,7 @@ export class RequestPage extends RequestNewPage {
         await Elements.waitForVisible(this.expertsList.first());
         await this.expertsList.first().click();
         await this.saveButton.click();
+        await this.closeNotifications("last");
         await Elements.waitForHidden(this.saveButton);
     }
     /**
@@ -159,6 +168,7 @@ export class RequestPage extends RequestNewPage {
         await searchModal.radio.first().click();
         await searchModal.selectButton.click();
         await this.saveButton.click();
+        await this.closeNotifications("last");
         await Elements.waitForHidden(this.saveButton);
     }
     /**
@@ -216,7 +226,8 @@ export class RequestPage extends RequestNewPage {
             await Elements.waitForVisible(this.docStatesList.last());
             const randomStateNumb = randomInt(0,await this.docStatesList.count());
             await this.docStatesList.nth(randomStateNumb).click();
-            await this.checkButton.nth(i).click()
+            await this.checkButton.nth(i).click();
+            await this.closeNotifications("last");
             await this.waitForDisplayStatus(i);
         }
     }
@@ -277,11 +288,21 @@ export class RequestPage extends RequestNewPage {
      */
     private async sendForVerification(currDocNumb : number,currMaxDocNumb : number) : Promise<void> {
         for(let c = currDocNumb;c < currMaxDocNumb; c++) {
+            await this.docTooltip.nth(c).click();
             await this.plusButton.nth(c).click();
             await Elements.waitForVisible(this.cancelButton);
             await this.fillDocsAndComment();
+            await this.checkCommentValue(c);
             await this.submitReviewButton.nth(c).click();
+            await this.closeNotifications("last");
             await this.waitForDisplayStatus(c);
         }
+    }
+    /**
+     * Check entered comment value
+     */
+    private async checkCommentValue(commentNumber : number) : Promise<void> {
+        const currentComment : string = await this.clubWorkerComment.nth(commentNumber).innerText();
+        if(currentComment == "-") await this.checkCommentValue(commentNumber);
     }
 }

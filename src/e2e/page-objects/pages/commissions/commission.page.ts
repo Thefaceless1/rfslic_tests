@@ -105,7 +105,7 @@ export class CommissionPage extends MainPage {
             }
             await this.comment.type(InputData.randomWord);
             await this.saveButton.click();
-            await this.closeNotifications();
+            await this.closeNotifications("all");
         }
     }
     /**

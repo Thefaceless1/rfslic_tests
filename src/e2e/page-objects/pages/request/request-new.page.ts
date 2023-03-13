@@ -96,5 +96,6 @@ export class RequestNewPage extends MainPage {
         await Elements.waitForVisible(this.xlsxIcon);
         await this.comment.type(InputData.randomWord);
         await this.addButton.click();
+        await this.closeNotifications("last");
     }
 }

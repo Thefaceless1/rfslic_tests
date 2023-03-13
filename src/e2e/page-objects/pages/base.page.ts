@@ -156,12 +156,18 @@ export class BasePage extends PlaywrightDevPage{
     /**
      * Close notifications
      */
-    protected async closeNotifications() : Promise<void> {
-        if(await this.closeNotifyButton.last().isVisible()) {
-            const notifyCount : number = await this.closeNotifyButton.count();
-            for(let i = 0; i< notifyCount; i++) {
-                await this.closeNotifyButton.nth(i).click();
+    protected async closeNotifications(choice : "all" | "last") : Promise<void> {
+        if(choice == "all") {
+            if(await this.closeNotifyButton.last().isVisible()) {
+                const notifyCount : number = await this.closeNotifyButton.count();
+                for(let i = 0; i< notifyCount; i++) {
+                    await this.closeNotifyButton.nth(i).click();
+                }
             }
+        }
+        else {
+            if(await this.closeNotifyButton.last().isVisible())
+                await this.closeNotifyButton.last().click();
         }
     }
 }
