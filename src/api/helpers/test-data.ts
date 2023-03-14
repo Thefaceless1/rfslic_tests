@@ -1,8 +1,7 @@
 import {randomInt} from "crypto";
-import {TLicAndDocStatus, TRankCriteria} from "./catalogs";
+import {TLicAndDocStatus, TRankCriteria} from "./types/catalogs.type";
 
 export class TestData {
-    //public static files: TFiles[] = [];
     public static readonly commentValue : string = "Тестовый комментарий";
     public static readonly descValue : string = "Тестовое описание";
     /**
@@ -52,8 +51,4 @@ export class TestData {
     public static randomIntForDocStat (docStatus : TLicAndDocStatus[]) : number {
         return randomInt(0,docStatus.length);
     }
-}
-export type TFiles = {
-    name : string,
-    storageId : string
 }

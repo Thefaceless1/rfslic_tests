@@ -1,7 +1,8 @@
 import {test, expect, describe} from "@jest/globals";
 import superagent from "superagent";
 import {TestData} from "../helpers/test-data";
-import {Prolicense, TCriterias, TDocuments} from "../helpers/prolicense";
+import {Prolicense} from "../helpers/prolicense";
+import {TCriterias, TDocuments} from "../helpers/types/prolicense.type";
 import {ProlicenseStatus} from "../helpers/enums/prolicense-status";
 import {Api} from "../helpers/api";
 import {Hooks} from "../helpers/hooks/hooks";

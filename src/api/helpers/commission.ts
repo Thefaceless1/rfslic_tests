@@ -1,13 +1,14 @@
-import {Templates} from "./prolicense";
-import {Catalogs, TClubWorkers, TLicAndDocStatus} from "./catalogs";
+import {TLicAndDocStatus} from "./types/catalogs.type";
+import {Catalogs} from "./catalogs";
 import {TestData} from "./test-data";
 import superagent, {Response} from "superagent";
 import {Api} from "./api";
-import {TLicense} from "./license";
+import {TLicense} from "./types/license.type";
 import {randomInt} from "crypto";
 import {DbHelper} from "../../db/db-helper";
 import {issuedLicense} from "../../db/tables";
 import {LicStatus} from "./enums/license-status";
+import {TClubReport, TCommission, TDecision, TLicTypeReport, TLicTypeText, TMembers, TRequests} from "./types/commission.type";
 
 export class Commission extends Catalogs {
     public commission : TCommission[]
@@ -134,53 +135,4 @@ export class Commission extends Catalogs {
         set("cookie", `${this.cookie}`);
         this.fillCommission(0,response);
     }
-}
-export type TCommission = {
-    id?: number,
-    typeId: number,
-    type?: string,
-    name: string,
-    workDate: string,
-    protocolName?: string,
-    protocolStorageId?: string,
-    licenses?: TLicenses[],
-    files?: Templates[],
-    members?: TClubWorkers[]
-}
-export type TLicenses = {
-    licId: number,
-    clubId: number,
-    clubName: string,
-    licType: string,
-    season: string,
-    licName: string,
-    controlDate: string,
-    comment: string,
-    beginStateId: number,
-    beginState: string,
-    endStateId: number,
-    endState: string
-}
-export type TDecision = {
-    licStateId: number,
-    controlDate: string,
-    comment: string
-}
-export type TMembers = {
-    userIds : number[]
-}
-export type TRequests = {
-    licIds : number[]
-}
-export type TLicTypeReport = {
-    licIds : number[],
-    licType : string
-}
-export type TClubReport = {
-    licIds : number[],
-    clubId : number
-}
-export type TLicTypeText = {
-    licType : number,
-    text : string
 }

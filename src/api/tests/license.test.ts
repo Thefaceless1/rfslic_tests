@@ -6,7 +6,7 @@ import {Api} from "../helpers/api";
 import {Hooks} from "../helpers/hooks/hooks";
 import {LicStatus} from "../helpers/enums/license-status";
 import {DocumentStatus} from "../helpers/enums/document-status";
-import {Templates} from "../helpers/prolicense";
+import {Templates} from "../helpers/types/prolicense.type";
 
 describe("License requests", () => {
     const license = new License();

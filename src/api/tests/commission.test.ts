@@ -1,6 +1,7 @@
 import {describe} from "@jest/globals";
 import superagent from "superagent";
-import {Commission, TLicenses} from "../helpers/commission";
+import {Commission} from "../helpers/commission";
+import {TLicenses} from "../helpers/types/commission.type";
 import {Api} from "../helpers/api";
 import {Hooks} from "../helpers/hooks/hooks";
 import {TestData} from "../helpers/test-data";
