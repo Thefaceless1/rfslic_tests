@@ -11,10 +11,10 @@ import {LicStatus} from "./enums/license-status";
 import {TClubReport, TCommission, TDecision, TLicTypeReport, TLicTypeText, TMembers, TRequests} from "./types/commission.type";
 
 export class Commission extends Catalogs {
-    public commission : TCommission[]
-    constructor() {
+    constructor(
+        public commission : TCommission[] = []
+    ) {
         super();
-        this.commission=[]
     }
     /**
      * Create a new commission
@@ -41,7 +41,14 @@ export class Commission extends Catalogs {
         const response = await superagent.get(api.basicUrl + api.request.requestsList).
         query({pageNum : 0, pageSize : 10}).
         set("cookie", `${this.cookie}`);
-        return {"licIds": response.body.data.map((value: TLicense) => value.id)};
+        const licIds : number[] = response.body.data.map((value: TLicense) => value.id);
+        const licStatusId : number = this.licStatusByEnum(LicStatus.waitForCommission).id;
+        const dbHelper = new DbHelper();
+        for(const licId of licIds) {
+            await dbHelper.updateLicenseStatus(licId,licStatusId);
+        }
+        await dbHelper.sql.end();
+        return {"licIds": licIds};
     }
     /**
      * Add decision for a commission request

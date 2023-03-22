@@ -28,44 +28,27 @@ export class Catalogs extends Authorization {
      * commissionSolution - catalog 'Commission solutions'
      * commissionMembers - catalog 'Commission members'
      */
-    public files : TFiles[]
-    public  seasons: TSeasons[]
-    public  criteriaGroups: TCriteriaGroups[]
-    public  licTypes: TLicTypes[]
-    public  docTypes: TDocTypes[]
-    public  rankCriteria : TRankCriteria[]
-    public  criteriaTypes : TCriteriaTypes[]
-    public  licStatus : TLicAndDocStatus[]
-    public  docStatus : TLicAndDocStatus[]
-    public  critGrpExperts : TClubWorkers[]
-    public  clubWorkers : TClubWorkers[]
-    public  ofi : TOfi[]
-    public organization : TOrganization[]
-    public roles : TRoles[]
-    public rights : TRights[]
-    public commissionTypes : TCommissionType[]
-    public commissionDecision : commissionDecision[]
-    public commissionTypeMembers : TCommissionTypeMember[]
-    constructor() {
-        super();
-        this.files=[]
-        this.seasons =[]
-        this.criteriaGroups =[]
-        this.licTypes =[]
-        this.docTypes =[]
-        this.rankCriteria =[]
-        this.criteriaTypes =[]
-        this.licStatus =[]
-        this.docStatus =[]
-        this.critGrpExperts =[]
-        this.clubWorkers =[]
-        this.ofi =[]
-        this.organization =[]
-        this.roles =[]
-        this.rights=[]
-        this.commissionTypes=[]
-        this.commissionDecision=[]
-        this.commissionTypeMembers=[]
+    constructor(
+        public files : TFiles[] = [],
+        public  seasons: TSeasons[] = [],
+        public  criteriaGroups: TCriteriaGroups[] = [],
+        public  licTypes: TLicTypes[] = [],
+        public  docTypes: TDocTypes[] = [],
+        public  rankCriteria : TRankCriteria[] = [],
+        public  criteriaTypes : TCriteriaTypes[] = [],
+        public  licStatus : TLicAndDocStatus[] = [],
+        public  docStatus : TLicAndDocStatus[] = [],
+        public  critGrpExperts : TClubWorkers[] = [],
+        public  clubWorkers : TClubWorkers[] = [],
+        public  ofi : TOfi[] = [],
+        public organization : TOrganization[] = [],
+        public roles : TRoles[] = [],
+        public rights : TRights[] = [],
+        public commissionTypes : TCommissionType[] = [],
+        public commissionDecision : commissionDecision[] = [],
+        public commissionTypeMembers : TCommissionTypeMember[] = []
+    ) {
+        super()
     }
     /**
      * ids of "Club workers" catalog elements

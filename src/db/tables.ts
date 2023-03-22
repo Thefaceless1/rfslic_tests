@@ -38,3 +38,10 @@ export const roles = {
         id : "id"
     }
 }
+export const licenses = {
+    tableName : "rfslic.licenses",
+    columns : {
+        id : "id",
+        stateId : "state_id"
+    }
+}

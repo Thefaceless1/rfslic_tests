@@ -4,11 +4,10 @@ import superagent from "superagent";
 import {operationsLog, roles, workUsers} from "../../db/tables";
 
 export class Authorization {
-    private readonly userNumber : number
     public cookie : string = ''
-    constructor() {
-        this.userNumber = 0
-    }
+    constructor(
+        private readonly userNumber : number = 0
+    ) {}
     /**
      * Create a user
      */

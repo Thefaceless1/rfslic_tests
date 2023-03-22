@@ -7,6 +7,8 @@ import {SearchModalPage} from "../search-modal.page.js";
 import {randomInt} from "crypto";
 import {LicStatus} from "../../helpers/enums/licstatus.js";
 import {Input} from "../../../framework/elements/input.js";
+import {MainMenuOptions} from "../../helpers/enums/main-menu-options.js";
+import {DbHelper} from "../../../../db/db-helper.js";
 
 export class CommissionPage extends MainPage {
     constructor(page : Page) {
@@ -85,6 +87,7 @@ export class CommissionPage extends MainPage {
         await Elements.waitForHidden(searchModal.loadIndicator);
         await this.checkbox.first().check();
         await searchModal.selectButton.click();
+        await this.closeNotifications("all");
     }
     /**
      * Add decision on requests
@@ -100,11 +103,15 @@ export class CommissionPage extends MainPage {
             const randomNumb : number = randomInt(0,decisionCount);
             const selectedDecisionName : string = await this.selectDecisionList.nth(randomNumb).innerText();
             await this.selectDecisionList.nth(randomNumb).click();
-            if(selectedDecisionName == LicStatus.issuedWithConditions) {
+            if(selectedDecisionName == LicStatus.issuedWithConditions || selectedDecisionName == LicStatus.returnForRevision) {
                 await Date.fillDateInput(this.dates,InputData.futureDate);
             }
             await this.comment.type(InputData.randomWord);
             await this.saveButton.click();
+            if(selectedDecisionName == LicStatus.returnForRevision) {
+                await this.checkbox.first().click();
+                await this.saveButton.last().click();
+            }
             await this.closeNotifications("all");
         }
     }
@@ -144,5 +151,21 @@ export class CommissionPage extends MainPage {
     public async deleteMeeting() : Promise<void> {
         await this.deleteMeetingButton.click();
         await this.deleteButton.click();
+    }
+    /**
+     * Set status "Wait for a commission solution" for licenses
+     */
+    public async changeLicensesStatus() : Promise<void> {
+        const dbHelper = new DbHelper();
+        const waitForCommissionStatusId : number = 4;
+        await this.menuOptionByEnum(MainMenuOptions.workWithRequest).click();
+        await Elements.waitForVisible(this.numberLicenseColumn.first());
+        let licIds : string[] | number[] = await this.numberLicenseColumn.allTextContents();
+        licIds = licIds.map(licId => Number(licId));
+        for(const licId of licIds) {
+            await dbHelper.updateLicenseStatus(licId,waitForCommissionStatusId);
+        }
+        await dbHelper.sql.end();
+        await this.page.goBack();
     }
 }

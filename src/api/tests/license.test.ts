@@ -52,7 +52,7 @@ describe("License requests", () => {
         const response = await superagent.put(api.basicUrl + api.request.publishLicense).
         send(license.publishLicense()).
         set("cookie", `${license.cookie}`);
-        expect(response.body.data.state).toBe(license.licStatusByEnum(LicStatus.checkManager).name);
+        expect(response.body.data.state).toBe(license.licStatusByEnum(LicStatus.inWork).name);
         license.fillLicense(0,response);
     })
     test("Adding club workers and experts to the criteria group", async () => {
@@ -161,6 +161,7 @@ describe("License requests", () => {
             expect(response.body.data.fileName).toBeTruthy();
             expect(response.body.data.storageId).toBeTruthy();
         }
+        await license.refreshLicense(api);
     })
     test("Adding conclusions for a request",async () => {
         const response = await superagent.put(api.basicUrl + api.request.changeLicense).

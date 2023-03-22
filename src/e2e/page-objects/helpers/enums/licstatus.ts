@@ -2,7 +2,8 @@ export enum LicStatus {
     declined = "Отказано",
     issued = "Выдана",
     issuedWithConditions = "Выдана с условиями",
-    checkExpert = "На проверке у экспертов",
-    checkManager = "На проверке у менеджера",
-    waitForCommission = "Ожидает решения комиссии"
+    readyForReport = "Готова к формированию отчета",
+    waitForCommission = "Ожидает решения комиссии",
+    returnForRevision = "Вернуть на доработку",
+    leaveUnchanged = "Оставить без изменений"
 }

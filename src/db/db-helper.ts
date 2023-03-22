@@ -1,6 +1,6 @@
 import postgres from "postgres";
 import fs from "fs";
-import {userRights, workUsers} from "./tables.js";
+import {licenses, userRights, workUsers} from "./tables.js";
 import {Roles} from "../e2e/page-objects/helpers/enums/roles.js";
 import {UserRights} from "../e2e/page-objects/helpers/enums/user-rights.js";
 
@@ -69,5 +69,13 @@ export class DbHelper {
      */
     public configData() : object {
        return JSON.parse(fs.readFileSync("./src/db/db.config.json","utf-8"));
+    }
+    /**
+     * Update state_id column in Licenses table
+     */
+    public async updateLicenseStatus(licIds : number, licStatusId : number) : Promise<void> {
+        await this.sql`UPDATE ${this.sql(licenses.tableName)}
+                       SET ${this.sql(licenses.columns.stateId)} = ${licStatusId}
+                       WHERE ${this.sql(licenses.columns.id)} = ${licIds}`;
     }
 }

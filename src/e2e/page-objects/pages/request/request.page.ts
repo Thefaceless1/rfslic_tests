@@ -112,8 +112,14 @@ export class RequestPage extends RequestNewPage {
     /**
      * Get the drop-down list value of the 'License decision' field by enum
      */
-    private licStatusByEnum(statusValue : LicStatus ) : Locator {
+    private selectLicStatusByEnum(statusValue : LicStatus ) : Locator {
         return Elements.getElement(this.page,`//*[contains(@class,'requestState__option') and text()='${statusValue}']`);
+    }
+    /**
+     * Get license status by enum
+     */
+    private licStatusByEnum(statusValue : LicStatus ) : Locator {
+        return Elements.getElement(this.page,`//*[contains(@class,'Badge_status_normal') and text()='${statusValue}']`);
     }
     /**
      * Get tabs by enum
@@ -174,13 +180,13 @@ export class RequestPage extends RequestNewPage {
     /**
      * Add ofi and participants to criterias and fill criteria documents
      */
-    public async addCritInfo () : Promise<void> {
+    public async addDocInfo () : Promise<void> {
         const groupsCount = await this.criteriaGroups.count();
         for(let i = groupsCount-1; i >= 0; i--) {
             await this.criteriaGroups.nth(i).click();
             await Elements.waitForVisible(this.criteriaInfo.first())
             const criteriaCount : number = await this.criteriaInfo.count();
-            let currMaxDocNumb : number = await this.checkButton.count()/criteriaCount;
+            let currMaxDocNumb : number = await this.submitReviewButton.count()/criteriaCount;
             const step : number = currMaxDocNumb;
             let currDocNumb : number = 0;
             for (let x = 0; x < criteriaCount; x++) {
@@ -204,29 +210,38 @@ export class RequestPage extends RequestNewPage {
                 }
             }
         }
-        await this.editLicStatus(LicStatus.checkExpert);
+        await this.addGeneralDocInfo();
+    }
+    /**
+     * Fill criteria documents in general info
+     */
+    private async addGeneralDocInfo() : Promise<void> {
+        await this.sectionByEnum(RequestSections.generalInfo).click();
+        await Elements.waitForVisible(this.plusButton.last());
+        const docsCount : number = await this.plusButton.count();
+        await this.sendForVerification(0,docsCount);
     }
     /**
      * Edit license status by enum
      */
-    private async editLicStatus(statusValue: LicStatus) : Promise<void> {
+    public async editLicStatus(statusValue: LicStatus) : Promise<void> {
         await this.licEditButton.click();
         await this.selectLicStatus.click();
-        await Elements.waitForVisible(this.licStatusByEnum(statusValue));
-        await this.licStatusByEnum(statusValue).click();
-        await this.saveButton.click()
+        await Elements.waitForVisible(this.selectLicStatusByEnum(statusValue));
+        await this.selectLicStatusByEnum(statusValue).click();
+        await this.saveButton.last().click()
     }
     /**
      * Fill in the fields "Comment" and "Decision on the document"
      */
-    private async fillStatusAndComment (iterationCount : number) : Promise<void> {
-        for (let i = 0; i <iterationCount; i++) {
+    private async fillStatusAndComment (docsCount : number) : Promise<void> {
+        for (let i = 0; i < docsCount; i++) {
             await this.reviewComment.nth(i).type(InputData.randomWord);
             await this.docStates.nth(i).click();
             await Elements.waitForVisible(this.docStatesList.last());
             const randomStateNumb = randomInt(0,await this.docStatesList.count());
             await this.docStatesList.nth(randomStateNumb).click();
-            await this.checkButton.nth(i).click();
+            await this.checkButton.first().click();
             await this.closeNotifications("last");
             await this.waitForDisplayStatus(i);
         }
@@ -235,10 +250,8 @@ export class RequestPage extends RequestNewPage {
      * Add comments and statuses for documents
      */
     public async addExpertInfo() : Promise<void> {
-        await this.sectionByEnum(RequestSections.generalInfo).click();
         let docsCount : number = await this.checkButton.count();
         await this.fillStatusAndComment(docsCount);
-        await this.fillGeneralInfo();
         await this.sectionByEnum(RequestSections.criterias).click();
         const groupsCount : number = await this.criteriaGroups.count();
         for(let i = 0; i<groupsCount;i++) {
@@ -258,7 +271,10 @@ export class RequestPage extends RequestNewPage {
     /**
      * Fill the fields "Conclusion of the RFS manager", "Recommendations on sanctions", "RPL criterias"
      */
-    private async fillGeneralInfo() : Promise<void> {
+    public async addConclusions() : Promise<void> {
+        await Elements.waitForVisible(this.licStatusByEnum(LicStatus.readyForReport));
+        await this.sectionByEnum(RequestSections.generalInfo).click();
+        await Elements.waitForVisible(this.conclusion);
         await this.conclusion.type(InputData.randomWord);
         await this.recommendation.type(InputData.randomWord);
         await this.rplCriterias.type(InputData.randomWord);
@@ -289,7 +305,7 @@ export class RequestPage extends RequestNewPage {
     private async sendForVerification(currDocNumb : number,currMaxDocNumb : number) : Promise<void> {
         for(let c = currDocNumb;c < currMaxDocNumb; c++) {
             await this.docTooltip.nth(c).click();
-            await this.plusButton.nth(c).click();
+            await this.plusButton.first().click();
             await Elements.waitForVisible(this.cancelButton);
             await this.fillDocsAndComment();
             await this.checkCommentValue(c);

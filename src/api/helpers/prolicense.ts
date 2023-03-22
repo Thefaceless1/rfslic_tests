@@ -6,12 +6,11 @@ import {Api} from "./api";
 import {TCriterias, TDocuments, TProlicense, TSampleLicense} from "./types/prolicense.type";
 
 export class Prolicense extends Catalogs {
-    public  prolicense : TProlicense[]
-    public criterias : TCriterias[]
-    constructor() {
+    constructor(
+        public  prolicense : TProlicense[] = [],
+        public criterias : TCriterias[] = []
+    ) {
         super();
-        this.prolicense =[]
-        this.criterias=[]
     }
     /**
      * Add a prolicense

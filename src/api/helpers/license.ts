@@ -6,12 +6,13 @@ import {DocumentStatus} from "./enums/document-status";
 import {LicStatus} from "./enums/license-status";
 import {Api} from "./api";
 import {TCreateLicense, TCriteriaGroups, TCriterias, TDocuments, TExpertReport, TLicense} from "./types/license.type";
+import {randomInt} from "crypto";
 
 export class License extends Prolicense {
-    public license : TLicense[]
-    constructor() {
+    constructor(
+        public license : TLicense[] = []
+    ) {
         super();
-        this.license = []
     }
     /**
      * Add a license request
@@ -89,15 +90,22 @@ export class License extends Prolicense {
      * 2.Random document status
      */
     public addStatusToDocuments () : TLicense {
+        const statusIds : number[] = this.docStatus.filter(
+            status => status.name == DocumentStatus.declined ||
+            status.name == DocumentStatus.accepted ||
+            status.name == DocumentStatus.acceptedWithCondition
+        ).map(status => status.id);
         this.license[0].documents.forEach((document) => {
+            const randomStatusId : number = randomInt(0,statusIds.length);
             document.reviewComment = TestData.commentValue;
-            document.stateId = this.docStatus[TestData.randomIntForDocStat(this.docStatus)].id;
+            document.stateId = statusIds[randomStatusId];
         })
         this.license[0].criteriaGroups.forEach((criteriaGroup) => {
             criteriaGroup.criterias.forEach((criteria) => {
                 criteria.documents.forEach((document) => {
+                    const randomStatusId : number = randomInt(0,statusIds.length);
                     document.reviewComment = TestData.commentValue;
-                    document.stateId = this.docStatus[TestData.randomIntForDocStat(this.docStatus)].id;
+                    document.stateId = statusIds[randomStatusId];
                 })
             })
         })

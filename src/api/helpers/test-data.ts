@@ -45,10 +45,4 @@ export class TestData {
     public static get randomIntForMulti () : number {
         return randomInt(2,10);
     }
-    /**
-     * Get a random number for the 'Document status' field
-     */
-    public static randomIntForDocStat (docStatus : TLicAndDocStatus[]) : number {
-        return randomInt(0,docStatus.length);
-    }
 }

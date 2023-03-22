@@ -122,6 +122,10 @@ export class BasePage extends PlaywrightDevPage{
      */
     private closeNotifyButton : Locator = Elements.getElement(this.page,"//span[contains(@class,'notice-close-icon')]");
     /**
+     * column "Number of a license" in Licenses table
+     */
+    protected numberLicenseColumn : Locator = Elements.getElement(this.page,"//td[@class='ant-table-cell'][2]");
+    /**
      * Get "Filter" button by table column name
      */
     public filterButtonByEnum(columnValue : Columns) : Locator {

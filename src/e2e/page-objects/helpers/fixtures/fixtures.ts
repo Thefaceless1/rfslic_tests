@@ -84,6 +84,7 @@ export const test = base.extend<Fixtures>({
         const commission = new CommissionPage(page);
         await commission.createUser();
         await commission.login();
+        await commission.changeLicensesStatus();
         await commission.commissionMenuByEnum(CommissionMenuOptions.meetings).click();
         await use(commission);
     },

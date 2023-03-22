@@ -69,12 +69,7 @@ export class RequestNewPage extends MainPage {
      * Publish a license
      */
     public async publishLic(): Promise<void> {
-        await Elements.waitForVisible(this.plusButton.last());
-        const iterationCount : number = await this.plusButton.count();
-        for(let i = 0; i<iterationCount; i++) {
-            await this.plusButton.nth(i).click();
-            await this.fillDocsAndComment();
-        }
+        await Elements.waitForVisible(this.publishReqButton);
         await this.publishReqButton.click();
     }
     /**

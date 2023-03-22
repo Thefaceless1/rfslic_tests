@@ -6,16 +6,13 @@ import {operationsLog, workUsers} from "../../db/tables";
 import {TCritGroup, TCritRank, TRole, TUser} from "./types/admin.type";
 
 export class Admin extends Catalogs {
-    public user: TUser[]
-    public role: TRole[]
-    public critGroups : TCritGroup[]
-    public critRanks : TCritRank[]
-    constructor() {
+    constructor(
+        public user: TUser[] = [],
+        public role: TRole[] = [],
+        public critGroups : TCritGroup[] = [],
+        public critRanks : TCritRank[] = []
+    ) {
         super();
-        this.user = []
-        this.role = []
-        this.critGroups = []
-        this.critRanks =[]
     }
     /**
      * 1. Add criteria groups to the user
