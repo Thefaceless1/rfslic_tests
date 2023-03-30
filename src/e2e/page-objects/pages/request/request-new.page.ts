@@ -33,10 +33,6 @@ export class RequestNewPage extends MainPage {
      */
     private selectClubList : Locator = Elements.getElement(this.page,"//*[contains(@class,'club__option')]");
     /**
-     * Page title "Request for club licensing"
-     */
-    public requestTitle : Locator = Elements.getElement(this.page,"//*[text()='Заявка на лицензирование клуба']");
-    /**
      * Select a club from the dropdown list of values
      */
     public async chooseClub() : Promise<void> {

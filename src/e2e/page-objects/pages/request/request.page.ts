@@ -46,7 +46,7 @@ export class RequestPage extends RequestNewPage {
     /**
      * Selected status near the document name
      */
-    private statusNearDoc : Locator = Elements.getElement(this.page,"//*[contains(@class,'DocumentInfo')]//*[contains(@class,'Badge_view_filled')]");
+    private statusNearDoc : Locator = Elements.getElement(this.page,"//*[contains(@class,'DocumentInfo')]//*[contains(@class,'Badge_view')]");
     /**
      * Selected status in the "Document Decision" field
      */
@@ -235,15 +235,18 @@ export class RequestPage extends RequestNewPage {
      * Fill in the fields "Comment" and "Decision on the document"
      */
     private async fillStatusAndComment (docsCount : number) : Promise<void> {
+        let currentIndex : number = 0;
         for (let i = 0; i < docsCount; i++) {
             await this.reviewComment.nth(i).type(InputData.randomWord);
             await this.docStates.nth(i).click();
             await Elements.waitForVisible(this.docStatesList.last());
             const randomStateNumb = randomInt(0,await this.docStatesList.count());
+            const selectedState : string = await this.docStatesList.nth(randomStateNumb).innerText();
             await this.docStatesList.nth(randomStateNumb).click();
-            await this.checkButton.first().click();
+            await this.checkButton.nth(currentIndex).click();
             await this.closeNotifications("last");
             await this.waitForDisplayStatus(i);
+            if(selectedState == DocStatus.notAccepted) currentIndex++;
         }
     }
     /**

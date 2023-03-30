@@ -46,7 +46,7 @@ export class ConstructorNewPage extends ConstructorPage {
     /**
      * Created criteria groups
      */
-    private createdGroups : Locator = Elements.getElement(this.page,"//*[contains(text(),'критерии')]");
+    private createdGroups : Locator = Elements.getElement(this.page,"//span[contains(text(),'критерии')]");
     /**
      * Action dropdown values
      */
@@ -79,14 +79,6 @@ export class ConstructorNewPage extends ConstructorPage {
      * Values of the drop-down list of the field "Criteria type"
      */
     private criteriaTypeList : Locator = Elements.getElement(this.page,"//*[contains(@class,'type__option')]");
-    /**
-     * Checkbox "Multiple criteria"
-     */
-    private multi : Locator = Elements.getElement(this.page,"//input[@name='isMulti']");
-    /**
-     * Field "Minimum quantity"
-     */
-    private minCount : Locator = Elements.getElement(this.page,"//input[@name='minCount']");
     /**
      * Field "Additional data type"
      */
@@ -237,6 +229,14 @@ export class ConstructorNewPage extends ConstructorPage {
             }
             await this.saveButton.click();
         }
+        await this.waitForVisibleAllGroups(groupsCount);
+    }
+    /**
+     * Waiting for the visibility of all created criteria groups
+     */
+    private async waitForVisibleAllGroups(groups : number) : Promise<void> {
+        const currentGroups : number = await this.createdGroups.count();
+        if(groups != currentGroups) await this.waitForVisibleAllGroups(groups);
     }
     /**
      * Fill in the criteria fields

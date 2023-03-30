@@ -25,7 +25,7 @@ export class Authorization {
             await dbHelper.insertUser(userId);
             await dbHelper.insertUserRights(userId);
         }
-        await dbHelper.sql.end();
+        await dbHelper.closeConnect();
         api.user.fillApi(userId);
         const setUserData = await superagent.put(api.basicUrl + api.user.setUser);
         const regExp : RegExp = /^.+?(?=;)/;

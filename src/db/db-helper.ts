@@ -1,40 +1,42 @@
 import postgres from "postgres";
 import fs from "fs";
-import {licenses, userRights, workUsers} from "./tables.js";
+import {licenses, userNotifications, userRights, workUsers} from "./tables.js";
 import {Roles} from "../e2e/page-objects/helpers/enums/roles.js";
 import {UserRights} from "../e2e/page-objects/helpers/enums/user-rights.js";
 
 export class DbHelper {
-   public readonly sql : postgres.Sql<Record<string, postgres.PostgresType> extends {} ? {} : any>
+   public readonly sqlLic : postgres.Sql<Record<string, postgres.PostgresType> extends {} ? {} : any>
+   public readonly sqlNot : postgres.Sql<Record<string, postgres.PostgresType> extends {} ? {} : any>
     constructor() {
-       this.sql = postgres(this.configData())
+       this.sqlLic = postgres(this.configData("license"))
+        this.sqlNot = postgres(this.configData("notification"))
     }
     /**
      * Delete data from tables
      */
     public async delete(table : string,column : string,data : number | string) : Promise<void> {
-       await this.sql`DELETE FROM ${this.sql(table)} WHERE ${this.sql(column)} = ${data}`;
+       await this.sqlLic`DELETE FROM ${this.sqlLic(table)} WHERE ${this.sqlLic(column)} = ${data}`;
     }
     /**
      * Select data from tables
      */
     public async select(table : string,column : string,data : number | string | boolean) : Promise<postgres.RowList<postgres.Row[]>> {
-        return this.sql`SELECT * FROM ${this.sql(table)} WHERE ${this.sql(column)} = ${data}`
+        return this.sqlLic`SELECT * FROM ${this.sqlLic(table)} WHERE ${this.sqlLic(column)} = ${data}`
     }
     /**
      * Add a user in 'work users' table
      */
     public async insertUser(userId : number) : Promise<void> {
-        await this.sql`INSERT INTO ${this.sql(workUsers.tableName)} 
-                       (${this.sql(workUsers.columns.userId)},${this.sql(workUsers.columns.isActive)},${this.sql(workUsers.columns.roleId)})
+        await this.sqlLic`INSERT INTO ${this.sqlLic(workUsers.tableName)} 
+                       (${this.sqlLic(workUsers.columns.userId)},${this.sqlLic(workUsers.columns.isActive)},${this.sqlLic(workUsers.columns.roleId)})
                         VALUES (${userId},true,${Roles.admin});`
     }
     /**
      * Add rights for a user in table 'user rights'
      */
     public async insertUserRights(userId : number) : Promise<void> {
-        await this.sql`INSERT INTO ${this.sql(userRights.tableName)} 
-                       (${this.sql(userRights.columns.userId)},${this.sql(userRights.columns.rightId)}) 
+        await this.sqlLic`INSERT INTO ${this.sqlLic(userRights.tableName)} 
+                       (${this.sqlLic(userRights.columns.userId)},${this.sqlLic(userRights.columns.rightId)}) 
                        VALUES
                        (${userId},${UserRights["adm.classificators.manage"]}),
                        (${userId},${UserRights["adm.critCategory.manage"]}),
@@ -65,17 +67,34 @@ export class DbHelper {
                        (${userId},${UserRights["request.viewAll"]});`
     }
     /**
-     * db.config.json file parser
+     * license.db.config.json file parser
      */
-    public configData() : object {
-       return JSON.parse(fs.readFileSync("./src/db/db.config.json","utf-8"));
+    public configData(db : "license" | "notification") : object {
+       return (db == "license") ?
+           JSON.parse(fs.readFileSync("./src/db/license.db.config.json","utf-8")) :
+           JSON.parse(fs.readFileSync("./src/db/notification.db.config.json","utf-8"));
     }
     /**
      * Update state_id column in Licenses table
      */
     public async updateLicenseStatus(licIds : number, licStatusId : number) : Promise<void> {
-        await this.sql`UPDATE ${this.sql(licenses.tableName)}
-                       SET ${this.sql(licenses.columns.stateId)} = ${licStatusId}
-                       WHERE ${this.sql(licenses.columns.id)} = ${licIds}`;
+        await this.sqlLic`UPDATE ${this.sqlLic(licenses.tableName)}
+                       SET ${this.sqlLic(licenses.columns.stateId)} = ${licStatusId}
+                       WHERE ${this.sqlLic(licenses.columns.id)} = ${licIds}`;
+    }
+    /**
+     * Update is_received column(set false) in the user_notification table;
+     */
+    public async markAsUnreadMessages(userId : number) : Promise<void> {
+        await this.sqlNot`UPDATE ${this.sqlLic(userNotifications.tableName)}
+                       SET ${this.sqlLic(userNotifications.columns.isReceived)} = false
+                       WHERE ${this.sqlLic(userNotifications.columns.userId)} = ${userId}`;
+    }
+    /**
+     * Close connect to databases
+     */
+    public async closeConnect() : Promise<void> {
+        await this.sqlLic.end();
+        await this.sqlNot.end();
     }
 }

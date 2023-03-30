@@ -8,6 +8,7 @@ import {Roles} from "../helpers/enums/roles.js";
 
 export class AuthPage extends BasePage {
     private readonly userNumber : number = 0;
+    protected userId : number = 0;
     constructor(page : Page) {
         super(page)
     }
@@ -34,6 +35,7 @@ export class AuthPage extends BasePage {
         const dbHelper = new DbHelper();
         const response = await this.page.request.get(Api.users);
         const userId : number = await response.json().then(value => value.data[this.userNumber].id);
+        this.userId = userId;
         const dbUserData  = await dbHelper.select(workUsers.tableName,workUsers.columns.userId,userId);
         if (dbUserData[0][workUsers.columns.roleId] == Roles.admin) return;
         else {
@@ -41,7 +43,7 @@ export class AuthPage extends BasePage {
             await dbHelper.delete(workUsers.tableName,workUsers.columns.userId,userId);
             await dbHelper.insertUser(userId);
             await dbHelper.insertUserRights(userId);
-            await dbHelper.sql.end();
+            await dbHelper.closeConnect();
         }
     }
     /**

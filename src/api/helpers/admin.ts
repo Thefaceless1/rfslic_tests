@@ -56,7 +56,7 @@ export class Admin extends Catalogs {
             await dbHelper.delete(operationsLog.tableName,operationsLog.columns.userId,this.clubWorkersId[0]);
             await dbHelper.delete(workUsers.tableName,workUsers.columns.userId,this.clubWorkersId[0]);
         }
-        await dbHelper.sql.end();
+        await dbHelper.closeConnect();
     }
     /**
      * Add a criteria group

@@ -1,7 +1,7 @@
 import {Page} from "@playwright/test";
 
 export class PlaywrightDevPage {
-    public readonly page : Page
+    public page : Page
     constructor(page : Page) {
         this.page = page
     }

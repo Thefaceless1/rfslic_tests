@@ -86,10 +86,6 @@ export class BasePage extends PlaywrightDevPage{
      */
     protected addButton : Locator = Elements.getElement(this.page,"//button[text()='Добавить']");
     /**
-     * Checkboxes
-     */
-    public checkbox : Locator = Elements.getElement(this.page,"//input[@type='checkbox']");
-    /**
      * Search button to call a modal window for club workers, organizations, ofi
      */
     protected searchDataButton : Locator = Elements.getElement(this.page,"//button//span[contains(@class,'IconSearch')]");
@@ -125,6 +121,18 @@ export class BasePage extends PlaywrightDevPage{
      * column "Number of a license" in Licenses table
      */
     protected numberLicenseColumn : Locator = Elements.getElement(this.page,"//td[@class='ant-table-cell'][2]");
+    /**
+     * Checkboxes
+     */
+    public get checkbox() : Locator {
+        return Elements.getElement(this.page,"//input[@type='checkbox']");
+    }
+    /**
+     * Get notification by text
+     */
+    public notification(text : string) : Locator {
+        return Elements.getElement(this.page,`//*[text()='${text}']`).last();
+    }
     /**
      * Get "Filter" button by table column name
      */

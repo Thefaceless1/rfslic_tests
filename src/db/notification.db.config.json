@@ -1,0 +1,7 @@
+{
+  "host" : "rfs-db-01.fors.ru",
+  "port" : "5432",
+  "database" : "rfs_ntf_test",
+  "username" : "rfs_ntf_adm",
+  "password" : "yZnQ8INCv5rRY4TS"
+}

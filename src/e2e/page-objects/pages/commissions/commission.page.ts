@@ -39,10 +39,6 @@ export class CommissionPage extends MainPage {
      */
     private selectDecisionList : Locator = Elements.getElement(this.page,"//*[contains(@class,'newLicState__option')]");
     /**
-     * Button "Delete meeting"
-     */
-    private deleteMeetingButton : Locator = Elements.getElement(this.page,"//button[text()='Удалить заседание']");
-    /**
      * Button "Materials"
      */
     private materialsButton : Locator = Elements.getElement(this.page,"//button[text()='Материалы']");
@@ -146,13 +142,6 @@ export class CommissionPage extends MainPage {
         }
     }
     /**
-     * Delete a meeting
-     */
-    public async deleteMeeting() : Promise<void> {
-        await this.deleteMeetingButton.click();
-        await this.deleteButton.click();
-    }
-    /**
      * Set status "Wait for a commission solution" for licenses
      */
     public async changeLicensesStatus() : Promise<void> {
@@ -165,7 +154,7 @@ export class CommissionPage extends MainPage {
         for(const licId of licIds) {
             await dbHelper.updateLicenseStatus(licId,waitForCommissionStatusId);
         }
-        await dbHelper.sql.end();
+        await dbHelper.closeConnect();
         await this.page.goBack();
     }
 }

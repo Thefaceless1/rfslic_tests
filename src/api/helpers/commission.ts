@@ -47,7 +47,7 @@ export class Commission extends Catalogs {
         for(const licId of licIds) {
             await dbHelper.updateLicenseStatus(licId,licStatusId);
         }
-        await dbHelper.sql.end();
+        await dbHelper.closeConnect();
         return {"licIds": licIds};
     }
     /**
@@ -132,7 +132,7 @@ export class Commission extends Catalogs {
     public async formLicense() : Promise<{ licId: number }> {
         const dbHelper = new DbHelper();
         await dbHelper.delete(issuedLicense.tableName,issuedLicense.columns.licId,this.commission[0].licenses![0].licId);
-        await dbHelper.sql.end();
+        await dbHelper.closeConnect();
         return {licId : this.commission[0].licenses![0].licId};
     }/**
      * Get a commission by id

@@ -13,6 +13,7 @@ import {CommissionPage} from "../../pages/commissions/commission.page.js";
 import {CommissionMenuOptions} from "../enums/Commission-menu-options.js";
 import {GroupsClassifierPage} from "../../pages/admin/groups-classifier.page.js";
 import {CategoriesClassifierPage} from "../../pages/admin/categories-classifier.page.js";
+import {NotificationsPage} from "../../pages/notifications/notifications.page.js";
 
 type Fixtures = {
     setUser : AuthPage,
@@ -23,8 +24,9 @@ type Fixtures = {
     users : UsersPage,
     licenseText : LicTextPage,
     commission : CommissionPage,
-    groupClassifier : GroupsClassifierPage
-    categoriesClassifier : CategoriesClassifierPage
+    groupClassifier : GroupsClassifierPage,
+    categoriesClassifier : CategoriesClassifierPage,
+    notifications : NotificationsPage
 }
 export const test = base.extend<Fixtures>({
     constructor : async ({page},use) => {
@@ -101,5 +103,11 @@ export const test = base.extend<Fixtures>({
         await categoriesClassifier.login();
         await categoriesClassifier.adminMenuByEnum(AdminOptions.categoriesClassifier).click();
         await use(categoriesClassifier);
+    },
+    notifications : async ({page},use) => {
+        const notification = new NotificationsPage(page);
+        await notification.createUser();
+        await notification.login()
+        await use(notification);
     }
 })
