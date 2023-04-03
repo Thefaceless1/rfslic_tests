@@ -1,8 +1,9 @@
 import {MainPage} from "../main.page.js";
-import {Locator, Page} from "@playwright/test";
+import {expect, Locator, Page} from "@playwright/test";
 import {Elements} from "../../../framework/elements/elements.js";
 import {randomInt} from "crypto";
 import {InputData} from "../../helpers/input-data.js";
+import {Notifications} from "../../helpers/enums/notifications.js";
 
 export class CategoriesClassifierPage extends MainPage {
     constructor(page : Page) {
@@ -30,6 +31,7 @@ export class CategoriesClassifierPage extends MainPage {
         await this.enterCode.type(this.nonExistentCode(existingCodes));
         await this.description.type(InputData.randomWord)
         await this.saveButton.click();
+        await expect(this.notification(Notifications.categoryAdded)).toBeVisible();
     }
     /**
      * Get non-existent code
@@ -53,13 +55,17 @@ export class CategoriesClassifierPage extends MainPage {
         await this.description.clear();
         await this.description.type(InputData.randomWord);
         await this.saveButton.click();
+        await expect(this.notification(Notifications.categoryChanged)).toBeVisible();
     }
     /**
      * Delete a category
      */
     public async deleteCategory() : Promise<void> {
         await Elements.waitForVisible(this.deleteTableButton.first());
+        const createdCode : string = await this.codeColumn.last().innerText();
+        const pendingNotification : string = `Разряд "${createdCode}" удален`;
         await this.deleteTableButton.last().click();
         await this.deleteButton.click();
+        await expect(this.notification(pendingNotification)).toBeVisible();
     }
 }

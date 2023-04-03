@@ -1,5 +1,5 @@
 import {MainPage} from "../main.page.js";
-import {Locator, Page} from "@playwright/test";
+import {expect, Locator, Page} from "@playwright/test";
 import {Elements} from "../../../framework/elements/elements.js";
 import {Date} from "../../../framework/elements/date.js";
 import {InputData} from "../../helpers/input-data.js";
@@ -9,6 +9,7 @@ import {LicStatus} from "../../helpers/enums/licstatus.js";
 import {Input} from "../../../framework/elements/input.js";
 import {MainMenuOptions} from "../../helpers/enums/main-menu-options.js";
 import {DbHelper} from "../../../../db/db-helper.js";
+import {FileReader} from "../../helpers/file-reader.js";
 
 export class CommissionPage extends MainPage {
     constructor(page : Page) {
@@ -51,6 +52,10 @@ export class CommissionPage extends MainPage {
      */
     private reportTypeList : Locator = Elements.getElement(this.page,"//*[contains(@class,'reportType__option')]");
     /**
+     * Field "Commission name"
+     */
+    private commissionName : Locator = Elements.getElement(this.page,"//*[contains(@class,'Text_weight_semibold') and contains(text(),'Заседание')]");
+    /**
      * Field "Requests"
      */
     private requests : Locator = Elements.getElement(this.page,"//*[contains(@class,'requests__control')]");
@@ -63,6 +68,20 @@ export class CommissionPage extends MainPage {
      */
     private formButton : Locator = Elements.getElement(this.page,"//button[text()='Сформировать']");
     /**
+     * Accepted decision in the table
+     */
+    private acceptedDecision : Locator = Elements.getElement(this.page,"//td[7]//*[contains(@class,'Badge_view_filled')]");
+    /**
+     * Report name
+     */
+    private report : Locator = Elements.getElement(this.page,"//span[contains(text(),'Отчет по')]");
+    /**
+     * Protocol name
+     */
+    private protocol(fileName : string) : Locator {
+        return Elements.getElement(this.page,`//span[text()='${fileName}']`);
+    }
+    /**
      * Create a meeting
      */
     public async createMeeting() : Promise<void> {
@@ -73,6 +92,7 @@ export class CommissionPage extends MainPage {
         await Date.fillDateInput(this.dates,InputData.currentDate);
         await this.name.type(InputData.randomWord);
         await this.createButton.click();
+        await expect(this.commissionName).toBeVisible();
     }
     /**
      * Add requests to a meeting
@@ -81,9 +101,13 @@ export class CommissionPage extends MainPage {
         await this.addRequestsButton.click();
         const searchModal = new SearchModalPage(this.page);
         await Elements.waitForHidden(searchModal.loadIndicator);
+        const requestsCount : number = await this.checkbox.count() - 1;
         await this.checkbox.first().check();
         await searchModal.selectButton.click();
         await this.closeNotifications("all");
+        await Elements.waitForVisible(this.tableRow.first());
+        const rowCount : number = await this.tableRow.count();
+        expect(requestsCount).toBe(rowCount);
     }
     /**
      * Add decision on requests
@@ -109,6 +133,7 @@ export class CommissionPage extends MainPage {
                 await this.saveButton.last().click();
             }
             await this.closeNotifications("all");
+            await expect(this.acceptedDecision.nth(i)).toBeVisible();
         }
     }
     /**
@@ -117,6 +142,7 @@ export class CommissionPage extends MainPage {
     public async addReport() : Promise<void> {
         await this.materialsButton.click();
         const plusButtonCount : number = await this.plusButton.count();
+        const fileName : string = FileReader.getTestFiles[0].match(/\w+\.\w+/g)![0];
         for(let i = 0; i < plusButtonCount; i++) {
             await this.plusButton.nth(i).click();
             if(i == 0) {
@@ -139,6 +165,7 @@ export class CommissionPage extends MainPage {
                 await Elements.waitForVisible(this.docIcon);
                 await this.saveButton.click();
             }
+            (i == 0) ? await expect(this.report).toBeVisible() : await expect(this.protocol(fileName)).toBeVisible();
         }
     }
     /**

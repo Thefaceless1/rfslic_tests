@@ -1,7 +1,6 @@
 import {test as base} from '@playwright/test';
 import {ConstructorNewPage} from "../../pages/constructor/constructor-new.page.js";
 import {Pages} from "../enums/pages.js";
-import {RequestNewPage} from "../../pages/request/request-new.page.js";
 import {RequestPage} from "../../pages/request/request.page.js";
 import {Columns} from "../enums/columns.js";
 import {RolesPage} from "../../pages/admin/roles.page.js";
@@ -10,7 +9,7 @@ import {UsersPage} from "../../pages/admin/users.page.js";
 import {AuthPage} from "../../pages/auth.page.js";
 import {LicTextPage} from "../../pages/admin/lictext.page.js";
 import {CommissionPage} from "../../pages/commissions/commission.page.js";
-import {CommissionMenuOptions} from "../enums/Commission-menu-options.js";
+import {CommissionMenuOptions} from "../enums/commission-menu-options.js";
 import {GroupsClassifierPage} from "../../pages/admin/groups-classifier.page.js";
 import {CategoriesClassifierPage} from "../../pages/admin/categories-classifier.page.js";
 import {NotificationsPage} from "../../pages/notifications/notifications.page.js";
@@ -18,7 +17,6 @@ import {NotificationsPage} from "../../pages/notifications/notifications.page.js
 type Fixtures = {
     setUser : AuthPage,
     constructor : ConstructorNewPage,
-    newRequest :  RequestNewPage,
     requests : RequestPage,
     roles : RolesPage,
     users : UsersPage,
@@ -36,23 +34,14 @@ export const test = base.extend<Fixtures>({
         await constructor.openConstructor();
         await use(constructor);
     },
-    newRequest : async ({page},use) => {
-        const newRequest = new RequestNewPage(page);
-        await newRequest.createUser();
-        await newRequest.login();
-        await newRequest.createTestProlicense();
-        await newRequest.goto(Pages.requestNewPage);
-        await newRequest.chooseClub();
-        await newRequest.filterByColumn(newRequest.filterButtonByEnum(Columns.licName));
-        await use(newRequest);
-    },
     requests : async ({page},use) => {
         const request = new RequestPage(page);
         await request.createUser();
         await request.login();
         await request.createTestProlicense();
-        await request.createTestLic();
-        await request.openPublishedLic();
+        await request.goto(Pages.requestNewPage);
+        await request.chooseClub();
+        await request.filterByColumn(request.filterButtonByEnum(Columns.licName));
         await use(request);
     },
     roles : async ({page},use) => {

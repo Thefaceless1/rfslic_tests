@@ -1,7 +1,8 @@
 import {PlaywrightDevPage} from "../../framework/helpers/playwright-dev-page.js";
-import {Locator, Page} from "@playwright/test";
+import {expect, Locator, Page} from "@playwright/test";
 import {Elements} from "../../framework/elements/elements.js";
 import {Columns} from "../helpers/enums/columns.js";
+import {Notifications} from "../helpers/enums/notifications.js";
 
 export class BasePage extends PlaywrightDevPage{
     protected prolicenseName : string
@@ -142,13 +143,16 @@ export class BasePage extends PlaywrightDevPage{
     /**
      * Change role rights
      */
-    public async changeRoleRights() : Promise<void> {
+    public async changeRoleRights(page : "users" | "roles") : Promise<void> {
         await this.waitCheckboxCount();
         const checkboxCount : number = await this.checkbox.count()-1;
         for(let i = 1; i<checkboxCount;i++) {
             if(i%2 == 0) await this.checkbox.nth(i).click();
         }
         await this.saveButton.click();
+        (page == "roles") ?
+            await expect(this.notification(Notifications.rightsChanged)).toBeVisible() :
+            await expect(this.notification(Notifications.userRightsChanged)).toBeVisible();
     }
     /**
      * Set a table filter by a given column

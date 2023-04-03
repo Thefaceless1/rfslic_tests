@@ -1,17 +1,17 @@
-import {RequestNewPage} from "./request-new.page.js";
 import {Locator, Page} from "@playwright/test";
-import {RequestSections} from "../../helpers/enums/RequestSections.js";
+import {RequestSections} from "../../helpers/enums/request-sections.js";
 import {Elements} from "../../../framework/elements/elements.js";
 import {SearchModalPage} from "../search-modal.page.js";
 import {InputData} from "../../helpers/input-data.js";
 import {randomInt} from "crypto";
-import {Pages} from "../../helpers/enums/pages.js";
 import {LicStatus} from "../../helpers/enums/licstatus.js";
-import {Columns} from "../../helpers/enums/columns.js";
 import {CriteriaTypes} from "../../helpers/enums/criteriatypes.js";
 import {DocStatus} from "../../helpers/enums/docstatus.js";
+import {MainPage} from "../main.page.js";
+import {ConstructorNewPage} from "../constructor/constructor-new.page.js";
+import {Input} from "../../../framework/elements/input.js";
 
-export class RequestPage extends RequestNewPage {
+export class RequestPage extends MainPage {
     constructor(page : Page) {
         super(page);
     }
@@ -104,6 +104,27 @@ export class RequestPage extends RequestNewPage {
      */
     private editMemberButton : Locator = Elements.getElement(this.page,"//button[@name='editButtonMember']");
     /**
+     * Button "->" in the left corner of the table
+     */
+    private arrow  : Locator = Elements.getElement(this.page,"(//td[contains(@class,'fix-left')]/button)[1]");
+
+    /**
+     * Button "Go to request"
+     */
+    private goToRequest : Locator = Elements.getElement(this.page,"//span[text()='Перейти к заявке']");
+    /**
+     * Button "Publish a request"
+     */
+    private publishReqButton : Locator = Elements.getElement(this.page,"//button[text()='Подать заявку']");
+    /**
+     * Field "Select a club"
+     */
+    private selectClub : Locator = Elements.getElement(this.page,"//*[contains(@class,'club__control')]");
+    /**
+     * Values of the drop-down list of the field "Select a club"
+     */
+    private selectClubList : Locator = Elements.getElement(this.page,"//*[contains(@class,'club__option')]");
+    /**
      * Get a cell with the name of the prolicense in the table by the name of the prolicense
      */
     private licenseRow(prolicName : string) : Locator {
@@ -128,19 +149,13 @@ export class RequestPage extends RequestNewPage {
         return Elements.getElement(this.page,`//button[text()='${section}']`);
     }
     /**
-     * Open published license
-     */
-    public async openPublishedLic() : Promise<void> {
-        await this.goto(Pages.requestPage);
-        await this.filterByColumn(this.filterButtonByEnum(Columns.licName));
-        await this.licenseRow(this.prolicenseName).click();
-    }
-    /**
      * Fill in experts and club workers for criteria groups
      */
     public async addExperts() : Promise<void> {
+        await this.page.reload();
+        await this.page.waitForLoadState();
+        await Elements.waitForVisible(this.sectionByEnum(RequestSections.criterias));
         await this.sectionByEnum(RequestSections.criterias).click();
-        await Elements.waitForVisible(this.criteriaGroups.last());
         const groupsCount = await this.criteriaGroups.count();
         for(let i = 0; i<groupsCount; i++) {
             if(i != 0) await this.criteriaGroups.nth(i).click();
@@ -151,6 +166,12 @@ export class RequestPage extends RequestNewPage {
                 await this.fillExperts();
             }
         }
+    }
+    private async checkClick() : Promise<void> {
+        await this.sectionByEnum(RequestSections.criterias).click();
+        const isVisibleGroups : boolean = await this.criteriaGroups.last().isVisible();
+        console.log(isVisibleGroups);
+        if(!isVisibleGroups) await this.checkClick();
     }
     /**
      * Add experts to a criteria group
@@ -323,5 +344,52 @@ export class RequestPage extends RequestNewPage {
     private async checkCommentValue(commentNumber : number) : Promise<void> {
         const currentComment : string = await this.clubWorkerComment.nth(commentNumber).innerText();
         if(currentComment == "-") await this.checkCommentValue(commentNumber);
+    }
+    /**
+     * Select a club from the dropdown list of values
+     */
+    public async chooseClub() : Promise<void> {
+        await Elements.waitForVisible(this.selectClub);
+        await this.selectClub.click();
+        await Elements.waitForVisible(this.selectClubList.first());
+        await this.selectClubList.first().click();
+    }
+    /**
+     * Create a prolicense with filled criteria groups and criterias
+     */
+    public async createTestProlicense() : Promise<void> {
+        const constructor = new ConstructorNewPage(this.page);
+        await constructor.openConstructor();
+        await constructor.createProlicense();
+        await constructor.createGrpCrit();
+        await constructor.createCriteria();
+        this.prolicenseName = await constructor.createdProlicName.innerText();
+        await constructor.publishProlicense("lic");
+        await Elements.waitForVisible(constructor.createProlicButton);
+    }
+    /**
+     * Create a request in the status "Draft"
+     */
+    public async createDraft() : Promise<void> {
+        await this.arrow.click();
+        await this.goToRequest.click();
+    }
+    /**
+     * Publish a license
+     */
+    public async publishLic(): Promise<void> {
+        await Elements.waitForVisible(this.publishReqButton);
+        await this.publishReqButton.click();
+    }
+    /**
+     * Add files and comments for license documents
+     */
+    protected async fillDocsAndComment () : Promise<void> {
+        await Input.uploadFiles(this.templates.first(),"all");
+        await Elements.waitForVisible(this.docIcon);
+        await Elements.waitForVisible(this.xlsxIcon);
+        await this.comment.type(InputData.randomWord);
+        await this.addButton.click();
+        await this.closeNotifications("last");
     }
 }

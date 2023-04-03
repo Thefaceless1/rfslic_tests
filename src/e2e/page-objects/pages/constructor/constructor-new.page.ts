@@ -1,4 +1,4 @@
-import {Locator, Page} from "@playwright/test";
+import {expect, Locator, Page} from "@playwright/test";
 import {Elements} from "../../../framework/elements/elements.js";
 import {Date} from "../../../framework/elements/date.js";
 import {Input} from "../../../framework/elements/input.js";
@@ -10,6 +10,8 @@ import {ConstructorPage} from "./constructor.page.js";
 import {MainMenuOptions} from "../../helpers/enums/main-menu-options.js";
 import {Columns} from "../../helpers/enums/columns.js";
 import {CriteriaTypes} from "../../helpers/enums/criteriatypes.js";
+import {Notifications} from "../../helpers/enums/notifications.js";
+import {ProlicStatus} from "../../helpers/enums/prolicstatus.js";
 
 export class ConstructorNewPage extends ConstructorPage {
     constructor(page : Page) {
@@ -100,6 +102,16 @@ export class ConstructorNewPage extends ConstructorPage {
      */
     private docDescription : Locator = Elements.getElement(this.page,"//textarea[@placeholder='Добавьте описание документа']");
     /**
+     * Created criteria name
+     */
+    private createdCriteria : Locator = Elements.getElement(this.page,"//span[contains(text(),'Название')]");
+    /**
+     * Current displayed prolicense status
+     */
+    private prolicenseStatus(statusValue : string) : Locator {
+        return Elements.getElement(this.page,`//*[text()='${statusValue}']`);
+    }
+    /**
      * Open Prolicense constructor
      */
     public async openConstructor () : Promise<void> {
@@ -134,6 +146,7 @@ export class ConstructorNewPage extends ConstructorPage {
      * Change the values in the fields of the "General information" block
      */
     public async changeBasicInfo() : Promise<void> {
+        const oldProlicName : string = await this.createdProlicName.innerText();
         await this.editButton.first().click();
         await this.name.clear();
         await this.name.type(InputData.randomWord);
@@ -142,6 +155,14 @@ export class ConstructorNewPage extends ConstructorPage {
             await Date.fillDateInput(date,InputData.futureDate);
         }
         await this.saveButton.click();
+        await expect(this.compareProlicName(oldProlicName)).toBeTruthy();
+    }
+    /**
+     * Comparison of the old and new name of the prolicense
+     */
+    private async compareProlicName(oldProlicName : string) : Promise<boolean> {
+        const newProlicName : string = await this.createdProlicName.innerText();
+        return (oldProlicName != newProlicName) ? true : this.compareProlicName(oldProlicName);
     }
     /**
      * Fill in the fields of the block "Documents for filing an application"
@@ -164,15 +185,18 @@ export class ConstructorNewPage extends ConstructorPage {
          await this.fillBasicInfo();
          await this.fillDocs();
          await this.saveButton.click();
+         await expect(this.createdProlicName).toBeVisible();
     }
     /**
      * Copy a prolicense
      */
     public async cloneProlicense() : Promise<void> {
+        const prolicNameBeforeClone : string = await this.createdProlicName.innerText();
         await this.actionButton.click();
         await this.actionsList.filter({hasText : ProlicenseActions.clone}).click();
         await this.name.type(InputData.randomWord);
         await this.saveButton.click();
+        await expect(this.compareProlicName(prolicNameBeforeClone)).toBeTruthy();
     }
     /**
      * Publication of a prolicense
@@ -186,17 +210,21 @@ export class ConstructorNewPage extends ConstructorPage {
         await this.actionButton.click();
         await this.actionsList.filter({hasText : ProlicenseActions.publish}).click();
         await this.publishButton.click();
+        if(scenario == "prolic") {
+            await this.filterByColumn(this.filterButtonByEnum(Columns.licName));
+            await this.waitForColumnFilter();
+            await this.tableRow.click();
+            await expect(this.prolicenseStatus(ProlicStatus.published)).toBeVisible();
+        }
     }
     /**
      * Unpublish of a prolicense
      */
     public async unpublishProlicense() : Promise<void> {
-        await this.filterByColumn(this.filterButtonByEnum(Columns.licName));
-        await this.waitForColumnFilter();
-        await this.tableRow.click();
         await this.actionButton.click();
         await this.actionsList.filter({hasText : ProlicenseActions.unpublish}).click();
         await this.unpublishButton.click();
+        await expect(this.prolicenseStatus(ProlicStatus.onEditing)).toBeVisible();
     }
     /**
      * Remove a prolicense
@@ -208,6 +236,7 @@ export class ConstructorNewPage extends ConstructorPage {
             await deleteValue.click();
             await this.deleteButton.click();
         }
+        await expect(this.notification(Notifications.prolicenseRemoved)).toBeVisible()
     }
     /**
      * Create criteria groups
@@ -228,6 +257,7 @@ export class ConstructorNewPage extends ConstructorPage {
                 await this.expertsList.first().click();
             }
             await this.saveButton.click();
+            await expect(this.createdGroups.nth(i)).toBeVisible();
         }
         await this.waitForVisibleAllGroups(groupsCount);
     }
@@ -286,6 +316,7 @@ export class ConstructorNewPage extends ConstructorPage {
         const groupsCount = await this.createdGroups.count();
         const criteriaTypes : string[] = [`${CriteriaTypes.documents}`,`${CriteriaTypes.member}`,`${CriteriaTypes.ofi}`];
         const docCount = 2;
+        let createdCriteriaCount : number = 0;
         for(let i = 0; i < groupsCount; i++) {
             for (const type of criteriaTypes) {
                 await this.fillCriteriaInfo(i,type);
@@ -293,6 +324,8 @@ export class ConstructorNewPage extends ConstructorPage {
                     await this.fillCriteriaDocs()
                 }
                 await this.saveButton.click();
+                await expect(this.createdCriteria.nth(createdCriteriaCount)).toBeVisible();
+                createdCriteriaCount++;
             }
         }
         this.prolicenseName = await this.createdProlicName.innerText();

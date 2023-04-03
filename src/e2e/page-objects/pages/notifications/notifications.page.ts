@@ -2,7 +2,7 @@ import {MainPage} from "../main.page.js";
 import {expect, Locator, Page} from "@playwright/test";
 import {Elements} from "../../../framework/elements/elements.js";
 import {DbHelper} from "../../../../db/db-helper.js";
-import {Notifications} from "../../helpers/enums/Notifications.js";
+import {Notifications} from "../../helpers/enums/notifications.js";
 
 export class NotificationsPage extends MainPage {
     constructor(page : Page) {
@@ -24,12 +24,6 @@ export class NotificationsPage extends MainPage {
      * Button "Show all"
      */
     private showAllButton : Locator = Elements.getElement(this.page,"//*[text()='Показать все']");
-    /**
-     * Button "subscription to notifications"
-     */
-    private get subscriptionButton() : Locator {
-        return Elements.getElement(this.page,"//button[text()='Подписка на уведомления']");
-    }
     /**
      * Message text
      */

@@ -3,7 +3,7 @@ import {Elements} from "../../framework/elements/elements.js";
 import {MainMenuOptions} from "../helpers/enums/main-menu-options.js";
 import {AdminOptions} from "../helpers/enums/admin-options.js";
 import {AuthPage} from "./auth.page.js";
-import {CommissionMenuOptions} from "../helpers/enums/Commission-menu-options";
+import {CommissionMenuOptions} from "../helpers/enums/commission-menu-options";
 
 export class MainPage extends AuthPage {
     constructor(page : Page) {

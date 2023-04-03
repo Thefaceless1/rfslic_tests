@@ -1,7 +1,8 @@
 import {MainPage} from "../main.page.js";
-import {Locator, Page} from "@playwright/test";
+import {expect, Locator, Page} from "@playwright/test";
 import {Elements} from "../../../framework/elements/elements.js";
 import {InputData} from "../../helpers/input-data.js";
+import {Notifications} from "../../helpers/enums/notifications.js";
 
 export class GroupsClassifierPage extends MainPage {
     constructor(page : Page) {
@@ -18,6 +19,7 @@ export class GroupsClassifierPage extends MainPage {
         await this.addGrpCritButton.click();
         await this.enterGroupName.type(InputData.randomWord);
         await this.saveButton.click();
+        await expect(this.notification(Notifications.groupAdded)).toBeVisible()
     }
     /**
      * Change a group
@@ -29,6 +31,7 @@ export class GroupsClassifierPage extends MainPage {
         await this.enterGroupName.type(InputData.randomWord);
         await this.checkbox.click();
         await this.saveButton.click();
+        await expect(this.notification(Notifications.groupChanged)).toBeVisible();
     }
     /**
      * Delete a group
@@ -37,5 +40,6 @@ export class GroupsClassifierPage extends MainPage {
         await Elements.waitForVisible(this.deleteTableButton.first());
         await this.deleteTableButton.last().click();
         await this.deleteButton.click();
+        await expect(this.notification(Notifications.groupDeleted)).toBeVisible();
     }
 }

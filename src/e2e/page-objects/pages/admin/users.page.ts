@@ -1,11 +1,12 @@
 import {MainPage} from "../main.page.js";
-import {Locator, Page} from "@playwright/test";
+import {expect, Locator, Page} from "@playwright/test";
 import {Elements} from "../../../framework/elements/elements.js";
 import {SearchModalPage} from "../search-modal.page.js";
 import {DbHelper} from "../../../../db/db-helper.js";
 import {operationsLog, workUsers} from "../../../../db/tables.js";
 import {UserTabs} from "../../helpers/enums/usertabs.js";
 import {Api} from "../../helpers/enums/api.js";
+import {Notifications} from "../../helpers/enums/notifications.js";
 
 export class UsersPage extends MainPage {
     private readonly createdUserNumber : number = 1
@@ -54,6 +55,7 @@ export class UsersPage extends MainPage {
         await Elements.waitForVisible(this.rolesList.first());
         await this.rolesList.first().click();
         await this.addButton.click();
+        await expect(this.notification(Notifications.userAdded)).toBeVisible();
     }
     /**
      * Change a user role
@@ -65,6 +67,7 @@ export class UsersPage extends MainPage {
         await this.rolesList.last().click();
         await this.saveButton.click();
         await this.changeRoleButton.click();
+        await expect(this.notification(Notifications.userRoleChanged)).toBeVisible();
     }
     /**
      * Change criteria groups for a user
@@ -78,6 +81,7 @@ export class UsersPage extends MainPage {
             await this.selectGroupsList.first().click();
         }
         await this.saveButton.click();
+        await expect(this.notification(Notifications.userGroupsChanged)).toBeVisible();
     }
     /**
      * Delete the first record of the found list of users from the database
