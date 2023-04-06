@@ -13,5 +13,6 @@ export enum Notifications {
     userRightsChanged = "Права пользователя изменены",
     userRoleChanged = "Роль пользователя изменена",
     userGroupsChanged = "Группы критериев пользователя изменены",
-    prolicenseRemoved = "Пролицензия удалена"
+    prolicenseRemoved = "Пролицензия удалена",
+    requestAdded = "Заявка подана"
 }

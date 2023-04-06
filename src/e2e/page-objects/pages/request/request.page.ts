@@ -1,3 +1,4 @@
+import {expect} from "@playwright/test";
 import {Locator, Page} from "@playwright/test";
 import {RequestSections} from "../../helpers/enums/request-sections.js";
 import {Elements} from "../../../framework/elements/elements.js";
@@ -10,6 +11,7 @@ import {DocStatus} from "../../helpers/enums/docstatus.js";
 import {MainPage} from "../main.page.js";
 import {ConstructorNewPage} from "../constructor/constructor-new.page.js";
 import {Input} from "../../../framework/elements/input.js";
+import {Notifications} from "../../helpers/enums/notifications.js";
 
 export class RequestPage extends MainPage {
     constructor(page : Page) {
@@ -125,11 +127,25 @@ export class RequestPage extends MainPage {
      */
     private selectClubList : Locator = Elements.getElement(this.page,"//*[contains(@class,'club__option')]");
     /**
-     * Get a cell with the name of the prolicense in the table by the name of the prolicense
+     * License title
      */
-    private licenseRow(prolicName : string) : Locator {
-        return Elements.getElement(this.page,`//td[text()='${prolicName}']`);
-    }
+    private licTitle : Locator = Elements.getElement(this.page,"//*[text()='Заявка на лицензирование клуба']");
+    /**
+     * Name of the expert report file
+     */
+    private expertReportFile : Locator = Elements.getElement(this.page,"//span[contains(text(),'Отчет эксперта')]");
+    /**
+     * Currently displayed license status
+     */
+    private currentLicStatus : Locator = Elements.getElement(this.page,"//*[contains(@class,'requestStateBadgeWrapper')]//*[contains(@class,'Badge_view_filled')]");
+    /**
+     * File attached to the document
+     */
+    private attachedFile : Locator = Elements.getElement(this.page,"//*[contains(@class,'DocumentInfo_file_wrapper')][1]");
+    /**
+     * Loader
+     */
+    private loader : Locator = Elements.getElement(this.page,"//*[contains(@class,'ProgressSpin-Circle')]");
     /**
      * Get the drop-down list value of the 'License decision' field by enum
      */
@@ -164,14 +180,9 @@ export class RequestPage extends MainPage {
             for(let c = 0;c<editCount; c++) {
                 await this.editButton.nth(c).click();
                 await this.fillExperts();
+                await expect(this.tableRow.nth(c)).toBeVisible();
             }
         }
-    }
-    private async checkClick() : Promise<void> {
-        await this.sectionByEnum(RequestSections.criterias).click();
-        const isVisibleGroups : boolean = await this.criteriaGroups.last().isVisible();
-        console.log(isVisibleGroups);
-        if(!isVisibleGroups) await this.checkClick();
     }
     /**
      * Add experts to a criteria group
@@ -250,7 +261,11 @@ export class RequestPage extends MainPage {
         await this.selectLicStatus.click();
         await Elements.waitForVisible(this.selectLicStatusByEnum(statusValue));
         await this.selectLicStatusByEnum(statusValue).click();
-        await this.saveButton.last().click()
+        await this.saveButton.last().click();
+        await Elements.waitForVisible(this.loader);
+        await Elements.waitForHidden(this.loader);
+        const licStatusValue : string = await this.currentLicStatus.innerText();
+        await expect(licStatusValue.toLowerCase()).toBe(LicStatus.waitForCommission.toLowerCase());
     }
     /**
      * Fill in the fields "Comment" and "Decision on the document"
@@ -290,6 +305,7 @@ export class RequestPage extends MainPage {
             docsCount = await this.checkButton.count();
             await this.fillStatusAndComment(docsCount);
             await this.fillExpertSolution();
+            await expect(this.expertReportFile).toBeVisible();
         }
     }
     /**
@@ -303,6 +319,10 @@ export class RequestPage extends MainPage {
         await this.recommendation.type(InputData.randomWord);
         await this.rplCriterias.type(InputData.randomWord);
         await this.saveButton.click();
+        const conclusionText : string | null = await this.conclusion.textContent();
+        const recommendationText : string | null = await this.recommendation.textContent();
+        const rplCriteriasText : string | null = await this.rplCriterias.textContent();
+        await expect(conclusionText && recommendationText && rplCriteriasText).not.toBeNull();
     }
     /**
      * Waiting for a status update near the document name in accordance with the selected status
@@ -333,6 +353,7 @@ export class RequestPage extends MainPage {
             await Elements.waitForVisible(this.cancelButton);
             await this.fillDocsAndComment();
             await this.checkCommentValue(c);
+            await expect(this.attachedFile.nth(c)).toBeVisible();
             await this.submitReviewButton.nth(c).click();
             await this.closeNotifications("last");
             await this.waitForDisplayStatus(c);
@@ -373,6 +394,7 @@ export class RequestPage extends MainPage {
     public async createDraft() : Promise<void> {
         await this.arrow.click();
         await this.goToRequest.click();
+        await expect(this.licTitle).toBeVisible();
     }
     /**
      * Publish a license
@@ -380,6 +402,7 @@ export class RequestPage extends MainPage {
     public async publishLic(): Promise<void> {
         await Elements.waitForVisible(this.publishReqButton);
         await this.publishReqButton.click();
+        await expect(this.notification(Notifications.requestAdded)).toBeVisible();
     }
     /**
      * Add files and comments for license documents
