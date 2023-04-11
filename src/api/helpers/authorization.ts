@@ -5,6 +5,7 @@ import {operationsLog, roles, workUsers} from "../../db/tables";
 
 export class Authorization {
     public cookie : string = ''
+    public x_csrf_token : string = ''
     constructor(
         private readonly userNumber : number = 0
     ) {}
@@ -26,9 +27,15 @@ export class Authorization {
             await dbHelper.insertUserRights(userId);
         }
         await dbHelper.closeConnect();
+        const response = await superagent.get(api.basicUrl + api.user.currentUser);
+        const sessionId : string = response.header['set-cookie'][1].match(/^.+?(?=;)/)[0];
+        const xCsrfToken : string = response.header['set-cookie'][0].match(/^.+?(?=;)/)[0];
+        const xCsrfTokenValue : string = xCsrfToken.match(/(?<==).+/)![0];
+        this.cookie = xCsrfToken + "; " + sessionId;
+        this.x_csrf_token = xCsrfTokenValue
         api.user.fillApi(userId);
-        const setUserData = await superagent.put(api.basicUrl + api.user.setUser);
-        const regExp : RegExp = /^.+?(?=;)/;
-        this.cookie = setUserData.header['set-cookie'][0].match(regExp)[0];
+        await superagent.put(api.basicUrl + api.user.setUser).
+        set('cookie',this.cookie).
+        set('x-csrf-token',this.x_csrf_token);
     }
 }

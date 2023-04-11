@@ -43,11 +43,14 @@ export class Api {
         requestsList : "/api/rest/licenses/find",
         deleteReqFile : "/api/rest/licenses/files/",
         deleteDocFile : "/api/rest/licenses/criterias/files/",
-        fillApi (license : TLicense) : void {
-            this.changeLicense = `/api/rest/licenses/${license.id}`;
-            this.publishLicense = `${this.changeLicense}/publish`;
-            this.createExpertReport = `${this.changeLicense}/groupReport/generate`;
-            this.checkDocument = `${this.changeLicense}/groups/${license.criteriaGroups[0].groupId}/check`;
+        fillApi (license : TLicense,groupId? : number) : void {
+            if(groupId) this.clubWorkers = `/api/rest/licenses/${license.id}/groups/${groupId}/clubExperts`;
+            else {
+                this.changeLicense = `/api/rest/licenses/${license.id}`;
+                this.publishLicense = `${this.changeLicense}/publish`;
+                this.createExpertReport = `${this.changeLicense}/groupReport/generate`;
+                this.checkDocument = `${this.changeLicense}/groups/${license.criteriaGroups[0].groupId}/check`;
+            }
         }
     }
     /**
@@ -60,9 +63,10 @@ export class Api {
      * Api user-controller
      */
     public user : TUser = {
-        clubWorkers : "/api/rest/persons/findbyparams",
+        persons : "/api/rest/persons/findbyparams",
         critGrpExperts : "/api/rest/persons/withRights",
         organization : "/api/rest/organizations/find",
+        currentUser : "/api/rest/info/currentUser",
         activeUsers : "/userChoice/list",
         fillApi(userId: number) {
             this.setUser = `/userChoice/set/${userId}`;

@@ -39,7 +39,7 @@ export class Catalogs extends Authorization {
         public  licStatus : TLicAndDocStatus[] = [],
         public  docStatus : TLicAndDocStatus[] = [],
         public  critGrpExperts : TClubWorkers[] = [],
-        public  clubWorkers : TClubWorkers[] = [],
+        public  persons : TClubWorkers[] = [],
         public  ofi : TOfi[] = [],
         public organization : TOrganization[] = [],
         public roles : TRoles[] = [],
@@ -53,8 +53,8 @@ export class Catalogs extends Authorization {
     /**
      * ids of "Club workers" catalog elements
      */
-    public get clubWorkersId () : number[] {
-        return this.clubWorkers.map(value => value.id);
+    public get personsId () : number[] {
+        return this.persons.map(value => value.id);
     }
     /**
      * ids of "Criteria groups" catalog elements
@@ -132,6 +132,7 @@ export class Catalogs extends Authorization {
             const files = await superagent.post(api.basicUrl + api.upload.upload).
             set("Content-Type", "multipart/form-data; boundary=----WebKitFormBoundaryoI4AK63JZr8jUhAa").
             set("cookie", `${this.cookie}`).
+            set("x-csrf-token",this.x_csrf_token).
             attach("file", FileReader.fileDir + fileName);
             this.addDataToFiles(fileName,files.body.data);
         }
@@ -148,76 +149,93 @@ export class Catalogs extends Authorization {
     public async fillCatalogsData () : Promise<void> {
         const api = new Api();
         const seasons = await superagent.get(api.basicUrl + api.constructors.seasons).
-        set("cookie", `${this.cookie}`);
+        set("cookie", `${this.cookie}`).
+        set("x-csrf-token",this.x_csrf_token);
         this.seasons = seasons.body.data;
 
         const groupCriterias = await superagent.get(api.basicUrl + api.constructors.critGroups).
-        set("cookie", `${this.cookie}`);
+        set("cookie", `${this.cookie}`).
+        set("x-csrf-token",this.x_csrf_token);
         this.criteriaGroups = groupCriterias.body.data;
 
         const licenseType = await superagent.get(api.basicUrl + api.constructors.licTypes).
-        set("cookie", `${this.cookie}`);
+        set("cookie", `${this.cookie}`).
+        set("x-csrf-token",this.x_csrf_token);
         this.licTypes = licenseType.body.data;
 
         const docTypes = await superagent.get(api.basicUrl + api.constructors.docTypes).
-        set("cookie", `${this.cookie}`);
+        set("cookie", `${this.cookie}`).
+        set("x-csrf-token",this.x_csrf_token);
         this.docTypes = docTypes.body.data;
 
         const criteriaRanks = await superagent.get(api.basicUrl + api.constructors.rankCriterias).
-        set("cookie", `${this.cookie}`);
+        set("cookie", `${this.cookie}`).
+        set("x-csrf-token",this.x_csrf_token);
         this.rankCriteria = criteriaRanks.body.data;
 
         const criteriaTypes = await superagent.get(api.basicUrl + api.constructors.criteriaTypes).
-        set("cookie", `${this.cookie}`);
+        set("cookie", `${this.cookie}`).
+        set("x-csrf-token",this.x_csrf_token);
         this.criteriaTypes = criteriaTypes.body.data;
 
         const requestStatus = await superagent.get(api.basicUrl + api.request.requestStatus).
-        set("cookie", `${this.cookie}`);
+        set("cookie", `${this.cookie}`).
+        set("x-csrf-token",this.x_csrf_token);
         this.licStatus = requestStatus.body.data;
 
         const docStatus = await superagent.get(api.basicUrl + api.request.docStatus).
-        set("cookie", `${this.cookie}`);
+        set("cookie", `${this.cookie}`).
+        set("x-csrf-token",this.x_csrf_token);
         this.docStatus = docStatus.body.data;
 
-        const clubWorkers = await superagent.get(api.basicUrl+api.user.clubWorkers).
+        const persons = await superagent.get(api.basicUrl+api.user.persons).
         query({pageNum : 2, pageSize : 10}).
-        set("cookie", `${this.cookie}`);
-        this.clubWorkers = clubWorkers.body.data;
+        set("cookie", `${this.cookie}`).
+        set("x-csrf-token",this.x_csrf_token);
+        this.persons = persons.body.data;
 
         const critGrpExperts = await superagent.get(api.basicUrl+api.user.critGrpExperts).
         query({rights : "request.checkExpert"}).
-        set("cookie", `${this.cookie}`);
+        set("cookie", `${this.cookie}`).
+        set("x-csrf-token",this.x_csrf_token);
         this.critGrpExperts = critGrpExperts.body.data;
 
         const ofi = await superagent.get(api.basicUrl + api.infraObject.ofi).
         query({pageNum : 0, pageSize : 10}).
-        set("cookie", `${this.cookie}`);
+        set("cookie", `${this.cookie}`).
+        set("x-csrf-token",this.x_csrf_token);
         this.ofi = ofi.body.data;
 
         const organization = await superagent.get(api.basicUrl + api.user.organization).
         query({pageNum : 0, pageSize : 10}).
-        set("cookie", `${this.cookie}`);
+        set("cookie", `${this.cookie}`).
+        set("x-csrf-token",this.x_csrf_token);
         this.organization = organization.body.data;
 
         const roles = await superagent.get(api.basicUrl + api.admin.roles).
-        set("cookie", `${this.cookie}`);
+        set("cookie", `${this.cookie}`).
+        set("x-csrf-token",this.x_csrf_token);
         this.roles = roles.body.data;
 
         const rights = await superagent.get(api.basicUrl + api.admin.rights).
-        set("cookie", `${this.cookie}`);
+        set("cookie", `${this.cookie}`).
+        set("x-csrf-token",this.x_csrf_token);
         this.rights = rights.body.data;
 
         const commission = await superagent.get(api.basicUrl + api.commissions.commissionTypes).
-        set("cookie", `${this.cookie}`);
+        set("cookie", `${this.cookie}`).
+        set("x-csrf-token",this.x_csrf_token);
         this.commissionTypes = commission.body.data;
 
         const commissionDecision = await superagent.get(api.basicUrl + api.commissions.commissionDecisions).
-        set("cookie", `${this.cookie}`);
+        set("cookie", `${this.cookie}`).
+        set("x-csrf-token",this.x_csrf_token);
         this.commissionDecision = commissionDecision.body.data;
 
         const commissionTypeMembers = await superagent.get(api.basicUrl + api.admin.addUser).
         query({pageNum : 0, pageSize : 10, rights : "commission.member"}).
-        set("cookie", `${this.cookie}`);
+        set("cookie", `${this.cookie}`).
+        set("x-csrf-token",this.x_csrf_token);
         this.commissionTypeMembers = commissionTypeMembers.body.data;
     }
 }

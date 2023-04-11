@@ -7,6 +7,7 @@ import {LicStatus} from "./enums/license-status";
 import {Api} from "./api";
 import {TCreateLicense, TCriteriaGroups, TCriterias, TDocuments, TExpertReport, TLicense} from "./types/license.type";
 import {randomInt} from "crypto";
+import {TClubWorkers, TLicAndDocStatus} from "./types/catalogs.type";
 
 export class License extends Prolicense {
     constructor(
@@ -51,13 +52,16 @@ export class License extends Prolicense {
     /**
      * Add criteria groups experts and club workers for a criteria group
      */
-    public addClubWorkersToCritGrp () : TLicense {
-        const checkedClubWorkers : number[] = this.clubWorkersId.
-        filter(workerId => workerId != this.critGrpExperts[0].id);
-        this.license[0].criteriaGroups.forEach((value) => {
-            value.experts = checkedClubWorkers;
-            value.rfuExpert = this.critGrpExperts[0].id;
-        })
+    public async addClubWorkersToCritGrp () : Promise<TLicense> {
+        const api = new Api();
+        for (const criteriaGroup of this.license[0].criteriaGroups) {
+            api.request.fillApi(this.license[0],criteriaGroup.groupId);
+            const response = await superagent.get(api.basicUrl + api.request.clubWorkers).
+            set("cookie", `${this.cookie}`).
+            set("x-csrf-token",this.x_csrf_token);
+            criteriaGroup.experts = response.body.data.map((clubWorker : TClubWorkers) => clubWorker.id);
+            criteriaGroup.rfuExpert = this.critGrpExperts[0].id;
+        }
         return this.license[0];
     }
     /**
@@ -74,7 +78,7 @@ export class License extends Prolicense {
                 criterias.documents.forEach((documents) => {
                     documents.comment = TestData.commentValue;
                     switch (documents.docTypeId) {
-                        case 5 : documents.externalIds = this.clubWorkersId; break;
+                        case 5 : documents.externalIds = this.personsId; break;
                         case 6 : documents.externalIds = this.ofiId; break;
                         case 9 : documents.externalIds = this.orgId; break;
                         default : documents.files = this.files;
@@ -201,7 +205,7 @@ export class License extends Prolicense {
      */
     public addOfiAndUsers() : TLicense {
         this.license[0].criteriaGroups.forEach(critGrp => {
-            critGrp.criterias[1].externalId = this.clubWorkersId[0];
+            critGrp.criterias[1].externalId = this.personsId[0];
             critGrp.criterias[2].externalId = this.ofiId[0];
             const iterationCount : number = 5;
             critGrp.criterias[iterationCount+1] = critGrp.criterias[2];
@@ -217,7 +221,7 @@ export class License extends Prolicense {
                 delete newOfi.id;
                 newUser.orderNum = i;
                 newOfi.orderNum = i;
-                newUser.externalId = this.clubWorkersId[i];
+                newUser.externalId = this.personsId[i];
                 newOfi.externalId = this.ofiId[i];
                 critGrp.criterias[i+1] = newUser;
                 critGrp.criterias.push(newOfi);
@@ -232,5 +236,13 @@ export class License extends Prolicense {
         const response = await superagent.get(api.basicUrl + api.request.changeLicense).
         set("cookie", `${this.cookie}`);
         this.fillLicense(0,response);
+    }
+    /**
+     * Set the license status to "Waiting for the commission's decision"
+     */
+    public changeLicStatus() : TLicense {
+        const waitForCommissionState: TLicAndDocStatus = this.licStatusByEnum(LicStatus.waitForCommission);
+        this.license[0].stateId = waitForCommissionState.id;
+        return this.license[0];
     }
 }

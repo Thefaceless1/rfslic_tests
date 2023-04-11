@@ -270,7 +270,7 @@ export class RequestPage extends MainPage {
     /**
      * Fill in the fields "Comment" and "Decision on the document"
      */
-    private async fillStatusAndComment (docsCount : number) : Promise<void> {
+    private async fillStatusAndComment (docsCount : number,reason : "generalInfo" | "criterias") : Promise<void> {
         let currentIndex : number = 0;
         for (let i = 0; i < docsCount; i++) {
             await this.reviewComment.nth(i).type(InputData.randomWord);
@@ -279,7 +279,9 @@ export class RequestPage extends MainPage {
             const randomStateNumb = randomInt(0,await this.docStatesList.count());
             const selectedState : string = await this.docStatesList.nth(randomStateNumb).innerText();
             await this.docStatesList.nth(randomStateNumb).click();
-            await this.checkButton.nth(currentIndex).click();
+            (reason == "generalInfo") ?
+                await this.checkButton.nth(currentIndex).click() :
+                await this.checkButton.nth(i).click();
             await this.closeNotifications("last");
             await this.waitForDisplayStatus(i);
             if(selectedState == DocStatus.notAccepted) currentIndex++;
@@ -290,7 +292,7 @@ export class RequestPage extends MainPage {
      */
     public async addExpertInfo() : Promise<void> {
         let docsCount : number = await this.checkButton.count();
-        await this.fillStatusAndComment(docsCount);
+        await this.fillStatusAndComment(docsCount,"generalInfo");
         await this.sectionByEnum(RequestSections.criterias).click();
         const groupsCount : number = await this.criteriaGroups.count();
         for(let i = 0; i<groupsCount;i++) {
@@ -303,7 +305,7 @@ export class RequestPage extends MainPage {
                 else if(criteriaType == CriteriaTypes.ofi) await this.ofiCriteriaInfo.click();
             }
             docsCount = await this.checkButton.count();
-            await this.fillStatusAndComment(docsCount);
+            await this.fillStatusAndComment(docsCount,"criterias");
             await this.fillExpertSolution();
             await expect(this.expertReportFile).toBeVisible();
         }

@@ -40,7 +40,8 @@ export class Commission extends Catalogs {
         const api = new Api();
         const response = await superagent.get(api.basicUrl + api.request.requestsList).
         query({pageNum : 0, pageSize : 10}).
-        set("cookie", `${this.cookie}`);
+        set("cookie", `${this.cookie}`).
+        set("x-csrf-token",this.x_csrf_token);
         const licIds : number[] = response.body.data.map((value: TLicense) => value.id);
         const licStatusId : number = this.licStatusByEnum(LicStatus.waitForCommission).id;
         const dbHelper = new DbHelper();
@@ -139,7 +140,8 @@ export class Commission extends Catalogs {
      */
     public async refreshCommission(api : Api) : Promise<void> {
         const response = await superagent.get(api.basicUrl + api.commissions.getCommission).
-        set("cookie", `${this.cookie}`);
+        set("cookie", `${this.cookie}`).
+        set("x-csrf-token",this.x_csrf_token);
         this.fillCommission(0,response);
     }
 }

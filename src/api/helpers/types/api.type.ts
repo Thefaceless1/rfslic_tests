@@ -36,13 +36,15 @@ export type TRequest = {
     publishLicense? : string,
     createExpertReport? : string,
     checkDocument? : string,
-    fillApi (license : TLicense) : void
+    clubWorkers? : string,
+    fillApi (license : TLicense,groupId? : number) : void
 }
 export type TUser = {
-    clubWorkers : string,
+    persons : string,
     critGrpExperts : string,
     organization : string,
     activeUsers : string,
+    currentUser : string,
     setUser? : string,
     fillApi (userId : number) : void
 }

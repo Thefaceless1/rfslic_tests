@@ -51,10 +51,10 @@ export class Admin extends Catalogs {
      */
     public async checkUser() : Promise<void> {
         const dbHelper = new DbHelper();
-        const dbUserData = await dbHelper.select(workUsers.tableName,workUsers.columns.userId,this.clubWorkersId[0]);
+        const dbUserData = await dbHelper.select(workUsers.tableName,workUsers.columns.userId,this.personsId[0]);
         if (dbUserData.length != 0) {
-            await dbHelper.delete(operationsLog.tableName,operationsLog.columns.userId,this.clubWorkersId[0]);
-            await dbHelper.delete(workUsers.tableName,workUsers.columns.userId,this.clubWorkersId[0]);
+            await dbHelper.delete(operationsLog.tableName,operationsLog.columns.userId,this.personsId[0]);
+            await dbHelper.delete(workUsers.tableName,workUsers.columns.userId,this.personsId[0]);
         }
         await dbHelper.closeConnect();
     }

@@ -15,7 +15,8 @@ describe("License requests", () => {
     test("Creating a request in 'draft' status",async () => {
         const response = await superagent.put(api.basicUrl+api.request.createLicense).
         send(license.createLicense(license.prolicense)).
-        set("cookie", `${license.cookie}`);
+        set("cookie", `${license.cookie}`).
+        set("x-csrf-token",license.x_csrf_token);
         expect(response.body.data.proLicId).toBe(license.prolicense[0].id);
         expect(response.body.data.state).toBe(LicStatus.new);
         expect(response.body.data.percent).toBe(0);
@@ -38,27 +39,30 @@ describe("License requests", () => {
             })
         })
     })
+    test("Publish license", async () => {
+        const response = await superagent.put(api.basicUrl + api.request.publishLicense).
+        send(license.publishLicense()).
+        set("cookie", `${license.cookie}`).
+        set("x-csrf-token",license.x_csrf_token);
+        expect(response.body.data.state).toBe(license.licStatusByEnum(LicStatus.inWork).name);
+        license.fillLicense(0,response);
+    })
     test("Adding documents and comments on the 'General Information' tab",async () => {
         const response = await superagent.put(api.basicUrl + api.request.changeLicense).
         send(license.addCommentsAndDocuments()).
-        set("cookie", `${license.cookie}`);
+        set("cookie", `${license.cookie}`).
+        set("x-csrf-token",license.x_csrf_token);
         license.fillLicense(0,response);
         license.license[0].documents.forEach((document) => {
             expect(document.comment).toBe(TestData.commentValue);
             expect(document.files.length).toBe(license.files.length);
         })
     })
-    test("Publish license", async () => {
-        const response = await superagent.put(api.basicUrl + api.request.publishLicense).
-        send(license.publishLicense()).
-        set("cookie", `${license.cookie}`);
-        expect(response.body.data.state).toBe(license.licStatusByEnum(LicStatus.inWork).name);
-        license.fillLicense(0,response);
-    })
     test("Adding club workers and experts to the criteria group", async () => {
         const response = await superagent.put(api.basicUrl + api.request.changeLicense).
-        send(license.addClubWorkersToCritGrp()).
-        set("cookie", `${license.cookie}`);
+        send(await license.addClubWorkersToCritGrp()).
+        set("cookie", `${license.cookie}`).
+        set("x-csrf-token",license.x_csrf_token);
         license.license[0].criteriaGroups.forEach((criteriaGroup, index) => {
             expect(criteriaGroup.experts).toEqual(response.body.data.criteriaGroups[index].experts);
             expect(criteriaGroup.rfuExpert).toBe(response.body.data.criteriaGroups[index].rfuExpert);
@@ -68,7 +72,8 @@ describe("License requests", () => {
     test("Adding participants and OFI for criterias with Participant and OFI types",async () => {
         const response = await superagent.put(api.basicUrl + api.request.changeLicense).
         send(license.addOfiAndUsers()).
-        set("cookie", `${license.cookie}`);
+        set("cookie", `${license.cookie}`).
+        set("x-csrf-token",license.x_csrf_token);
         license.fillLicense(0,response);
         const criteriaCount = license.criteriaTypes.length;
         license.license[0].criteriaGroups.forEach(critGrp => {
@@ -78,7 +83,8 @@ describe("License requests", () => {
     test("Adding documents, club workers, OFI, organizations and comments for criteria documents", async () => {
         const response = await superagent.put(api.basicUrl + api.request.changeLicense).
         send(license.addDataToCritDoc()).
-        set("cookie", `${license.cookie}`);
+        set("cookie", `${license.cookie}`).
+        set("x-csrf-token",license.x_csrf_token);
         license.fillLicense(0,response);
         license.license[0].criteriaGroups.forEach((criteriaGroup) => {
             criteriaGroup.criterias.forEach((criteria) => {
@@ -92,7 +98,8 @@ describe("License requests", () => {
     test("Removing request file",async () => {
         const fileForRemoving : Templates = license.license[0].documents[0].files[0];
         await superagent.delete(api.basicUrl + api.request.deleteReqFile + fileForRemoving.id).
-        set("cookie", `${license.cookie}`);
+        set("cookie", `${license.cookie}`).
+        set("x-csrf-token",license.x_csrf_token);
         await license.refreshLicense(api);
         const isHaveFile : boolean = license.license[0].documents[0].files.includes(fileForRemoving);
         expect(isHaveFile).toBeFalsy();
@@ -100,21 +107,24 @@ describe("License requests", () => {
     test("Removing criteria document file",async () => {
         const fileForRemoving : Templates = license.license[0].criteriaGroups[0].criterias[0].documents[0].files[0];
         await superagent.delete(api.basicUrl + api.request.deleteDocFile + fileForRemoving.id).
-        set("cookie", `${license.cookie}`);
+        set("cookie", `${license.cookie}`).
+        set("x-csrf-token",license.x_csrf_token);
         await license.refreshLicense(api);
         const isHaveFile : boolean = license.license[0].criteriaGroups[0].criterias[0].documents[0].files.includes(fileForRemoving);
         expect(isHaveFile).toBeFalsy();
     })
     test("Submit all the criteria group documents for review",async () => {
         await superagent.put(api.basicUrl + api.request.checkDocument).
-        set("cookie", `${license.cookie}`);
+        set("cookie", `${license.cookie}`).
+        set("x-csrf-token",license.x_csrf_token);
         await license.refreshLicense(api);
         expect(license.license[0].criteriaGroups[0].state).toBe(DocumentStatus.underReview);
     })
     test("Setting statuses and comments for documents",async () => {
         const response = await superagent.put(api.basicUrl + api.request.changeLicense).
         send(license.addStatusToDocuments()).
-        set("cookie", `${license.cookie}`);
+        set("cookie", `${license.cookie}`).
+        set("x-csrf-token",license.x_csrf_token);
         license.fillLicense(0,response);
         expect(license.licPercent).toBe(Math.round(license.license[0].percent));
         license.license[0].criteriaGroups.forEach((criteriaGroup) => {
@@ -157,7 +167,8 @@ describe("License requests", () => {
             const groupId : number = license.criteriaGroups[i].id;
             const response = await superagent.post(api.basicUrl + api.request.createExpertReport).
             send(license.addExpertReport(groupId)).
-            set("cookie", `${license.cookie}`);
+            set("cookie", `${license.cookie}`).
+            set("x-csrf-token",license.x_csrf_token);
             expect(response.body.data.fileName).toBeTruthy();
             expect(response.body.data.storageId).toBeTruthy();
         }
@@ -166,9 +177,17 @@ describe("License requests", () => {
     test("Adding conclusions for a request",async () => {
         const response = await superagent.put(api.basicUrl + api.request.changeLicense).
         send(license.addConclusions()).
-        set("cookie", `${license.cookie}`);
+        set("cookie", `${license.cookie}`).
+        set("x-csrf-token",license.x_csrf_token);
         expect(response.body.data.recommendation).toBe(TestData.commentValue);
         expect(response.body.data.conclusion).toBe(TestData.commentValue);
         expect(response.body.data.rplCriterias).toBe(TestData.commentValue);
+    })
+    test("Changing request status",async () => {
+        const response = await superagent.put(api.basicUrl + api.request.changeLicense).
+        send(license.changeLicStatus()).
+        set("cookie", `${license.cookie}`).
+        set("x-csrf-token",license.x_csrf_token);
+        expect(response.body.data.state).toBe(LicStatus.waitForCommission);
     })
 })

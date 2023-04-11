@@ -34,7 +34,7 @@ export class NotificationsPage extends MainPage {
      * Column "Date and time created"
      */
     private get createdDateColumn() : Locator {
-        return Elements.getElement(this.page,"//td[@class='ant-table-cell'][4]");
+        return Elements.getElement(this.page,"//td[@class='ant-table-cell'][3]");
     }
     /**
      * Button "Delete selected"

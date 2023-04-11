@@ -81,7 +81,8 @@ export class Prolicense extends Catalogs {
         this.createProlicense();
         const response = await superagent.put(api.basicUrl + api.constructors.createProlicense).
         send(this.prolicense[0]).
-        set("cookie", `${this.cookie}`);
+        set("cookie", `${this.cookie}`).
+        set("x-csrf-token",this.x_csrf_token);
         this.fillProlicense(0,response);
     }
     /**
@@ -152,7 +153,8 @@ export class Prolicense extends Catalogs {
         for (const i of this.criterias) {
             await superagent.put(api.basicUrl + api.constructors.createCriteriaGrp).
             query({groupId: i.id, experts: i.experts}).
-            set("cookie", `${this.cookie}`);
+            set("cookie", `${this.cookie}`).
+            set("x-csrf-token",this.x_csrf_token);
         }
         this.createCriterias();
         for(const criteriaGroup of this.criterias) {
@@ -160,9 +162,16 @@ export class Prolicense extends Catalogs {
                 const index = criteriaGroup.criterias.indexOf(criteria);
                 const response = await superagent.put(api.basicUrl + api.constructors.createCriterias).
                 send(criteria).
-                set("cookie", `${this.cookie}`);
+                set("cookie", `${this.cookie}`).
+                set("x-csrf-token",this.x_csrf_token);
                 criteriaGroup.criterias[index] = response.body.data;
             }
         }
+    }
+    public async refreshProlicense(api : Api) : Promise<void> {
+        const response = await superagent.get(api.basicUrl + api.constructors.changeProlicense).
+        set("cookie", `${this.cookie}`).
+        set("x-csrf-token",this.x_csrf_token);
+        this.fillProlicense(0,response);
     }
 }
