@@ -147,6 +147,10 @@ export class RequestPage extends MainPage {
      */
     private loader : Locator = Elements.getElement(this.page,"//*[contains(@class,'ProgressSpin-Circle')]");
     /**
+     * Title of the modal window "Change ticket status"
+     */
+    private changeLicStatusTitle : Locator = Elements.getElement(this.page,"//*[contains(@class,'ChangeRequestStatusModal_modal_titleWrapper')]");
+    /**
      * Get the drop-down list value of the 'License decision' field by enum
      */
     private selectLicStatusByEnum(statusValue : LicStatus ) : Locator {
@@ -257,13 +261,15 @@ export class RequestPage extends MainPage {
      * Edit license status by enum
      */
     public async editLicStatus(statusValue: LicStatus) : Promise<void> {
+        await this.page.reload();
+        await this.page.waitForLoadState();
         await this.licEditButton.click();
         await this.selectLicStatus.click();
         await Elements.waitForVisible(this.selectLicStatusByEnum(statusValue));
         await this.selectLicStatusByEnum(statusValue).click();
         await this.saveButton.last().click();
         await Elements.waitForVisible(this.loader);
-        await Elements.waitForHidden(this.loader);
+        await Elements.waitForHidden(this.changeLicStatusTitle);
         const licStatusValue : string = await this.currentLicStatus.innerText();
         await expect(licStatusValue.toLowerCase()).toBe(LicStatus.waitForCommission.toLowerCase());
     }
@@ -309,18 +315,20 @@ export class RequestPage extends MainPage {
             await this.fillExpertSolution();
             await expect(this.expertReportFile).toBeVisible();
         }
+        const licStatusValue : string = await this.currentLicStatus.innerText();
+        await expect(licStatusValue.toLowerCase()).toBe(LicStatus.readyForReport.toLowerCase());
     }
     /**
      * Fill the fields "Conclusion of the RFS manager", "Recommendations on sanctions", "RPL criterias"
      */
     public async addConclusions() : Promise<void> {
-        await Elements.waitForVisible(this.licStatusByEnum(LicStatus.readyForReport));
         await this.sectionByEnum(RequestSections.generalInfo).click();
         await Elements.waitForVisible(this.conclusion);
         await this.conclusion.type(InputData.randomWord);
         await this.recommendation.type(InputData.randomWord);
         await this.rplCriterias.type(InputData.randomWord);
         await this.saveButton.click();
+        await Elements.waitForVisible(this.saveButton);
         const conclusionText : string | null = await this.conclusion.textContent();
         const recommendationText : string | null = await this.recommendation.textContent();
         const rplCriteriasText : string | null = await this.rplCriterias.textContent();
@@ -414,7 +422,7 @@ export class RequestPage extends MainPage {
         await Elements.waitForVisible(this.docIcon);
         await Elements.waitForVisible(this.xlsxIcon);
         await this.comment.type(InputData.randomWord);
-        await this.addButton.click();
+        await this.addButton.click({timeout: 1000});
         await this.closeNotifications("last");
     }
 }

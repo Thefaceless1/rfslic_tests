@@ -96,6 +96,7 @@ export const test = base.extend<Fixtures>({
     notifications : async ({page},use) => {
         const notification = new NotificationsPage(page);
         await notification.createUser();
+        await notification.checkNotificationUser();
         await notification.login()
         await use(notification);
     }

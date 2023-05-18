@@ -23,10 +23,6 @@ export class BasePage extends PlaywrightDevPage{
      */
     protected plusButton : Locator = Elements.getElement(this.page,"//button[contains(@class,'Button_view_secondary')][.//span[contains(@class,'IconAdd')]]");
     /**
-     * Button "Save"
-     */
-    protected saveButton = Elements.getElement(this.page,"//button[text()='Сохранить']");
-    /**
      * Button "Delete"
      */
     protected deleteButton = Elements.getElement(this.page,"//button[text()='Удалить']");
@@ -71,10 +67,6 @@ export class BasePage extends PlaywrightDevPage{
      */
     protected comment : Locator = Elements.getElement(this.page,"//textarea[@name='comment']");
     /**
-     * Field "Description"
-     */
-    protected description : Locator = Elements.getElement(this.page,"//textarea[@name='description' or @placeholder='Описание']");
-    /**
      * Button "Edit group" in a table
      */
     protected editTableButton : Locator = Elements.getElement(this.page,"//span[contains(@class,'IconEdit')]");
@@ -83,10 +75,6 @@ export class BasePage extends PlaywrightDevPage{
      */
     protected deleteTableButton : Locator = Elements.getElement(this.page,"//span[contains(@class,'IconTrash')]");
     /**
-     * Button "Add"
-     */
-    protected addButton : Locator = Elements.getElement(this.page,"//button[text()='Добавить']");
-    /**
      * Search button to call a modal window for club workers, organizations, ofi
      */
     protected searchDataButton : Locator = Elements.getElement(this.page,"//button//span[contains(@class,'IconSearch')]");
@@ -94,10 +82,6 @@ export class BasePage extends PlaywrightDevPage{
      * Field "License type"
      */
     protected licType : Locator = Elements.getElement(this.page,"//*[contains(@class,'type__control') or contains(@class,'licType__control')]");
-    /**
-     * Field "Name"
-     */
-    protected name : Locator = Elements.getElement(this.page,"//input[@name='name']");
     /**
      * Button "Add criteria groups"
      */
@@ -123,10 +107,34 @@ export class BasePage extends PlaywrightDevPage{
      */
     protected numberLicenseColumn : Locator = Elements.getElement(this.page,"//td[@class='ant-table-cell'][2]");
     /**
+     * Field "Name"
+     */
+    protected get name() : Locator {
+        return Elements.getElement(this.page,"//input[@name='name']");
+    }
+    /**
+     * Button "Add"
+     */
+    protected get addButton() : Locator {
+        return Elements.getElement(this.page,"//button[text()='Добавить']");
+    }
+    /**
+     * Field "Description"
+     */
+    protected get description() : Locator {
+        return Elements.getElement(this.page,"//*[@name='description' or @placeholder='Описание' or @placeholder='Введите описание']");
+    }
+    /**
+     * Button "Save"
+     */
+    protected get saveButton() : Locator {
+        return Elements.getElement(this.page,"//button[text()='Сохранить']");
+    }
+    /**
      * Checkboxes
      */
     public get checkbox() : Locator {
-        return Elements.getElement(this.page,"//input[@type='checkbox']");
+        return Elements.getElement(this.page,"//input[@type='checkbox' and not(@disabled) and not(contains(@name,'isGetNotify'))]");
     }
     /**
      * Get notification by text

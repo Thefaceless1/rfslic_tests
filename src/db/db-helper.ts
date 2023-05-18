@@ -3,6 +3,7 @@ import fs from "fs";
 import {licenses, userNotifications, userRights, workUsers} from "./tables.js";
 import {Roles} from "../e2e/page-objects/helpers/enums/roles.js";
 import {UserRights} from "../e2e/page-objects/helpers/enums/user-rights.js";
+import {NotificationRoles} from "../e2e/page-objects/helpers/enums/notification-roles.js";
 
 export class DbHelper {
    public readonly sqlLic : postgres.Sql<Record<string, postgres.PostgresType> extends {} ? {} : any>
@@ -24,7 +25,7 @@ export class DbHelper {
         return this.sqlLic`SELECT * FROM ${this.sqlLic(table)} WHERE ${this.sqlLic(column)} = ${data}`
     }
     /**
-     * Add a user in 'work users' table
+     * Create a user in the license module system
      */
     public async insertUser(userId : number) : Promise<void> {
         await this.sqlLic`INSERT INTO ${this.sqlLic(workUsers.tableName)} 
@@ -89,6 +90,33 @@ export class DbHelper {
         await this.sqlNot`UPDATE ${this.sqlLic(userNotifications.tableName)}
                        SET ${this.sqlLic(userNotifications.columns.isReceived)} = false
                        WHERE ${this.sqlLic(userNotifications.columns.userId)} = ${userId}`;
+    }
+    /**
+     * Get notification user role Id
+     */
+    public async getUserRoleId(userId : number) : Promise<[{user_id : number}]> {
+        return this.sqlNot`SELECT ${this.sqlNot(workUsers.columns.roleId)}
+                           FROM ${this.sqlNot(workUsers.notificationTableName)}
+                           WHERE ${this.sqlNot(workUsers.columns.userId)} = ${userId}`;
+    }
+    /**
+     * Create a user in the notification module system
+     */
+    public async insertNotificationUser(userId : number) : Promise<void> {
+        await this.sqlNot`INSERT INTO ${this.sqlNot(workUsers.notificationTableName)}
+                          (${this.sqlNot(workUsers.columns.userId)},
+                           ${this.sqlNot(workUsers.columns.roleId)},
+                           ${this.sqlNot(workUsers.columns.isActive)})
+                          VALUES
+                          (${userId}, ${NotificationRoles.admin}, ${true})`;
+    }
+    /**
+     * Set "Administrator" role for user
+     */
+    public async setAdminRole(userId : number) : Promise<void> {
+        await this.sqlNot`UPDATE ${this.sqlNot(workUsers.notificationTableName)}
+                          SET ${this.sqlNot(workUsers.columns.roleId)} = ${NotificationRoles.admin}
+                          WHERE ${this.sqlNot(workUsers.columns.userId)} = ${userId}`;
     }
     /**
      * Close connect to databases

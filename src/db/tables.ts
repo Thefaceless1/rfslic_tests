@@ -1,5 +1,6 @@
 export const workUsers = {
     tableName : "rfslic.work_users",
+    notificationTableName : "rfsntf.work_users",
     columns : {
         userId : "user_id",
         isActive : "is_active",

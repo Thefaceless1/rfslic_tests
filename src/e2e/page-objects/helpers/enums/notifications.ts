@@ -14,5 +14,6 @@ export enum Notifications {
     userRoleChanged = "Роль пользователя изменена",
     userGroupsChanged = "Группы критериев пользователя изменены",
     prolicenseRemoved = "Пролицензия удалена",
-    requestAdded = "Заявка подана"
+    requestAdded = "Заявка подана",
+    subscriptionChanged = "Подписка обновлена"
 }
