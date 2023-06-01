@@ -1,5 +1,6 @@
 import type { PlaywrightTestConfig } from '@playwright/test';
 import { devices } from '@playwright/test';
+import * as Process from "process";
 
 /**
  * Read environment variables from file.
@@ -30,16 +31,16 @@ const config: PlaywrightTestConfig = {
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : 1,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: [['html',{outputFolder : 'src/e2e/artifacts/report', open : "never",outputFile : "report"}]],
+  reporter: [['html',{outputFolder : 'src/e2e/artifacts/report', open : "never"}]],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     screenshot : "only-on-failure",
-    headless : !!process.env.CI,
+    headless : false,
     viewport: null,
     /* Maximum time each action such as `click()` can take. Defaults to 0 (no limit). */
     actionTimeout: 0,
     /* Base URL to use in actions like `await page.goto('/')`. */
-     baseURL: 'https://rfs-lic-test-01.fors.ru/',
+     baseURL: (Process.env.BRANCH == "prod") ? 'https://preprod.platform.rfs.ru/' : 'https://rfs-lic-test-01.fors.ru/',
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',

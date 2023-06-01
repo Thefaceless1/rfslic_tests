@@ -1,6 +1,6 @@
 import {test} from "../../page-objects/helpers/fixtures/fixtures.js";
 
-test.describe("Prolicense", () => {
+test.describe.only("Prolicense", () => {
     test("Prolicense scenario",async ({constructor}) => {
         await test.step("Creation a prolicense",async () => await constructor.createProlicense());
         await test.step("Changing the general information of a prolicense",async () => await constructor.changeBasicInfo());

@@ -143,10 +143,6 @@ export class RequestPage extends MainPage {
      */
     private attachedFile : Locator = Elements.getElement(this.page,"//*[contains(@class,'DocumentInfo_file_wrapper')][1]");
     /**
-     * Loader
-     */
-    private loader : Locator = Elements.getElement(this.page,"//*[contains(@class,'ProgressSpin-Circle')]");
-    /**
      * Title of the modal window "Change ticket status"
      */
     private changeLicStatusTitle : Locator = Elements.getElement(this.page,"//*[contains(@class,'ChangeRequestStatusModal_modal_titleWrapper')]");
@@ -222,12 +218,14 @@ export class RequestPage extends MainPage {
             await this.criteriaGroups.nth(i).click();
             await Elements.waitForVisible(this.criteriaInfo.first())
             const criteriaCount : number = await this.criteriaInfo.count();
+            for(let m = 0; m < criteriaCount;m++) {
+                await this.criteriaInfo.nth(m).click();
+                await Elements.waitForVisible(this.critTypeValue.nth(m));
+            }
             let currMaxDocNumb : number = await this.submitReviewButton.count()/criteriaCount;
             const step : number = currMaxDocNumb;
             let currDocNumb : number = 0;
             for (let x = 0; x < criteriaCount; x++) {
-                await this.criteriaInfo.nth(x).click();
-                await Elements.waitForVisible(this.critTypeValue.nth(x));
                 const critTypeName : string = await this.critTypeValue.nth(x).innerText();
                 switch (critTypeName) {
                     case CriteriaTypes.documents : {
@@ -268,7 +266,6 @@ export class RequestPage extends MainPage {
         await Elements.waitForVisible(this.selectLicStatusByEnum(statusValue));
         await this.selectLicStatusByEnum(statusValue).click();
         await this.saveButton.last().click();
-        await Elements.waitForVisible(this.loader);
         await Elements.waitForHidden(this.changeLicStatusTitle);
         const licStatusValue : string = await this.currentLicStatus.innerText();
         await expect(licStatusValue.toLowerCase()).toBe(LicStatus.waitForCommission.toLowerCase());

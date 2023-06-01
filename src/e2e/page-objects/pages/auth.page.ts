@@ -5,8 +5,12 @@ import {DbHelper} from "../../../db/db-helper.js";
 import {operationsLog, workUsers} from "../../../db/tables.js";
 import {Api} from "../helpers/enums/api.js";
 import {Roles} from "../helpers/enums/roles.js";
+import twoFactor from "node-2fa";
+import * as Process from "process";
 
 export class AuthPage extends BasePage {
+    private readonly userMail : string = "sync-license@rfs.ru"
+    private readonly userPassword : string = "RfsTest2023"
     private readonly userNumber : number = 0;
     protected userId : number = 0;
     constructor(page : Page) {
@@ -28,6 +32,26 @@ export class AuthPage extends BasePage {
      * 'Check user' menu dropdown values
      */
     private selectUserMenuList : Locator = Elements.getElement(this.page,"//*[contains(@class,'user__option')]");
+    /**
+     * Field "E-mail"
+     */
+    private email : Locator = Elements.getElement(this.page,"//input[@name='email']");
+    /**
+     * Field "Password"
+     */
+    private password : Locator = Elements.getElement(this.page,"//input[@name='password']");
+    /**
+     * Field "Confirmation code"
+     */
+    private confirmationCode : Locator = Elements.getElement(this.page,"//input[@placeholder='Код подтверждения']");
+    /**
+     * Button "Confirm"
+     */
+    private confirmButton : Locator = Elements.getElement(this.page,"//button[text()='Подтвердить']");
+    /**
+     * Button "Enter"
+     */
+    private enterButton : Locator = Elements.getElement(this.page,"//button[text()='Войти']");
     /**
      * Create a user with 'Administrator' role
      */
@@ -51,14 +75,25 @@ export class AuthPage extends BasePage {
      */
     public async login() : Promise<void> {
         await this.page.goto("");
-        await Elements.waitForVisible(this.authAvatar);
-        await this.checkSelectUserButton();
-        await this.selectUserButton.click();
-        await Elements.waitForVisible(this.selectUserMenu);
-        await this.selectUserMenu.click();
-        await Elements.waitForVisible(this.selectUserMenuList.first());
-        await this.selectUserMenuList.nth(this.userNumber).click();
-        await this.saveButton.click();
+        if (Process.env.BRANCH == "prod") {
+            await Elements.waitForVisible(this.email);
+            await this.email.type(this.userMail);
+            await this.password.type(this.userPassword);
+            await this.enterButton.click();
+            await Elements.waitForVisible(this.confirmationCode);
+            await this.confirmationCode.type(this.get2FaToken);
+            await this.confirmButton.click();
+        }
+        else {
+            await Elements.waitForVisible(this.authAvatar);
+            await this.checkSelectUserButton();
+            await this.selectUserButton.click();
+            await Elements.waitForVisible(this.selectUserMenu);
+            await this.selectUserMenu.click();
+            await Elements.waitForVisible(this.selectUserMenuList.first());
+            await this.selectUserMenuList.nth(this.userNumber).click();
+            await this.saveButton.click();
+        }
     }
     /**
      * Check for the 'Select user' button
@@ -67,5 +102,9 @@ export class AuthPage extends BasePage {
         await this.authAvatar.click();
         if(await this.selectUserButton.isVisible()) return;
         else setTimeout(() =>this.checkSelectUserButton(),500);
+    }
+    private get get2FaToken() : string {
+        const token = twoFactor.generateToken("MFEONTQDSEYUEMWYXWJMPJY6QZSYO2U7");
+        return (token) ? token.token : this.get2FaToken;
     }
 }

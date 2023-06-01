@@ -23,10 +23,6 @@ export class BasePage extends PlaywrightDevPage{
      */
     protected plusButton : Locator = Elements.getElement(this.page,"//button[contains(@class,'Button_view_secondary')][.//span[contains(@class,'IconAdd')]]");
     /**
-     * Button "Delete"
-     */
-    protected deleteButton = Elements.getElement(this.page,"//button[text()='Удалить']");
-    /**
      * Button "Cancel"
      */
     protected cancelButton = Elements.getElement(this.page,"//button[text()='Отменить']");
@@ -71,10 +67,6 @@ export class BasePage extends PlaywrightDevPage{
      */
     protected editTableButton : Locator = Elements.getElement(this.page,"//span[contains(@class,'IconEdit')]");
     /**
-     * Button "Delete group" in a table
-     */
-    protected deleteTableButton : Locator = Elements.getElement(this.page,"//span[contains(@class,'IconTrash')]");
-    /**
      * Search button to call a modal window for club workers, organizations, ofi
      */
     protected searchDataButton : Locator = Elements.getElement(this.page,"//button//span[contains(@class,'IconSearch')]");
@@ -106,6 +98,18 @@ export class BasePage extends PlaywrightDevPage{
      * column "Number of a license" in Licenses table
      */
     protected numberLicenseColumn : Locator = Elements.getElement(this.page,"//td[@class='ant-table-cell'][2]");
+    /**
+     * Button "Delete"
+     */
+    protected get deleteButton() : Locator {
+        return Elements.getElement(this.page,"//button[text()='Удалить']");
+    }
+    /**
+     * Button "Delete" in a table
+     */
+    protected get deleteTableButton() : Locator {
+        return Elements.getElement(this.page,"//span[contains(@class,'IconTrash')]");
+    }
     /**
      * Field "Name"
      */

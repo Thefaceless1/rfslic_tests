@@ -8,7 +8,8 @@ import {InputData} from "../../helpers/input-data.js";
 import {randomInt} from "crypto";
 
 export class NotificationsPage extends MainPage {
-    private moduleName : string = InputData.randomWord;
+    private readonly moduleName : string = InputData.randomWord;
+    private templateName : string = InputData.randomWord;
     constructor(page : Page) {
         super(page);
     }
@@ -109,8 +110,8 @@ export class NotificationsPage extends MainPage {
     /**
      * Dropdown values of field "Select module"
      */
-    private get selectModuleValues() : Locator {
-        return Elements.getElement(this.page,"//*[contains(@class,'module__option')]");
+    private moduleValue(moduleName : string) : Locator {
+        return Elements.getElement(this.page,`//*[contains(@class,'module__option') and text()='${moduleName}']`);
     }
     /**
      * Button "Notification template management"
@@ -153,6 +154,18 @@ export class NotificationsPage extends MainPage {
      */
     private get period() : Locator {
         return Elements.getElement(this.page,"//input[@name='period']");
+    }
+    /**
+     * Get module by name
+     */
+    private getModuleByName(moduleName : string) : Locator {
+        return Elements.getElement(this.page,`//td[text()='${moduleName}']`);
+    }
+    /**
+     * Get template by name
+     */
+    private getTemplateByName(templateName : string) : Locator {
+        return Elements.getElement(this.page,`//textarea[contains(@name,'title') and text()='${templateName}']`);
     }
     /**
      * Button "Add module"
@@ -265,6 +278,7 @@ export class NotificationsPage extends MainPage {
         await this.name.type(this.moduleName);
         await this.description.type(InputData.randomWord);
         await this.addButton.click();
+        await expect(this.getModuleByName(this.moduleName)).toBeVisible();
     }
     /**
      * Add a notification template
@@ -272,11 +286,11 @@ export class NotificationsPage extends MainPage {
     public async addTemplate() : Promise<void> {
         await this.navigateTo("manageTemplates");
         await this.selectModule.click();
-        await Elements.waitForVisible(this.selectModuleValues.first());
-        await this.selectModuleValues.first().click();
+        await Elements.waitForVisible(this.moduleValue(this.moduleName));
+        await this.moduleValue(this.moduleName).click();
         await this.addTemplateButton.click();
         await this.code.type(InputData.randomWord);
-        await this.title.type(InputData.randomWord);
+        await this.title.type(this.templateName);
         await this.description.type(InputData.randomWord);
         await this.templateText.type(InputData.randomWord);
         const allCheckboxCount : number = await this.checkbox.count()
@@ -286,5 +300,27 @@ export class NotificationsPage extends MainPage {
         }
         await this.period.type(String(randomInt(0, 100)));
         await this.addButton.click();
+        await Elements.waitForHidden(this.addButton);
+        await expect(this.getTemplateByName(this.templateName)).toBeVisible();
+    }
+    /**
+     * Edit a notification template
+     */
+    public async editTemplate() : Promise<void> {
+        const newTemplateName : string = InputData.randomWord;
+        await this.getTemplateByName(this.templateName).fill(newTemplateName);
+        this.templateName = newTemplateName;
+        const checkboxCount : number = await this.checkbox.count();
+        for (let i=0;i<checkboxCount;i++) {
+            await this.checkbox.nth(i).click()
+        }
+        await this.saveButton.click();
+        await expect(this.getTemplateByName(this.templateName)).toBeVisible();
+    }
+    public async deleteTemplate() : Promise<void> {
+        await this.deleteTableButton.click();
+        await this.deleteButton.click();
+        await Elements.waitForHidden(this.deleteButton);
+        await expect(this.getTemplateByName(this.templateName)).not.toBeVisible;
     }
 }
