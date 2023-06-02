@@ -30,14 +30,14 @@ type Fixtures = {
 export const test = base.extend<Fixtures>({
     constructor : async ({page},use) => {
         const constructor = new ConstructorNewPage(page);
-        if (!Process.env.BRANCH) await constructor.createUser();
+        if (Process.env.BRANCH != "prod") await constructor.createUser();
         await constructor.login();
         await constructor.openConstructor();
         await use(constructor);
     },
     requests : async ({page},use) => {
         const request = new RequestPage(page);
-        if (!Process.env.BRANCH) await request.createUser();
+        if (Process.env.BRANCH != "prod") await request.createUser();
         await request.login();
         await request.createTestProlicense();
         await request.goto(Pages.requestNewPage);
@@ -47,16 +47,16 @@ export const test = base.extend<Fixtures>({
     },
     roles : async ({page},use) => {
         const roles = new RolesPage(page);
-        if (!Process.env.BRANCH) await roles.createUser();
+        if (Process.env.BRANCH != "prod") await roles.createUser();
         await roles.login();
         await roles.adminMenuByEnum(AdminOptions.roles).click();
         await use(roles);
     },
     users : async ({page},use) => {
         const users = new UsersPage(page);
-        if (!Process.env.BRANCH) await users.createUser();
+        if (Process.env.BRANCH != "prod") await users.createUser();
         await users.login();
-        await users.deleteUser();
+        if (Process.env.BRANCH != "prod") await users.deleteUser();
         await users.adminMenuByEnum(AdminOptions.users).click();
         await use(users);
     },
@@ -68,13 +68,13 @@ export const test = base.extend<Fixtures>({
     },
     licenseText : async ({page},use) => {
         const licenseText = new LicTextPage(page);
-        if (!Process.env.BRANCH) await licenseText.createUser();
+        if (Process.env.BRANCH != "prod") await licenseText.createUser();
         await licenseText.login();
         await use(licenseText);
     },
     commission : async ({page},use) => {
         const commission = new CommissionPage(page);
-        if (!Process.env.BRANCH) await commission.createUser();
+        if (Process.env.BRANCH != "prod") await commission.createUser();
         await commission.login();
         await commission.changeLicensesStatus();
         await commission.commissionMenuByEnum(CommissionMenuOptions.meetings).click();
@@ -82,21 +82,21 @@ export const test = base.extend<Fixtures>({
     },
     groupClassifier : async ({page},use) => {
         const groupClassifier = new GroupsClassifierPage(page);
-        if (!Process.env.BRANCH) await groupClassifier.createUser();
+        if (Process.env.BRANCH != "prod") await groupClassifier.createUser();
         await groupClassifier.login();
         await groupClassifier.adminMenuByEnum(AdminOptions.groupsClassifier).click();
         await use(groupClassifier);
     },
     categoriesClassifier : async ({page},use) => {
         const categoriesClassifier = new CategoriesClassifierPage(page);
-        if (!Process.env.BRANCH) await categoriesClassifier.createUser();
+        if (Process.env.BRANCH != "prod") await categoriesClassifier.createUser();
         await categoriesClassifier.login();
         await categoriesClassifier.adminMenuByEnum(AdminOptions.categoriesClassifier).click();
         await use(categoriesClassifier);
     },
     notifications : async ({page},use) => {
         const notification = new NotificationsPage(page);
-        if (!Process.env.BRANCH) {
+        if (Process.env.BRANCH != "prod") {
             await notification.createUser();
             await notification.checkNotificationUser();
         }

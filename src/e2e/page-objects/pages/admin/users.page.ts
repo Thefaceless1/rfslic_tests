@@ -7,6 +7,7 @@ import {operationsLog, workUsers} from "../../../../db/tables.js";
 import {UserTabs} from "../../helpers/enums/usertabs.js";
 import {Api} from "../../helpers/enums/api.js";
 import {Notifications} from "../../helpers/enums/notifications.js";
+import * as Process from "process";
 
 export class UsersPage extends MainPage {
     private readonly createdUserNumber : number = 1
@@ -43,13 +44,17 @@ export class UsersPage extends MainPage {
      * Add a user
      */
     public async addUser() : Promise<void> {
+        const userRfsId : string = "826252";
         const searchModal = new SearchModalPage(this.page);
         await this.plusAddButton.click();
         await Elements.waitForVisible(this.searchDataButton);
         await this.searchDataButton.click();
+        if (Process.env.BRANCH == "prod") await searchModal.search.type(userRfsId);
         await searchModal.findButton.click();
         await Elements.waitForHidden(searchModal.loadIndicator.first());
-        await searchModal.radio.nth(this.createdUserNumber).click();
+        (Process.env.BRANCH == "prod") ?
+            await searchModal.radio.click() :
+            await searchModal.radio.nth(this.createdUserNumber).click();
         await searchModal.selectButton.click();
         await this.selectRole.click();
         await Elements.waitForVisible(this.rolesList.first());

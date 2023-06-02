@@ -22,4 +22,8 @@ export class SearchModalPage extends BasePage {
      * Table radio buttons with found values
      */
     public radio : Locator = Elements.getElement(this.page,"//input[@type='radio']");
+    /**
+     * Field "Enter name, last name or rfs id"
+     */
+    public search : Locator = Elements.getElement(this.page,"//input[@name='searchText']");
 }

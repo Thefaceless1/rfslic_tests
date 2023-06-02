@@ -35,7 +35,7 @@ export class AuthPage extends BasePage {
     /**
      * Field "E-mail"
      */
-    private email : Locator = Elements.getElement(this.page,"//input[@name='email']");
+    private email : Locator = Elements.getElement(this.page,"//input[@placeholder='E-mail']");
     /**
      * Field "Password"
      */
@@ -47,11 +47,11 @@ export class AuthPage extends BasePage {
     /**
      * Button "Confirm"
      */
-    private confirmButton : Locator = Elements.getElement(this.page,"//button[text()='Подтвердить']");
+    private confirmButton : Locator = Elements.getElement(this.page,"//button[text()='ПОДТВЕРДИТЬ']");
     /**
      * Button "Enter"
      */
-    private enterButton : Locator = Elements.getElement(this.page,"//button[text()='Войти']");
+    private enterButton : Locator = Elements.getElement(this.page,"//button[text()='ВОЙТИ']");
     /**
      * Create a user with 'Administrator' role
      */

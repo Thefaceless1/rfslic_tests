@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest --config jest.config.js"
+    "test": "jest --config jest.config.js",
+    "playwright_powershell": "$env:BRANCH=\"prod\"\nnpx playwright test\nallure generate src/e2e/artifacts/report -o src/e2e/artifacts/allure-report --clean\nallure open src/e2e/artifacts/allure-report",
+    "playwright_cmd": "set BRANCH=prod\nnpx playwright test & allure generate src/e2e/artifacts/report -o src/e2e/artifacts/allure-report --clean & allure open src/e2e/artifacts/allure-report"
   },
   "author": "shelekh mikhail",
   "license": "ISC",
@@ -15,6 +17,8 @@
     "@types/jest": "^29.2.4",
     "@types/node": "^18.11.13",
     "@types/superagent": "^4.1.16",
+    "allure-commandline": "^2.22.1",
+    "allure-playwright": "^2.4.0",
     "jest": "^29.3.1",
     "node": "^19.2.0",
     "node-2fa": "^2.0.3",

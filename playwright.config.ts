@@ -31,7 +31,11 @@ const config: PlaywrightTestConfig = {
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : 1,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: [['html',{outputFolder : 'src/e2e/artifacts/report', open : "never"}]],
+  reporter: [['allure-playwright',{
+    detail: true,
+    outputFolder: 'src/e2e/artifacts/report',
+    suiteTitle: false
+  }]],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     screenshot : "only-on-failure",
@@ -40,7 +44,7 @@ const config: PlaywrightTestConfig = {
     /* Maximum time each action such as `click()` can take. Defaults to 0 (no limit). */
     actionTimeout: 0,
     /* Base URL to use in actions like `await page.goto('/')`. */
-     baseURL: (Process.env.BRANCH == "prod") ? 'https://preprod.platform.rfs.ru/' : 'https://rfs-lic-test-01.fors.ru/',
+     baseURL: (Process.env.BRANCH == "prod") ? 'https://preprod-license.platform.rfs.ru/' : 'https://rfs-lic-test-01.fors.ru/',
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
