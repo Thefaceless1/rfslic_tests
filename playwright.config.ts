@@ -42,7 +42,7 @@ const config: PlaywrightTestConfig = {
     headless : true,
     viewport: null,
     /* Maximum time each action such as `click()` can take. Defaults to 0 (no limit). */
-    actionTimeout: 0,
+    actionTimeout: 25000,
     /* Base URL to use in actions like `await page.goto('/')`. */
      baseURL: (Process.env.BRANCH == "prod") ? 'https://preprod-license.platform.rfs.ru/' : 'https://rfs-lic-test-01.fors.ru/',
 

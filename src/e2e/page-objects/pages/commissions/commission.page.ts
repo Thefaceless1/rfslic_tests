@@ -10,6 +10,8 @@ import {Input} from "../../../framework/elements/input.js";
 import {MainMenuOptions} from "../../helpers/enums/main-menu-options.js";
 import {DbHelper} from "../../../../db/db-helper.js";
 import {FileReader} from "../../helpers/file-reader.js";
+import * as Process from "process";
+import {Columns} from "../../helpers/enums/columns.js";
 
 export class CommissionPage extends MainPage {
     constructor(page : Page) {
@@ -101,8 +103,9 @@ export class CommissionPage extends MainPage {
         await this.addRequestsButton.click();
         const searchModal = new SearchModalPage(this.page);
         await Elements.waitForHidden(searchModal.loadIndicator);
-        const requestsCount : number = await this.checkbox.count() - 1;
+        if (Process.env.BRANCH == "prod") await this.filterByColumn(this.filterButtonByEnum(Columns.licName).last());
         await this.checkbox.first().check();
+        const requestsCount : number = await this.checkbox.count() - 1;
         await searchModal.selectButton.click();
         await this.closeNotifications("all");
         await Elements.waitForVisible(this.tableRow.first());

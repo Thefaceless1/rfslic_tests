@@ -8,12 +8,13 @@ import {randomInt} from "crypto";
 import {LicStatus} from "../../helpers/enums/licstatus.js";
 import {CriteriaTypes} from "../../helpers/enums/criteriatypes.js";
 import {DocStatus} from "../../helpers/enums/docstatus.js";
-import {MainPage} from "../main.page.js";
 import {ConstructorNewPage} from "../constructor/constructor-new.page.js";
 import {Input} from "../../../framework/elements/input.js";
 import {Notifications} from "../../helpers/enums/notifications.js";
+import {Pages} from "../../helpers/enums/pages.js";
+import {CommissionPage} from "../commissions/commission.page.js";
 
-export class RequestPage extends MainPage {
+export class RequestPage extends CommissionPage {
     constructor(page : Page) {
         super(page);
     }
@@ -414,12 +415,26 @@ export class RequestPage extends MainPage {
     /**
      * Add files and comments for license documents
      */
-    protected async fillDocsAndComment () : Promise<void> {
+    protected async fillDocsAndComment() : Promise<void> {
         await Input.uploadFiles(this.templates.first(),"all");
         await Elements.waitForVisible(this.docIcon);
         await Elements.waitForVisible(this.xlsxIcon);
         await this.comment.type(InputData.randomWord);
-        await this.addButton.click({timeout: 1000});
+        try {
+            await this.addButton.click();
+        }
+        catch (err) {
+            await this.addButton.click();
+        }
         await this.closeNotifications("last");
+    }
+    /**
+     * Add commission decision for created license
+     */
+    public async addCommissionDecision() : Promise<void> {
+        await this.page.goto(Pages.commissionPage);
+        await this.createMeeting();
+        await this.addRequestsToMeeting();
+        await this.addRequestDecision();
     }
 }

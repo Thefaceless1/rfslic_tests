@@ -4,5 +4,6 @@ export enum Pages {
     constructorPage = "/#/constructor",
     requestPage = "/#/request",
     requestNewPage = "/#/request_new",
-    rolesPage = "/#/admin/roles"
+    rolesPage = "/#/admin/roles",
+    commissionPage = "/#/commissions/sessions"
 }
