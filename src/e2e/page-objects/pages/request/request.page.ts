@@ -357,7 +357,7 @@ export class RequestPage extends MainPage {
         for(let c = currDocNumb;c < currMaxDocNumb; c++) {
             await this.docTooltip.nth(c).click();
             await this.plusButton.first().click();
-            await Elements.waitForVisible(this.cancelButton);
+            await Elements.waitForVisible(this.addButton);
             await this.fillDocsAndComment();
             await this.checkCommentValue(c);
             await expect(this.attachedFile.nth(c)).toBeVisible();

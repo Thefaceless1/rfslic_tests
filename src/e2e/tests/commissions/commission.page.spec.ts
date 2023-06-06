@@ -1,6 +1,6 @@
 import {test} from "../../page-objects/helpers/fixtures/fixtures.js";
 
-test.describe.skip("Commissions", () => {
+test.describe("Commissions", () => {
     test("Commission scenario", async ({commission}) => {
         await test.step("Creating a meeting", async () => await commission.createMeeting());
         await test.step("Adding requests to a meeting", async () => await commission.addRequestsToMeeting());

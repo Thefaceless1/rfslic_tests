@@ -53,6 +53,10 @@ export class AuthPage extends BasePage {
      */
     private enterButton : Locator = Elements.getElement(this.page,"//button[text()='ВОЙТИ']");
     /**
+     * Message "Verification code entered incorrectly"
+     */
+    private invalidCodeMessage : Locator = Elements.getElement(this.page,"//p[text()='Неверно введён проверочный код']");
+    /**
      * Create a user with 'Administrator' role
      */
     public async createUser() : Promise<void> {
@@ -81,8 +85,7 @@ export class AuthPage extends BasePage {
             await this.password.type(this.userPassword);
             await this.enterButton.click();
             await Elements.waitForVisible(this.confirmationCode);
-            await this.confirmationCode.type(this.get2FaToken);
-            await this.confirmButton.click();
+            await this.setConfirmationCode();
         }
         else {
             await Elements.waitForVisible(this.authAvatar);
@@ -103,8 +106,20 @@ export class AuthPage extends BasePage {
         if(await this.selectUserButton.isVisible()) return;
         else setTimeout(() =>this.checkSelectUserButton(),500);
     }
+    /**
+     * Get 2FA code
+     */
     private get get2FaToken() : string {
         const token = twoFactor.generateToken("MFEONTQDSEYUEMWYXWJMPJY6QZSYO2U7");
         return (token) ? token.token : this.get2FaToken;
+    }
+    /**
+     * Enter confirmation code
+     */
+    private async setConfirmationCode() : Promise<void> {
+        await this.confirmationCode.clear();
+        await this.confirmationCode.type(this.get2FaToken);
+        await this.confirmButton.click();
+        if (await this.invalidCodeMessage.isVisible({timeout:500})) await this.setConfirmationCode();
     }
 }
