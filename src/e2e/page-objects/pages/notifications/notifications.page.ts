@@ -6,6 +6,7 @@ import {Notifications} from "../../helpers/enums/notifications.js";
 import {NotificationRoles} from "../../helpers/enums/notification-roles.js";
 import {InputData} from "../../helpers/input-data.js";
 import {randomInt} from "crypto";
+import * as Process from "process";
 
 export class NotificationsPage extends MainPage {
     private readonly moduleName : string = InputData.randomWord;
@@ -177,9 +178,11 @@ export class NotificationsPage extends MainPage {
      * Open selected notification
      */
     public async viewSelectedNotification() : Promise<void> {
-        const dbHelper = new DbHelper();
-        await dbHelper.markAsUnreadMessages(this.userId);
-        await dbHelper.closeConnect();
+        if (Process.env.BRANCH != "prod") {
+            const dbHelper = new DbHelper();
+            await dbHelper.markAsUnreadMessages(this.userId);
+            await dbHelper.closeConnect();
+        }
         await Elements.waitForVisible(this.countMessageIcon);
         await this.bellButton.click();
         await Elements.waitForVisible(this.unreadMessageList.first());

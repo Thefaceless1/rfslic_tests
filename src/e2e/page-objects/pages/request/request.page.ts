@@ -13,6 +13,7 @@ import {Input} from "../../../framework/elements/input.js";
 import {Notifications} from "../../helpers/enums/notifications.js";
 import {Pages} from "../../helpers/enums/pages.js";
 import {CommissionPage} from "../commissions/commission.page.js";
+import * as Process from "process";
 
 export class RequestPage extends CommissionPage {
     constructor(page : Page) {
@@ -177,7 +178,7 @@ export class RequestPage extends CommissionPage {
         for(let i = 0; i<groupsCount; i++) {
             if(i != 0) await this.criteriaGroups.nth(i).click();
             await Elements.waitForVisible(this.editButton.last());
-            const editCount = await this.editButton.count();
+            const editCount = (Process.env.BRANCH == "prod") ? 1 : await this.editButton.count();
             for(let c = 0;c<editCount; c++) {
                 await this.editButton.nth(c).click();
                 await this.fillExperts();

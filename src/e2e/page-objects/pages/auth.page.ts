@@ -104,7 +104,7 @@ export class AuthPage extends BasePage {
     private async checkSelectUserButton() : Promise<void> {
         await this.authAvatar.click();
         if(await this.selectUserButton.isVisible()) return;
-        else setTimeout(() =>this.checkSelectUserButton(),500);
+        else setTimeout(() => this.checkSelectUserButton(),500);
     }
     /**
      * Get 2FA code

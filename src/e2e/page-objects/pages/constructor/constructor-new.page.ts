@@ -106,6 +106,14 @@ export class ConstructorNewPage extends ConstructorPage {
      */
     private createdCriteria : Locator = Elements.getElement(this.page,"//span[contains(text(),'Название')]");
     /**
+     * Field "Multiple criteria"
+     */
+    private multipleCriteria : Locator = Elements.getElement(this.page,"//input[@name='isMulti']");
+    /**
+     * Field "Minimal amount"
+     */
+    private minAmount : Locator = Elements.getElement(this.page,"//input[@name='minCount']");
+    /**
      * Current displayed prolicense status
      */
     private prolicenseStatus(statusValue : string) : Locator {
@@ -280,6 +288,10 @@ export class ConstructorNewPage extends ConstructorPage {
         await this.description.type(InputData.randomWord)
         await this.criteriaType.click();
         await this.criteriaTypeList.filter({hasText : critType}).click();
+        if (critType == CriteriaTypes.ofi || critType == CriteriaTypes.member) {
+            await this.multipleCriteria.click();
+            await this.minAmount.type(String(randomInt(1,10)));
+        }
     }
     /**
      * Fill in the fields of criteria documents

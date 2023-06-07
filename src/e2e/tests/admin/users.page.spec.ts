@@ -1,6 +1,6 @@
 import {test} from "../../page-objects/helpers/fixtures/fixtures.js";
 
-test.describe.skip("Users",() => {
+test.describe("Users",() => {
     test("Users scenario",async ({users}) => {
         await test.step("Adding a new user",async () => await users.addUser());
         await test.step("Editing user rights",async () => await users.changeRoleRights("users"));
