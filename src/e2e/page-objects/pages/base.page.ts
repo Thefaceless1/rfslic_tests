@@ -23,10 +23,6 @@ export class BasePage extends PlaywrightDevPage{
      */
     protected plusButton : Locator = Elements.getElement(this.page,"//button[contains(@class,'Button_view_secondary')][.//span[contains(@class,'IconAdd')]]");
     /**
-     * Button "Cancel"
-     */
-    protected cancelButton = Elements.getElement(this.page,"//button[text()='Отменить']");
-    /**
      * Button "Edit"
      */
     protected editButton : Locator = Elements.getElement(this.page,"//button[contains(@class,'Button_view_secondary') and not(contains(@name,'editButton'))][.//span[contains(@class,'IconEdit')]]");

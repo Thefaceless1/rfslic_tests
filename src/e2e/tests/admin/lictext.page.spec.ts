@@ -1,7 +1,8 @@
 import {test} from "../../page-objects/helpers/fixtures/fixtures.js";
 
-test.describe("License texts", () => {
-    test("License texts scenario", async ({licenseText}) => {
-        await test.step("Adding a license text",async () => await licenseText.addLicText());
+test.describe("Тексты лицензий", () => {
+    test("Сценарий проверки: " +
+        "1. Добавление текста для типа лицензии", async ({licenseText}) => {
+        await test.step("Добавление текста для типа лицензии",async () => await licenseText.addLicText());
     })
 })

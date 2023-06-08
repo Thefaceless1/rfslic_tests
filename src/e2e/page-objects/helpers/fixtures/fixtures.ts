@@ -12,7 +12,6 @@ import {CommissionPage} from "../../pages/commissions/commission.page.js";
 import {CommissionMenuOptions} from "../enums/commission-menu-options.js";
 import {GroupsClassifierPage} from "../../pages/admin/groups-classifier.page.js";
 import {CategoriesClassifierPage} from "../../pages/admin/categories-classifier.page.js";
-import {NotificationsPage} from "../../pages/notifications/notifications.page.js";
 import * as Process from "process";
 
 type Fixtures = {
@@ -24,8 +23,7 @@ type Fixtures = {
     licenseText : LicTextPage,
     commission : CommissionPage,
     groupClassifier : GroupsClassifierPage,
-    categoriesClassifier : CategoriesClassifierPage,
-    notifications : NotificationsPage
+    categoriesClassifier : CategoriesClassifierPage
 }
 export const test = base.extend<Fixtures>({
     constructor : async ({page},use) => {
@@ -93,14 +91,5 @@ export const test = base.extend<Fixtures>({
         await categoriesClassifier.login();
         await categoriesClassifier.adminMenuByEnum(AdminOptions.categoriesClassifier).click();
         await use(categoriesClassifier);
-    },
-    notifications : async ({page},use) => {
-        const notification = new NotificationsPage(page);
-        if (Process.env.BRANCH != "prod") {
-            await notification.createUser();
-            await notification.checkNotificationUser();
-        }
-        await notification.login()
-        await use(notification);
     }
 })

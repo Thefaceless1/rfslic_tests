@@ -46,10 +46,3 @@ export const licenses = {
         stateId : "state_id"
     }
 }
-export const userNotifications = {
-    tableName : "rfsntf.user_notifications",
-    columns : {
-        userId : "user_id",
-        isReceived : "is_received"
-    }
-}
