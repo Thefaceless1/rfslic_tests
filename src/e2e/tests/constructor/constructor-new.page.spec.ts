@@ -1,15 +1,9 @@
 import {test} from "../../page-objects/helpers/fixtures/fixtures.js";
+import {InputData} from "../../page-objects/helpers/input-data.js";
 
 test.describe("Пролицензии", () => {
-    test("Сценарий проверки: " +
-        "1. Создание пролицензии " +
-        "2. Изменение общей информации пролицензии " +
-        "3. Добавление групп критериев" +
-        "4. Добавление критериев и документов " +
-        "5. Создание пролицензии по образцу" +
-        "6. Удаление пролицензии " +
-        "7. Публикация пролицензии " +
-        "8. Снятие с публикации пролицензии",async ({constructor}) => {
+    test(`Дата запуска : ${InputData.currentDate}, Версия модуля: ${InputData.moduleVersion}`,
+        async ({constructor}) => {
         await test.step("Создание пролицензии",async () => await constructor.createProlicense());
         await test.step("Изменение общей информации пролицензии",async () => await constructor.changeBasicInfo());
         await test.step("Добавление групп критериев",async () => await constructor.createGrpCrit());

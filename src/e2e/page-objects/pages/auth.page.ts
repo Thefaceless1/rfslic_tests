@@ -11,8 +11,8 @@ import * as Process from "process";
 export class AuthPage extends BasePage {
     private readonly userMail : string = "sync-license@rfs.ru"
     private readonly userPassword : string = "RfsTest2023"
-    private readonly userNumber : number = 0;
-    protected userId : number = 0;
+    private readonly userNumber : number = 0
+    protected userId : number = 0
     constructor(page : Page) {
         super(page)
     }

@@ -6,8 +6,5 @@
 /playwright/.cache/
 /src/api/report/*/
 /src/api/report/*.html
-/src/e2e/artifacts/report/*.html
-/src/e2e/artifacts/report/data/*.png
 /src/e2e/artifacts/screenshots/*.png
-/src/e2e/artifacts/allure-report/
-/src/e2e/artifacts/report/*.*
+/src/e2e/artifacts/report/

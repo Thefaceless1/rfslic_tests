@@ -114,6 +114,10 @@ export class ConstructorNewPage extends ConstructorPage {
      */
     private minAmount : Locator = Elements.getElement(this.page,"//input[@name='minCount']");
     /**
+     * Radio "Finance control"
+     */
+    private finControl : Locator = Elements.getElement(this.page,"//button[@role='switch']");
+    /**
      * Current displayed prolicense status
      */
     private prolicenseStatus(statusValue : string) : Locator {
@@ -156,6 +160,7 @@ export class ConstructorNewPage extends ConstructorPage {
     public async changeBasicInfo() : Promise<void> {
         const oldProlicName : string = await this.createdProlicName.innerText();
         await this.editButton.first().click();
+        await this.finControl.click();
         await this.name.clear();
         await this.name.type(InputData.randomWord);
         const allDates = await this.dates.all();
