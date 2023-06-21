@@ -8,7 +8,7 @@ export class InputData {
     /**
      * Current module version
      */
-    public static moduleVersion  : string = "9.1.2.0";
+    public static moduleVersion  : string = "9.1.2.1";
     /**
      * Future date
      */
