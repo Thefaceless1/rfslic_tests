@@ -427,6 +427,7 @@ export class RequestPage extends CommissionPage {
         catch (err) {
             await this.addButton.click();
         }
+        await Elements.waitForHidden(this.addButton);
         await this.closeNotifications("last");
     }
     /**
