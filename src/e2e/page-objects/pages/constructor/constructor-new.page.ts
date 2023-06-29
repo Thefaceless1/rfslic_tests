@@ -12,6 +12,7 @@ import {Columns} from "../../helpers/enums/columns.js";
 import {CriteriaTypes} from "../../helpers/enums/criteriatypes.js";
 import {Notifications} from "../../helpers/enums/notifications.js";
 import {ProlicStatus} from "../../helpers/enums/prolicstatus.js";
+import {DbHelper} from "../../../../db/db-helper.js";
 
 export class ConstructorNewPage extends ConstructorPage {
     constructor(page : Page) {
@@ -354,5 +355,13 @@ export class ConstructorNewPage extends ConstructorPage {
         const rowCount : number = await this.tableRow.count();
         if(rowCount > 1) await this.waitForColumnFilter();
         return;
+    }
+    /**
+     * Delete created prolicense from pre-prod database
+     */
+    public async deleteProdProlicense() : Promise<void> {
+        const dbHelper = new DbHelper();
+        await dbHelper.deleteProlicense();
+        await dbHelper.closeConnect();
     }
 }

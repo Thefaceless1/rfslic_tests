@@ -14,6 +14,7 @@ import {Notifications} from "../../helpers/enums/notifications.js";
 import {Pages} from "../../helpers/enums/pages.js";
 import {CommissionPage} from "../commissions/commission.page.js";
 import * as Process from "process";
+import {DbHelper} from "../../../../db/db-helper.js";
 
 export class RequestPage extends CommissionPage {
     constructor(page : Page) {
@@ -153,12 +154,6 @@ export class RequestPage extends CommissionPage {
      */
     private selectLicStatusByEnum(statusValue : LicStatus ) : Locator {
         return Elements.getElement(this.page,`//*[contains(@class,'requestState__option') and text()='${statusValue}']`);
-    }
-    /**
-     * Get license status by enum
-     */
-    private licStatusByEnum(statusValue : LicStatus ) : Locator {
-        return Elements.getElement(this.page,`//*[contains(@class,'Badge_status_normal') and text()='${statusValue}']`);
     }
     /**
      * Get tabs by enum
@@ -438,5 +433,15 @@ export class RequestPage extends CommissionPage {
         await this.createMeeting();
         await this.addRequestsToMeeting();
         await this.addRequestDecision();
+    }
+    /**
+     * Delete created prolicense and license from pre-prod database
+     */
+    public async deleteProdLicense() : Promise<void> {
+        const dbHelper = new DbHelper();
+        await dbHelper.deleteLicense();
+        await dbHelper.deleteProlicense();
+        await dbHelper.deleteCommission();
+        await dbHelper.closeConnect();
     }
 }

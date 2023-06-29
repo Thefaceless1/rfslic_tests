@@ -3,14 +3,12 @@ import {expect, Locator, Page} from "@playwright/test";
 import {Elements} from "../../../framework/elements/elements.js";
 import {SearchModalPage} from "../search-modal.page.js";
 import {DbHelper} from "../../../../db/db-helper.js";
-import {operationsLog, workUsers} from "../../../../db/tables.js";
 import {UserTabs} from "../../helpers/enums/usertabs.js";
-import {Api} from "../../helpers/enums/api.js";
 import {Notifications} from "../../helpers/enums/notifications.js";
-import * as Process from "process";
 
 export class UsersPage extends MainPage {
-    private readonly createdUserNumber : number = 1
+    private readonly testedUserId : number = 17500821
+    private readonly testedUserRfsId : string = '826252'
     constructor(page : Page) {
         super(page);
     }
@@ -44,17 +42,14 @@ export class UsersPage extends MainPage {
      * Add a user
      */
     public async addUser() : Promise<void> {
-        const userRfsId : string = "826252";
         const searchModal = new SearchModalPage(this.page);
         await this.plusAddButton.click();
         await Elements.waitForVisible(this.searchDataButton);
         await this.searchDataButton.click();
-        if (Process.env.BRANCH == "prod") await searchModal.search.type(userRfsId);
+        await searchModal.search.type(this.testedUserRfsId);
         await searchModal.findButton.click();
         await Elements.waitForHidden(searchModal.loadIndicator.first());
-        (Process.env.BRANCH == "prod") ?
-            await searchModal.radio.click() :
-            await searchModal.radio.nth(this.createdUserNumber).click();
+        await searchModal.radio.click();
         await searchModal.selectButton.click();
         await this.selectRole.click();
         await Elements.waitForVisible(this.rolesList.first());
@@ -89,17 +84,11 @@ export class UsersPage extends MainPage {
         await expect(this.notification(Notifications.userGroupsChanged)).toBeVisible();
     }
     /**
-     * Delete the first record of the found list of users from the database
+     * Delete testing user before test run
      */
-    public async deleteUser() : Promise<void> {
-        const response = await this.page.request.get(Api.clubWorkers);
-        const userId : number  = await response.json().then(value => value.data[this.createdUserNumber].id);
+    public async deleteTestedUser() : Promise<void> {
         const dbHelper = new DbHelper()
-        const userData = await dbHelper.select(workUsers.tableName,workUsers.columns.userId,userId);
-        if(userData.length == 0) return ;
-        else {
-            await dbHelper.delete(operationsLog.tableName,operationsLog.columns.userId,userId);
-            await dbHelper.delete(workUsers.tableName,workUsers.columns.userId,userId);
-        }
+        await dbHelper.deleteProdUserData(this.testedUserId);
+        await dbHelper.closeConnect();
     }
 }

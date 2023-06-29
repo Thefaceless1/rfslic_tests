@@ -1,8 +1,9 @@
 import postgres from "postgres";
 import fs from "fs";
-import {licenses, userRights, workUsers} from "./tables.js";
+import {commissions, licenses, operationsLog, prolicenses, userRights, workUsers} from "./tables.js";
 import {Roles} from "../e2e/page-objects/helpers/enums/roles.js";
 import {UserRights} from "../e2e/page-objects/helpers/enums/user-rights.js";
+import * as Process from "process";
 
 export class DbHelper {
    public readonly sql : postgres.Sql<Record<string, postgres.PostgresType> extends {} ? {} : any>
@@ -27,7 +28,8 @@ export class DbHelper {
     public async insertUser(userId : number) : Promise<void> {
         await this.sql`INSERT INTO ${this.sql(workUsers.tableName)} 
                        (${this.sql(workUsers.columns.userId)},${this.sql(workUsers.columns.isActive)},${this.sql(workUsers.columns.roleId)})
-                        VALUES (${userId},true,${Roles.admin});`
+                        VALUES (${userId},true,${Roles.admin})
+                        on conflict do nothing;`
     }
     /**
      * Add rights for a user in table 'user rights'
@@ -62,13 +64,16 @@ export class DbHelper {
                        (${userId},${UserRights["request.groupReport.add"]}),
                        (${userId},${UserRights["request.groupReport.edit"]}),
                        (${userId},${UserRights["request.history"]}),
-                       (${userId},${UserRights["request.viewAll"]});`
+                       (${userId},${UserRights["request.viewAll"]})
+                       on conflict do nothing;`
     }
     /**
-     * db.config.json file parser
+     * test.db.config.json and prod.db.config.json files parser
      */
     public configData() : object {
-       return JSON.parse(fs.readFileSync("./src/db/db.config.json","utf-8"));
+       return (Process.env.BRANCH == "prod") ?
+           JSON.parse(fs.readFileSync("./src/db/prod.db.config.json","utf-8")) :
+           JSON.parse(fs.readFileSync("./src/db/test.db.config.json","utf-8"));
     }
     /**
      * Update state_id column in Licenses table
@@ -83,5 +88,40 @@ export class DbHelper {
      */
     public async closeConnect() : Promise<void> {
         await this.sql.end();
+    }
+    /**
+     * Delete prod user data from 'users' and 'operations_log' tables
+     */
+    public async deleteProdUserData(prodUserId : number) : Promise<void> {
+        await this.sql`DELETE FROM ${this.sql(operationsLog.tableName)}
+                       WHERE ${this.sql(operationsLog.columns.userId)} = ${prodUserId}`;
+        await this.sql`DELETE FROM ${this.sql(workUsers.tableName)}
+                       WHERE ${this.sql(workUsers.columns.userId)} = ${prodUserId}`;
+    }
+    /**
+     * Delete prolicense from 'nsi_prolicenses' table
+     */
+    public async deleteProlicense() : Promise<void> {
+        await this.sql`DELETE FROM ${this.sql(prolicenses.tableName)}
+                       WHERE ${this.sql(prolicenses.columns.licName)} like ('автотест%');`
+    }
+    /**
+     * Delete license from 'licenses' table
+     */
+    public async deleteLicense() : Promise<void> {
+        await this.sql`DELETE FROM ${this.sql(licenses.tableName)}
+                       WHERE ${this.sql(licenses.columns.id)} in
+                       (SELECT ${this.sql(prolicenses.columns.id)}
+                        FROM ${this.sql(licenses.tableName)}
+                        INNER JOIN ${this.sql(prolicenses.tableName)}
+                        on ${this.sql(licenses.columns.prolicId)} = ${this.sql(prolicenses.columns.id)}
+                        WHERE ${this.sql(prolicenses.columns.licName)} like ('автотест%'));`
+    }
+    /**
+     * Delete commission from 'commissions' table
+     */
+    public async deleteCommission() : Promise<void> {
+        await this.sql`DELETE FROM ${this.sql(commissions.tableName)}
+                       WHERE ${this.sql(commissions.columns.name)} like ('автотест%');`
     }
 }

@@ -28,35 +28,45 @@ type Fixtures = {
 export const test = base.extend<Fixtures>({
     constructor : async ({page},use) => {
         const constructor = new ConstructorNewPage(page);
-        if (Process.env.BRANCH != "prod") await constructor.createUser();
+        await constructor.createUser();
         await constructor.login();
         await constructor.openConstructor();
         await use(constructor);
+        if(Process.env.BRANCH == "prod") {
+            await constructor.deleteProdUser();
+            await constructor.deleteProdProlicense();
+        }
     },
     requests : async ({page},use) => {
         const request = new RequestPage(page);
-        if (Process.env.BRANCH != "prod") await request.createUser();
+        await request.createUser();
         await request.login();
         await request.createTestProlicense();
         await request.goto(Pages.requestNewPage);
         await request.chooseClub();
         await request.filterByColumn(request.filterButtonByEnum(Columns.licName));
         await use(request);
+        if(Process.env.BRANCH == "prod") {
+            await request.deleteProdUser();
+            await request.deleteProdLicense();
+        }
     },
     roles : async ({page},use) => {
         const roles = new RolesPage(page);
-        if (Process.env.BRANCH != "prod") await roles.createUser();
+        await roles.createUser();
         await roles.login();
         await roles.adminMenuByEnum(AdminOptions.roles).click();
         await use(roles);
+        if(Process.env.BRANCH == "prod") await roles.deleteProdUser();
     },
     users : async ({page},use) => {
         const users = new UsersPage(page);
-        if (Process.env.BRANCH != "prod") await users.createUser();
+        await users.createUser();
+        await users.deleteTestedUser();
         await users.login();
-        if (Process.env.BRANCH != "prod") await users.deleteUser();
         await users.adminMenuByEnum(AdminOptions.users).click();
         await use(users);
+        if(Process.env.BRANCH == "prod") await users.deleteProdUser();
     },
     setUser : async ({browser},use) => {
         const page = await browser.newPage();
@@ -66,13 +76,14 @@ export const test = base.extend<Fixtures>({
     },
     licenseText : async ({page},use) => {
         const licenseText = new LicTextPage(page);
-        if (Process.env.BRANCH != "prod") await licenseText.createUser();
+        await licenseText.createUser();
         await licenseText.login();
         await use(licenseText);
+        if(Process.env.BRANCH == "prod") await licenseText.deleteProdUser();
     },
     commission : async ({page},use) => {
         const commission = new CommissionPage(page);
-        if (Process.env.BRANCH != "prod") await commission.createUser();
+        await commission.createUser();
         await commission.login();
         await commission.changeLicensesStatus();
         await commission.commissionMenuByEnum(CommissionMenuOptions.meetings).click();
@@ -80,16 +91,18 @@ export const test = base.extend<Fixtures>({
     },
     groupClassifier : async ({page},use) => {
         const groupClassifier = new GroupsClassifierPage(page);
-        if (Process.env.BRANCH != "prod") await groupClassifier.createUser();
+        await groupClassifier.createUser();
         await groupClassifier.login();
         await groupClassifier.adminMenuByEnum(AdminOptions.groupsClassifier).click();
         await use(groupClassifier);
+        if(Process.env.BRANCH == "prod") await groupClassifier.deleteProdUser();
     },
     categoriesClassifier : async ({page},use) => {
         const categoriesClassifier = new CategoriesClassifierPage(page);
-        if (Process.env.BRANCH != "prod") await categoriesClassifier.createUser();
+        await categoriesClassifier.createUser();
         await categoriesClassifier.login();
         await categoriesClassifier.adminMenuByEnum(AdminOptions.categoriesClassifier).click();
         await use(categoriesClassifier);
+        if(Process.env.BRANCH == "prod") await categoriesClassifier.deleteProdUser();
     }
 })

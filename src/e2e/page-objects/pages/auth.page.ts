@@ -12,6 +12,7 @@ export class AuthPage extends BasePage {
     private readonly userMail : string = "sync-license@rfs.ru"
     private readonly userPassword : string = "RfsTest2023"
     private readonly userNumber : number = 0
+    private readonly prodUserId : number = 17513354
     protected userId : number = 0
     constructor(page : Page) {
         super(page)
@@ -61,17 +62,24 @@ export class AuthPage extends BasePage {
      */
     public async createUser() : Promise<void> {
         const dbHelper = new DbHelper();
-        const response = await this.page.request.get(Api.users);
-        const userId : number = await response.json().then(value => value.data[this.userNumber].id);
-        this.userId = userId;
-        const dbUserData  = await dbHelper.select(workUsers.tableName,workUsers.columns.userId,userId);
-        if (dbUserData[0][workUsers.columns.roleId] == Roles.admin) return;
-        else {
-            await dbHelper.delete(operationsLog.tableName,operationsLog.columns.userId,userId);
-            await dbHelper.delete(workUsers.tableName,workUsers.columns.userId,userId);
-            await dbHelper.insertUser(userId);
-            await dbHelper.insertUserRights(userId);
+        if(Process.env.BRANCH == "prod") {
+            await dbHelper.insertUser(this.prodUserId);
+            await dbHelper.insertUserRights(this.prodUserId);
             await dbHelper.closeConnect();
+        }
+        else {
+            const response = await this.page.request.get(Api.users);
+            const userId : number = await response.json().then(value => value.data[this.userNumber].id);
+            this.userId = userId;
+            const dbUserData  = await dbHelper.select(workUsers.tableName,workUsers.columns.userId,userId);
+            if (dbUserData[0][workUsers.columns.roleId] == Roles.admin) return;
+            else {
+                await dbHelper.delete(operationsLog.tableName,operationsLog.columns.userId,userId);
+                await dbHelper.delete(workUsers.tableName,workUsers.columns.userId,userId);
+                await dbHelper.insertUser(userId);
+                await dbHelper.insertUserRights(userId);
+                await dbHelper.closeConnect();
+            }
         }
     }
     /**
@@ -97,6 +105,14 @@ export class AuthPage extends BasePage {
             await this.selectUserMenuList.nth(this.userNumber).click();
             await this.saveButton.click();
         }
+    }
+    /**
+     * Delete user from pre-prod database
+     */
+    public async deleteProdUser() : Promise<void> {
+        const dbHelper = new DbHelper();
+        await dbHelper.deleteProdUserData(this.prodUserId);
+        await dbHelper.closeConnect();
     }
     /**
      * Check for the 'Select user' button

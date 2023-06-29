@@ -6,8 +6,11 @@ import {InputData} from "../../page-objects/helpers/input-data.js";
 test.describe("Заявки", () => {
     test(`Дата запуска : ${InputData.currentDate}, Версия модуля: ${InputData.moduleVersion}`,
         async ({requests}) => {
-        test.info().annotations.push({type: "Дата и время запуска",description: `${new Date().toLocaleString()}`});
-        test.info().annotations.push({type: "Версия модуля",description: `${InputData.moduleVersion}`});
+        test.info().annotations.push
+        (
+            {type: "Дата и время запуска",description: `${new Date().toLocaleString()}`},
+            {type: "Версия модуля",description: `${InputData.moduleVersion}`}
+        );
         await test.step("Создание заявки в статусе Черновик",async () => await requests.createDraft());
         await test.step("Подача заявки",async () => await requests.publishLic());
         await test.step("Добавление экспертов и сотрудников для групп критериев",async () => await requests.addExperts());

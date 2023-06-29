@@ -1,6 +1,5 @@
 export const workUsers = {
     tableName : "rfslic.work_users",
-    notificationTableName : "rfsntf.work_users",
     columns : {
         userId : "user_id",
         isActive : "is_active",
@@ -43,6 +42,21 @@ export const licenses = {
     tableName : "rfslic.licenses",
     columns : {
         id : "id",
-        stateId : "state_id"
+        stateId : "state_id",
+        prolicId : "prolic_id"
+    }
+}
+export const prolicenses = {
+    tableName : "rfslic.nsi_prolicenses",
+    columns : {
+        id : "id",
+        licName : "licname"
+    }
+}
+export const commissions = {
+    tableName : "rfslic.commissions",
+    columns : {
+        id : "id",
+        name : "name"
     }
 }
