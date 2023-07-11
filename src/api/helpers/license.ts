@@ -1,124 +1,159 @@
 import {TestData} from "./test-data";
-import {TProlicense} from "./types/prolicense.type";
+import {TDocumentsAndComments} from "./types/prolicense.type";
 import {Prolicense} from "./prolicense";
-import superagent, {Response} from "superagent";
+import superagent from "superagent";
 import {DocumentStatus} from "./enums/document-status";
 import {LicStatus} from "./enums/license-status";
-import {Api} from "./api";
-import {TCreateLicense, TCriteriaGroups, TCriterias, TDocuments, TExpertReport, TLicense} from "./types/license.type";
+import {
+    TAddDocStatus, TChangeLicStatus, TConclusion, TCreateLicense, TCriteriaGroups,
+    TCriterias, TDocuments, TExpertReport,
+    TExternal, TLicense, TRfuExpert
+} from "./types/license.type";
 import {randomInt} from "crypto";
-import {TClubWorkers, TLicAndDocStatus} from "./types/catalogs.type";
+import {TClubExperts, TClubWorkers, TLicAndDocStatus} from "./types/catalogs.type";
+import {logger} from "../../logger/logger";
+import {CriteriaTypes} from "./enums/criteria-types";
+import {RequestApi} from "./api/request.api";
+import {UserApi} from "./api/user.api";
 
 export class License extends Prolicense {
     constructor(
-        public license : TLicense[] = []
+        public license : TLicense[] = [],
+        public selectedRfuExpertId : number = 0,
+        public selectedOfiId : number = 0,
+        public selectedClubWorkerId : number = 0,
+        public selectedLicenseClubId : number = 0,
+        public removedFileId : number = 0
     ) {
         super();
     }
     /**
-     * Add a license request
+     * Create a license request in 'Draft' status
      */
-    public createLicense (prolicense : TProlicense[]) : TCreateLicense {
-        const firstClubId : number = this.organization[0].id;
-        return {
-            proLicId : prolicense[0].id as number,
-            clubId : firstClubId
+    public async createLicense(): Promise<void> {
+        this.selectedLicenseClubId = this.organization[0].id;
+        const requestBody: TCreateLicense = {
+            proLicId : this.prolicense[0].id as number,
+            clubId : this.selectedLicenseClubId
         }
-    }
-    /**
-     * Add response body to the 'license' array
-     */
-    public fillLicense(index : number,response : Response) : void {
-        this.license[index] = response.body.data;
+        const response = await superagent.put(RequestApi.createRequest).
+        send(requestBody).
+        set("cookie", `${this.cookie}`).
+        set("x-csrf-token",this.x_csrf_token);
+        this.license[0] = response.body.data;
     }
     /**
      * Add documents and comments for a license request
      */
-    public addCommentsAndDocuments () : TLicense {
-        this.license[0].documents.forEach((document) => {
-            document.comment = TestData.commentValue;
-            document.files = this.files;
-        })
-        return this.license[0];
+    public async addCommentsAndDocuments(): Promise<void> {
+        const requestBody: TDocumentsAndComments = {files: this.files,comment: TestData.commentValue};
+        for(const document of this.license[0].documents) {
+            await superagent.put(RequestApi.addGeneralInfoFiles(document.id)).
+            send(requestBody).
+            set("cookie", `${this.cookie}`).
+            set("x-csrf-token",this.x_csrf_token);
+        }
+        await this.refreshLicense();
     }
     /**
      * Publish a license request
      */
-    public publishLicense () : TLicense {
-        this.license[0].stateId = this.licStatusByEnum(LicStatus.new).id;
-        this.license[0].state = this.licStatusByEnum(LicStatus.new).name;
-        return this.license[0];
+    public async publishLicense(): Promise<void>  {
+        const response = await superagent.put(RequestApi.publishLicense(this.license[0].id)).
+        set("cookie", `${this.cookie}`).
+        set("x-csrf-token",this.x_csrf_token);
+        this.license[0] = response.body.data;
     }
     /**
-     * Add criteria groups experts and club workers for a criteria group
+     * Add club experts to criteria groups
      */
-    public async addClubWorkersToCritGrp () : Promise<TLicense> {
-        const api = new Api();
-        for (const criteriaGroup of this.license[0].criteriaGroups) {
-            api.request.fillApi(this.license[0],criteriaGroup.groupId);
-            const response = await superagent.get(api.basicUrl + api.request.clubWorkers).
+    public async addClubExperts() : Promise<void> {
+        for(const group of this.license[0].criteriaGroups) {
+            const requestBody: TClubExperts = {experts: await this.selectClubExperts(group.groupId)};
+            await superagent.put(RequestApi.changeClubExperts(this.license[0].id,group.groupId)).
+            send(requestBody).
             set("cookie", `${this.cookie}`).
             set("x-csrf-token",this.x_csrf_token);
-            criteriaGroup.experts = response.body.data.map((clubWorker : TClubWorkers) => clubWorker.id);
-            criteriaGroup.rfuExpert = this.critGrpExperts[0].id;
         }
-        return this.license[0];
+        await this.refreshLicense();
     }
     /**
-     * Add for criteria documents :
-     * 1. Comments
-     * 2. If document type != List of participants, OFI, Organization - then add files
-     * 3. If document type = List of participants - then add participants
-     * 4. If document type = OFI - then add OFI
-     * 5. If document type = Organization - then add organizations
+     * Set club experts for each criteria group
      */
-    public addDataToCritDoc () {
-        this.license[0].criteriaGroups.forEach((critGrp) => {
-            critGrp.criterias.forEach((criterias) => {
-                criterias.documents.forEach((documents) => {
-                    documents.comment = TestData.commentValue;
-                    switch (documents.docTypeId) {
-                        case 5 : documents.externalIds = this.personsId; break;
-                        case 6 : documents.externalIds = this.ofiId; break;
-                        case 9 : documents.externalIds = this.orgId; break;
-                        default : documents.files = this.files;
-                    }
-                })
-            })
-        })
-        return this.license[0];
+    private async selectClubExperts(grpId: number): Promise<number[]> {
+        const response = await superagent.get(UserApi.clubExpertsByCriteriaGroup(this.license[0].id,grpId)).
+        set("cookie", `${this.cookie}`).
+        set("x-csrf-token",this.x_csrf_token);
+        const clubExpertIds: number[] = response.body.data.map((clubExpert: TClubWorkers) => clubExpert.id);
+        if(clubExpertIds.length == 0) logger.info(`Отсутствуют сотрудники клуба для группы критериев ${grpId}`);
+        return clubExpertIds
     }
     /**
-     * Add for criteria documents:
+     * Add rfu experts to criteria groups
+     */
+    public async addRfuExperts(): Promise<void> {
+        this.selectedRfuExpertId = this.license[0].criteriaGroups[0].rfuExpertChoice[0];
+        const requestBody: TRfuExpert = {rfuExpert: this.selectedRfuExpertId};
+        for(const group of this.license[0].criteriaGroups) {
+            await superagent.put(RequestApi.changeRfuExpert(this.license[0].id,group.groupId)).
+            send(requestBody).
+            set("cookie", `${this.cookie}`).
+            set("x-csrf-token",this.x_csrf_token);
+        }
+        await this.refreshLicense();
+    }
+    /**
+     * Add files and comments for criteria documents
+     */
+    public async addDataToCritDoc(): Promise<void> {
+        const requestBody: TDocumentsAndComments = {files: this.files,comment: TestData.commentValue};
+        for(const group of this.license[0].criteriaGroups) {
+            for(const criteria of group.criterias) {
+                for(const document of criteria.documents) {
+                    await superagent.put(RequestApi.addCritDocFiles(document.id!)).
+                    send(requestBody).
+                    set("cookie", `${this.cookie}`).
+                    set("x-csrf-token",this.x_csrf_token);
+                }
+            }
+        }
+        await this.refreshLicense();
+    }
+    /**
+     * Add for criteria documents and general info documents:
      * 1.Comments
-     * 2.Random document status
+     * 2.Random status
      */
-    public addStatusToDocuments () : TLicense {
+    public async addStatusToDocuments(): Promise<void>  {
         const statusIds : number[] = this.docStatus.filter(
             status => status.name == DocumentStatus.declined ||
             status.name == DocumentStatus.accepted ||
             status.name == DocumentStatus.acceptedWithCondition
         ).map(status => status.id);
-        this.license[0].documents.forEach((document) => {
-            const randomStatusId : number = randomInt(0,statusIds.length);
-            document.reviewComment = TestData.commentValue;
-            document.stateId = statusIds[randomStatusId];
-        })
-        this.license[0].criteriaGroups.forEach((criteriaGroup) => {
-            criteriaGroup.criterias.forEach((criteria) => {
-                criteria.documents.forEach((document) => {
-                    const randomStatusId : number = randomInt(0,statusIds.length);
-                    document.reviewComment = TestData.commentValue;
-                    document.stateId = statusIds[randomStatusId];
-                })
-            })
-        })
-        return this.license[0];
+        for(const document of this.license[0].documents) {
+            const requestBody: TAddDocStatus = {stateId: statusIds[randomInt(0,statusIds.length)],comment: TestData.commentValue};
+            await superagent.put(RequestApi.changeGeneralInfoDocStatus(document.id)).
+            send(requestBody).
+            set("cookie", `${this.cookie}`).
+            set("x-csrf-token",this.x_csrf_token);
+        }
+        for(const group of this.license[0].criteriaGroups) {
+            for(const criteria of group.criterias) {
+                for(const document of criteria.documents) {
+                    const requestBody: TAddDocStatus = {stateId: statusIds[randomInt(0,statusIds.length)],comment: TestData.commentValue};
+                    await superagent.put(RequestApi.changeCriteriaDocStatus(document.id!)).
+                    send(requestBody).
+                    set("cookie", `${this.cookie}`).
+                    set("x-csrf-token",this.x_csrf_token);
+                }
+            }
+        }
+        await this.refreshLicense();
     }
     /**
      * Calculation of license filling percentages after filling out decisions on documents
      */
-    public get licPercent () : number {
+    public get licPercent() : number {
         let allDocsCount : number = 0;
         let checkedDocsCount : number = 0;
         this.license[0].documents.forEach((document) => {
@@ -185,64 +220,117 @@ export class License extends Prolicense {
     /**
      * Add conclusions for a license
      */
-    public addConclusions() : TLicense {
-        this.license[0].recommendation = TestData.commentValue;
-        this.license[0].conclusion = TestData.commentValue;
-        this.license[0].rplCriterias = TestData.commentValue;
-        return this.license[0];
+    public async addConclusions(): Promise<void> {
+        const requestBody: TConclusion = {
+            conclusion: TestData.commentValue,
+            recommendation: TestData.commentValue,
+            rplCriterias: TestData.commentValue
+        }
+        await superagent.put(RequestApi.addDecision(this.license[0].id)).
+        send(requestBody).
+        set("cookie", `${this.cookie}`).
+        set("x-csrf-token",this.x_csrf_token);
+        await this.refreshLicense();
     }
     /**
      * Add an expert report for criteria groups
      */
-    public addExpertReport(grpId : number) : TExpertReport {
-        return {
-            groupId : grpId,
-            recommendation : TestData.commentValue
+    public async addExpertReport(): Promise<void> {
+        for(const group of this.license[0].criteriaGroups) {
+            const requestBody: TExpertReport = {
+                groupId : group.groupId,
+                recommendation : TestData.commentValue
+            }
+            await superagent.post(RequestApi.createExpertReport(this.license[0].id)).
+            send(requestBody).
+            set("cookie", `${this.cookie}`).
+            set("x-csrf-token",this.x_csrf_token);
         }
+        await this.refreshLicense();
+
     }
     /**
      * Add participants and OFI for criteria with types Participant and OFI
      */
-    public addOfiAndUsers() : TLicense {
-        this.license[0].criteriaGroups.forEach(critGrp => {
-            critGrp.criterias[1].externalId = this.personsId[0];
-            critGrp.criterias[2].externalId = this.ofiId[0];
-            const iterationCount : number = 5;
-            critGrp.criterias[iterationCount+1] = critGrp.criterias[2];
-            for(let i=1; i<iterationCount; i++) {
-                let newUser = {...critGrp.criterias[1]};
-                let newOfi = {...critGrp.criterias[iterationCount+1]};
-                const docCount : number = newUser.documents.length;
-                for(let i = 0; i<docCount; i++) {
-                    delete newUser.documents[i].id;
-                    delete newOfi.documents[i].id
-                }
-                delete newUser.id;
-                delete newOfi.id;
-                newUser.orderNum = i;
-                newOfi.orderNum = i;
-                newUser.externalId = this.personsId[i];
-                newOfi.externalId = this.ofiId[i];
-                critGrp.criterias[i+1] = newUser;
-                critGrp.criterias.push(newOfi);
+    public async addOfiAndUsers() : Promise<void> {
+        this.selectedOfiId = this.ofiId[0];
+        this.selectedClubWorkerId = this.personsId[0];
+        for(const group of this.license[0].criteriaGroups) {
+            for(const criteria of group.criterias) {
+                if(criteria.typeId == CriteriaTypes.file) continue;
+                const requestBody : TExternal = (criteria.typeId == CriteriaTypes.participant) ?
+                    {externalId: this.selectedClubWorkerId} :
+                    {externalId: this.selectedOfiId};
+                await superagent.put(RequestApi.addExternal(criteria.id!)).
+                send(requestBody).
+                set("cookie", `${this.cookie}`).
+                set("x-csrf-token",this.x_csrf_token);
             }
-        })
-        return this.license[0];
+        }
+        await this.refreshLicense();
     }
     /**
      * Get license by id
      */
-    public async refreshLicense(api : Api) : Promise<void> {
-        const response = await superagent.get(api.basicUrl + api.request.changeLicense).
+    public async refreshLicense(): Promise<void> {
+        const response = await superagent.get(RequestApi.getLicenseById(this.license[0].id)).
         set("cookie", `${this.cookie}`);
-        this.fillLicense(0,response);
+        this.license[0] = response.body.data;
     }
     /**
      * Set the license status to "Waiting for the commission's decision"
      */
-    public changeLicStatus() : TLicense {
+    public async changeLicStatus(): Promise<void> {
         const waitForCommissionState: TLicAndDocStatus = this.licStatusByEnum(LicStatus.waitForCommission);
-        this.license[0].stateId = waitForCommissionState.id;
-        return this.license[0];
+        const requestBody: TChangeLicStatus = {
+            stateId: waitForCommissionState.id,
+            notActualGroupIds: []
+        }
+        await superagent.put(RequestApi.changeLicStatus(this.license[0].id)).
+        send(requestBody).
+        set("cookie", `${this.cookie}`).
+        set("x-csrf-token",this.x_csrf_token);
+        await this.refreshLicense();
+    }
+    /**
+     * Delete a general info document file
+     */
+    public async deleteGeneralInfoDocFile(): Promise<void> {
+        this.removedFileId = this.license[0].documents[0].files[0].id!;
+        await superagent.delete(RequestApi.deleteRequestFile(this.removedFileId)).
+        set("cookie", `${this.cookie}`).
+        set("x-csrf-token",this.x_csrf_token);
+        await this.refreshLicense();
+    }
+    /**
+     * Delete a criteria document file
+     */
+    public async deleteCriteriaDocFile(): Promise<boolean> {
+        this.removedFileId = this.license[0].criteriaGroups[0].criterias[0].documents[0].files[0].id!;
+        await superagent.delete(RequestApi.deleteCriteriaFile(this.removedFileId)).
+        set("cookie", `${this.cookie}`).
+        set("x-csrf-token",this.x_csrf_token);
+        await this.refreshLicense();
+        return this.license[0].criteriaGroups[0].criterias[0].documents[0].files.every(file => file.id != this.removedFileId);
+    }
+    /**
+     * Send for verification all general info documents
+     */
+    public async checkGeneralInfoDocs(): Promise<void> {
+        await superagent.put(RequestApi.sendGeneralInfoDocsForVerification(this.license[0].id)).
+        set("cookie", `${this.cookie}`).
+        set("x-csrf-token",this.x_csrf_token);
+        await this.refreshLicense();
+    }
+    /**
+     * Send for verification all criteria documents
+     */
+    public async checkCriteriaDocs(): Promise<void> {
+        for(const group of this.license[0].criteriaGroups) {
+            await superagent.put(RequestApi.sendCriteriaDocsForVerification(this.license[0].id,group.groupId)).
+            set("cookie", `${this.cookie}`).
+            set("x-csrf-token",this.x_csrf_token);
+        }
+        await this.refreshLicense();
     }
 }

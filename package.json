@@ -18,6 +18,7 @@
     "@types/node": "^18.11.13",
     "@types/superagent": "^4.1.16",
     "jest": "^29.3.1",
+    "log4js": "^6.9.1",
     "node": "^19.2.0",
     "node-2fa": "^2.0.3",
     "postgres": "^3.3.3",

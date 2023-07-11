@@ -18,6 +18,7 @@ export type TLicenses = {
     clubId: number,
     clubName: string,
     licType: string,
+    licTypeId: number,
     season: string,
     licName: string,
     controlDate: string,
@@ -33,20 +34,35 @@ export type TDecision = {
     comment: string
 }
 export type TMembers = {
-    userIds : number[]
+    userIds: number[]
 }
 export type TRequests = {
-    licIds : number[]
+    licIds: number[]
+}
+export type TFormLicense = {
+    licId: number
 }
 export type TLicTypeReport = {
-    licIds : number[],
-    licType : string
+    licIds: number[],
+    licType: number
 }
 export type TClubReport = {
-    licIds : number[],
-    clubId : number
+    licIds: number[],
+    clubId: number
 }
 export type TLicTypeText = {
-    licType : number,
-    text : string
+    licType: number,
+    text: string
+}
+export interface Iface {
+    id?: number,
+    typeId: number,
+    type?: string,
+    name: string,
+    workDate: string,
+    protocolName?: string,
+    protocolStorageId?: string,
+    licenses?: TLicenses[],
+    files?: Templates[],
+    members?: TClubWorkers[]
 }

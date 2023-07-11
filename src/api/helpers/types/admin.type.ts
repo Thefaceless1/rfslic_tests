@@ -30,12 +30,19 @@ export type TRole = {
     rights: string[]
 }
 export type TCritGroup = {
-    id? : number,
-    active? : boolean,
-    name : string
+    id?: number,
+    active?: boolean,
+    name: string
 }
 export type TCritRank = {
-    id? : number,
-    code : string,
-    description : string
+    id?: number,
+    code: string,
+    description: string
+}
+export type TAddUser = {
+    roleId: number,
+    userId: number
+}
+export type TChangeUserRole = {
+    roleId: number
 }

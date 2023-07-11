@@ -1,55 +1,90 @@
 import {Catalogs} from "./catalogs";
 import {TestData} from "./test-data";
-import {Response} from "superagent";
+import superagent from "superagent";
 import {DbHelper} from "../../db/db-helper";
 import {operationsLog, workUsers} from "../../db/tables";
-import {TCritGroup, TCritRank, TRole, TUser} from "./types/admin.type";
+import {TAddUser, TChangeUserRole, TCritGroup, TCritRank, TRole, TUser} from "./types/admin.type";
+import {AdminApi} from "./api/admin.api";
 
 export class Admin extends Catalogs {
     constructor(
         public user: TUser[] = [],
         public role: TRole[] = [],
-        public critGroups : TCritGroup[] = [],
-        public critRanks : TCritRank[] = []
+        public critGroups: TCritGroup[] = [],
+        public critRanks: TCritRank[] = [],
+        public selectedUserRoleId: number = 0,
+        public selectedUserId: number = 0
     ) {
         super();
     }
     /**
-     * 1. Add criteria groups to the user
+     * Add a user
+     */
+    public async addUser(): Promise<void> {
+        this.selectedUserRoleId = this.rolesId[0];
+        this.selectedUserId = this.personsId[0];
+        const requestQuery: TAddUser = {roleId: this.selectedUserRoleId,userId: this.selectedUserId};
+        const response = await superagent.put(AdminApi.addUser).
+        query(requestQuery).
+        set("cookie", `${this.cookie}`).
+        set("x-csrf-token",this.x_csrf_token);
+        this.user.push(response.body.data);
+    }
+    /**
+     * 1. Add criteria groups to user
      * 2. if user role have property value isClub=true then add clubs
      */
-    public changeUser() : TUser {
+    public async changeUser(): Promise<void> {
         this.user[0].groups = [...this.criteriaGrpId];
-        if(this.roles[1].isClub) this.user[0].clubs = [...this.orgId];
-        return this.user[0];
+        const currentUserRoleData = this.roles.find(role => role.id == this.selectedUserRoleId);
+        if(currentUserRoleData && currentUserRoleData.isClub) this.user[0].clubs = [...this.orgId];
+        const response = await superagent.put(AdminApi.changeUser(this.user[0].id)).
+        send(this.user[0]).
+        set("cookie", `${this.cookie}`).
+        set("x-csrf-token",this.x_csrf_token);
+        this.user[0] = response.body.data;
+    }
+    /**
+     * Change a user role
+     */
+    public async changeUserRole(): Promise<void> {
+        this.selectedUserRoleId = this.rolesId[this.rolesId.length-1];
+        const requestQuery: TChangeUserRole = {roleId: this.selectedUserRoleId};
+        const response = await superagent.put(AdminApi.changeUserRole(this.user[0].id)).
+        query(requestQuery).
+        set("cookie", `${this.cookie}`).
+        set("x-csrf-token",this.x_csrf_token);
+        this.user[0] = response.body.data;
     }
     /**
      * Create a new role
      */
-    public addRole() : TRole {
-        this.role.push({
+    public async addRole(): Promise<void> {
+        const requestBody: TRole = {
             name : TestData.randomWord,
             isClub : true,
             description : TestData.descValue,
             rights : [...this.rightsId]
-        })
-        return this.role[0];
+        }
+        const response = await superagent.put(AdminApi.addOrGetRoles).
+        send(requestBody).
+        set("cookie", `${this.cookie}`).
+        set("x-csrf-token",this.x_csrf_token);
+        this.role.push(response.body.data);
     }
     /**
-     * Add response data to "critGroups", "role", "user", "criteriaRanks" arrays
+     * Delete a role
      */
-    public fillEntity(array : "user" | "role" | "criteriaGroups" | "criteriaRanks", index : number, response : Response) : void {
-        switch (array) {
-            case "user" : this.user[index] = response.body.data; break;
-            case "role" : this.role[index] = response.body.data; break;
-            case "criteriaGroups" : this.critGroups[index] = response.body.data; break;
-            default : this.critRanks[index] = response.body.data;
-        }
+    public async deleteRole(): Promise<string> {
+        const response = await superagent.delete(AdminApi.deleteRole(this.role[0].id!)).
+        set("cookie", `${this.cookie}`).
+        set("x-csrf-token",this.x_csrf_token);
+        return response.body.status
     }
     /**
      * Check if the user exists in the database
      */
-    public async checkUser() : Promise<void> {
+    public async checkUser(): Promise<void> {
         const dbHelper = new DbHelper();
         const dbUserData = await dbHelper.select(workUsers.tableName,workUsers.columns.userId,this.personsId[0]);
         if (dbUserData.length != 0) {
@@ -61,34 +96,76 @@ export class Admin extends Catalogs {
     /**
      * Add a criteria group
      */
-    public addCriteriaGroup() : TCritGroup {
-        this.critGroups.push({name : TestData.randomWord});
-        return this.critGroups[0];
+    public async addCriteriaGroup(): Promise<void> {
+        const requestBody: TCritGroup = {name: TestData.randomWord};
+        const response = await superagent.put(AdminApi.changeCriteriaGroup).
+        send(requestBody).
+        set("cookie", `${this.cookie}`).
+        set("x-csrf-token",this.x_csrf_token);
+        this.critGroups.push(response.body.data);
     }
     /**
      * Change a criteria group
      */
-    public changeCriteriaGroup() : TCritGroup {
-        this.critGroups[0].name = TestData.randomWord;
-        this.critGroups[0].active = !this.critGroups[0].active;
-        return this.critGroups[0];
+    public async changeCriteriaGroup(): Promise<void> {
+        const requestBody: TCritGroup = {
+            id: this.critGroups[0].id,
+            name: TestData.randomWord,
+            active: false
+        }
+        const response = await superagent.put(AdminApi.changeCriteriaGroup).
+        send(requestBody).
+        set("cookie", `${this.cookie}`).
+        set("x-csrf-token",this.x_csrf_token);
+        this.critGroups[0] = response.body.data;
+    }
+    /**
+     * Delete a criteria group
+     */
+    public async deleteCriteriaGroup(): Promise<string> {
+        const response = await superagent.delete(AdminApi.deleteCriteriaGroup(this.critGroups[0].id!)).
+        set("cookie", `${this.cookie}`).
+        set("x-csrf-token",this.x_csrf_token);
+        return response.body.status
     }
     /**
      * Add a criteria rank
      */
-    public addCriteriaRank() : TCritRank {
-        this.critRanks.push({
+    public async addCriteriaRank(): Promise<void> {
+        const requestBody: TCritRank = {
             code : TestData.randomCode(this.rankCriteria),
             description : TestData.randomWord
-        })
-        return this.critRanks[0];
+        }
+        const response = await superagent.put(AdminApi.changeCriteriaRank).
+        send(requestBody).
+        set("cookie", `${this.cookie}`).
+        set("x-csrf-token",this.x_csrf_token);
+        this.critRanks.push(response.body.data);
     }
     /**
      * Change a criteria rank
      */
-    public changeCriteriaRank() : TCritRank {
-        this.critRanks[0].description = TestData.randomWord
-        this.critRanks[0].code = TestData.randomCode(this.rankCriteria);
-        return this.critRanks[0];
+    public async changeCriteriaRank(): Promise<TCritRank> {
+        const oldCriteriaRankData: TCritRank = this.critRanks[0];
+        const requestBody: TCritRank = {
+            id: this.critRanks[0].id,
+            description: TestData.randomWord,
+            code: TestData.randomCode(this.rankCriteria)
+        }
+        const response = await superagent.put(AdminApi.changeCriteriaRank).
+        send(requestBody).
+        set("cookie", `${this.cookie}`).
+        set("x-csrf-token",this.x_csrf_token);
+        this.critRanks[0] = response.body.data;
+        return oldCriteriaRankData
+    }
+    /**
+     * Delete a criteria rank
+     */
+    public async deleteCriteriaRank(): Promise<string> {
+        const response = await superagent.delete(AdminApi.deleteCriteriaRank(this.critRanks[0].id!)).
+        set("cookie", `${this.cookie}`).
+        set("x-csrf-token",this.x_csrf_token);
+        return response.body.status;
     }
 }

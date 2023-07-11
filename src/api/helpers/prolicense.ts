@@ -1,31 +1,41 @@
 import {TestData} from "./test-data";
 import {TDocTypes} from "./types/catalogs.type";
 import {Catalogs} from "./catalogs";
-import superagent, {Response} from "superagent";
-import {Api} from "./api";
-import {TCriterias, TDocuments, TProlicense, TSampleLicense} from "./types/prolicense.type";
+import superagent from "superagent";
+import {
+    TCriteria,
+    TCriteriaGroup,
+    TDocuments,
+    TProlicense,
+    TSampleProlicense
+} from "./types/prolicense.type";
+import {ProlicTypes} from "./enums/prolic-types";
+import {ConstructorApi} from "./api/constructor.api";
+import {randomInt} from "crypto";
 
 export class Prolicense extends Catalogs {
     constructor(
-        public  prolicense : TProlicense[] = [],
-        public criterias : TCriterias[] = []
+        public  prolicense: TProlicense[] = [],
+        public criterias: TCriteriaGroup[] = []
     ) {
         super();
     }
     /**
-     * Add a prolicense
+     * Create a prolicense
      */
-    public createProlicense() : TProlicense {
-        const docArray : TDocuments[] = [...Array(5)].fill({
+    public async createProlicense(): Promise<void> {
+        const docsCount: number = 5;
+        const docArray : TDocuments[] = [...Array(docsCount)].fill({
             name: TestData.randomWord,
             description : TestData.descValue,
             docTypeId: this.docTypes[0].id,
             templates: this.files
         })
-        this.prolicense.push({
+        const requestBody: TProlicense = {
             name: TestData.randomWord,
-            season: this.seasons[0].name,
-            type: this.licTypes[0].name,
+            season: this.seasons[0].id,
+            type: this.licTypes[0].id,
+            proLicType: ProlicTypes.licensing,
             requestBegin: TestData.currentDate,
             requestEnd: TestData.futureDate,
             dueDate: TestData.futureDate,
@@ -35,100 +45,102 @@ export class Prolicense extends Catalogs {
             begin: TestData.currentDate,
             end: TestData.futureDate,
             documents: docArray
-        })
-        return this.prolicense[0];
+        }
+        const response = await superagent.put(ConstructorApi.createProlicense).
+        send(requestBody).
+        set("cookie", `${this.cookie}`).
+        set("x-csrf-token",this.x_csrf_token);
+        this.prolicense.push(response.body.data);
     }
     /**
      * Change prolicense attributes:
      * 1. Name
      * 2. Type
      * 3. Season
-     * 4. Add document
+     * 4. documents
+     * 5. Dates
      */
-    public changeProlicense () : TProlicense {
+    public async changeProlicense(): Promise<void> {
         this.prolicense[0].name = TestData.randomWord;
-        this.prolicense[0].type = this.licTypes[this.licTypes.length-1].name;
-        this.prolicense[0].season = this.seasons[this.seasons.length-1].name;
+        this.prolicense[0].type = this.licTypes[this.licTypes.length-1].id;
+        this.prolicense[0].season = this.seasons[this.seasons.length-1].id;
+        this.prolicense[0].proLicType = ProlicTypes.finControl;
+        this.prolicense[0].dueDate = null;
+        this.prolicense[0].begin = null;
+        this.prolicense[0].end = null;
         this.prolicense[0].documents.push({
             name: TestData.randomWord,
             description : TestData.descValue,
             docTypeId: this.docTypes[0].id,
             templates: this.files
         })
-        return this.prolicense[0];
-    }
-    /**
-     * Copy prolicense
-     */
-    public createSampleProlicense () : TSampleLicense {
-        return {
-            type : this.licTypes[0].name,
-            season : this.seasons[0].name,
-            name : TestData.randomWord
-        }
-    }
-    /**
-     * Add response body to the 'prolicense' array
-     */
-    public fillProlicense (index : number,response : Response) : void {
-        this.prolicense[index] = response.body.data;
-    }
-    /**
-     * Create prolicense for the 'license.test.ts' test scenario
-     */
-    public async createTestProlicense () : Promise<void> {
-        const api = new Api();
-        this.createProlicense();
-        const response = await superagent.put(api.basicUrl + api.constructors.createProlicense).
+        await superagent.put(ConstructorApi.changeProlicense(this.prolicense[0].id!)).
         send(this.prolicense[0]).
         set("cookie", `${this.cookie}`).
         set("x-csrf-token",this.x_csrf_token);
-        this.fillProlicense(0,response);
+        await this.refreshProlicense();
+    }
+    /**
+     * Copy a prolicense
+     */
+    public async cloneProlicense(): Promise<void> {
+        const requestBody: TSampleProlicense = {
+            type : this.licTypes[0].id,
+            season : this.seasons[0].id,
+            name : TestData.randomWord
+        }
+        const response = await superagent.put(ConstructorApi.cloneProlicense(this.prolicense[0].id!)).
+        send(requestBody).
+        set("cookie", `${this.cookie}`).
+        set("x-csrf-token",this.x_csrf_token);
+        this.prolicense.push(response.body.data);
     }
     /**
      * Add criteria groups
      */
-    public createCritGroups () : void {
-        this.criteriaGroups.forEach((value) => {
-            this.criterias.push({
-                    id : value.id,
-                    name : value.name,
-                    experts : this.critGrpExpertsId,
-                    details : {
-                        experts : this.critGrpExperts
-                    },
-                    criterias : []
-            })
-        })
+    public async createCriteriaGroups(): Promise<void> {
+        for(const group of this.criteriaGroups) {
+            await superagent.put(ConstructorApi.createCriteriaGroup(this.prolicense[0].id!)).
+            query({groupId: group.id, experts: this.critGrpExpertsId}).
+            set("cookie", `${this.cookie}`).
+            set("x-csrf-token",this.x_csrf_token);
+        }
+        await this.refreshCriteriaGroups();
     }
     /**
      * Add criterias and criteria documents
      */
-    public createCriterias () : void {
-        this.criterias.forEach((criteriaGroup) => {
-                this.criteriaTypes.forEach((criteriaType,index) => {
-                    const fileDocType : TDocTypes = this.docTypes.find(docType => docType.name == "Файл")!;
-                    const docArray : TDocuments[] = [...new Array(3)].fill({
-                        name: TestData.randomWord,
-                        description : TestData.descValue,
-                        docTypeId: fileDocType.id,
-                        templates: this.files
-                    })
-                    criteriaGroup.criterias.push({
-                            groupId: criteriaGroup.id,
-                            number: TestData.randomWord,
-                            categoryId: this.rankCriteria[0].id,
-                            name: TestData.randomWord,
-                            description: TestData.descValue,
-                            isMulti: (criteriaType.name == "Документы") ? null : TestData.randomIntForMulti,
-                            typeId: this.criteriaTypes[index].id,
-                            docSubmitDate: TestData.futureDate,
-                            reviewDate: TestData.futureDate,
-                            documents: docArray
-                    })
+    public async createCriterias(): Promise<void> {
+        for(const group of this.criterias) {
+            for(const criteriaType of this.criteriaTypes) {
+                const typeIndex: number = this.criteriaTypes.indexOf(criteriaType);
+                const fileDocType: TDocTypes = this.docTypes.find(docType => docType.name == "Файл")!;
+                const docsCount: number = 3;
+                const docArray: TDocuments[] = [...new Array(docsCount)].fill({
+                    name: TestData.randomWord,
+                    description: TestData.descValue,
+                    docTypeId: fileDocType.id,
+                    templates: this.files
                 })
+                const requestBody: TCriteria = {
+                    groupId: group.id,
+                    number: TestData.randomWord,
+                    categoryId: this.rankCriteria[0].id,
+                    name: TestData.randomWord,
+                    description: TestData.descValue,
+                    isMulti: (criteriaType.name == "Документы") ? null : TestData.randomIntForMulti,
+                    typeId: this.criteriaTypes[typeIndex].id,
+                    docSubmitDate: TestData.futureDate,
+                    reviewDate: TestData.futureDate,
+                    documents: docArray
+                }
+                await superagent.put(ConstructorApi.createOrGetCriteria(this.prolicense[0].id!)).
+                send(requestBody).
+                set("cookie", `${this.cookie}`).
+                set("x-csrf-token",this.x_csrf_token);
             }
-        )
+        }
+        await this.refreshCriteriaGroups();
     }
     /**
      * Change criterias:
@@ -136,42 +148,87 @@ export class Prolicense extends Catalogs {
      * 2. Criteria name
      * 3. Criteria rank
      */
-    public changeCriterias () : void {
-        this.criterias.forEach((criteriaGroup) => {
-            criteriaGroup.criterias.forEach((criteria) => {
+    public async changeCriterias(): Promise<void> {
+        for(const group of this.criterias) {
+            for(const criteria of group.criterias) {
                 criteria.number = TestData.randomWord;
                 criteria.name = TestData.randomWord;
-                criteria.categoryId = this.rankCriteria[1].id;
-            })
-        })
-    }
-    /**
-     * Create criteria groups and criterias for the 'license.test.ts' test scenario
-     */
-    public async createTestCriterias (api : Api) : Promise<void> {
-        this.createCritGroups();
-        for (const i of this.criterias) {
-            await superagent.put(api.basicUrl + api.constructors.createCriteriaGrp).
-            query({groupId: i.id, experts: i.experts}).
-            set("cookie", `${this.cookie}`).
-            set("x-csrf-token",this.x_csrf_token);
-        }
-        this.createCriterias();
-        for(const criteriaGroup of this.criterias) {
-            for(let criteria of criteriaGroup.criterias) {
-                const index = criteriaGroup.criterias.indexOf(criteria);
-                const response = await superagent.put(api.basicUrl + api.constructors.createCriterias).
+                criteria.categoryId = this.rankCriteria[randomInt(0,this.rankCriteria.length)].id;
+                await superagent.put(ConstructorApi.changeCriterias(criteria.id!)).
                 send(criteria).
                 set("cookie", `${this.cookie}`).
                 set("x-csrf-token",this.x_csrf_token);
-                criteriaGroup.criterias[index] = response.body.data;
             }
         }
+        await this.refreshCriteriaGroups();
     }
-    public async refreshProlicense(api : Api) : Promise<void> {
-        const response = await superagent.get(api.basicUrl + api.constructors.changeProlicense).
+    /**
+     * Publish a prolicense
+     */
+    public async publishProlicense(): Promise<void> {
+        await superagent.put(ConstructorApi.publishProlicense(this.prolicense[0].id!)).
         set("cookie", `${this.cookie}`).
         set("x-csrf-token",this.x_csrf_token);
-        this.fillProlicense(0,response);
+        await this.refreshProlicense();
+    }
+    /**
+     * Get a prolicense data
+     */
+    public async refreshProlicense(): Promise<void> {
+        const response = await superagent.get(ConstructorApi.changeProlicense(this.prolicense[0].id!)).
+        set("cookie", `${this.cookie}`).
+        set("x-csrf-token",this.x_csrf_token);
+        this.prolicense[0] = response.body.data;
+    }
+    /**
+     * Get a criteria groups data
+     */
+    public async refreshCriteriaGroups(): Promise<void> {
+        const response = await superagent.get(ConstructorApi.createOrGetCriteria(this.prolicense[0].id!)).
+        set("cookie", `${this.cookie}`).
+        set("x-csrf-token",this.x_csrf_token);
+        this.criterias = response.body.data.groups;
+    }
+    /**
+     * Delete a prolicense
+     */
+    public async deleteProlicense(): Promise<string> {
+        const response = await superagent.delete(ConstructorApi.changeProlicense(this.prolicense[1].id!)).
+        set("cookie", `${this.cookie}`).
+        set("x-csrf-token",this.x_csrf_token);
+        return response.body.status;
+    }
+    /**
+     * Delete criterias
+     */
+    public async deleteCriterias(): Promise<void> {
+        for(const group of this.criterias) {
+            for(const criteria of group.criterias) {
+                await superagent.delete(ConstructorApi.changeCriterias(criteria.id!)).
+                set("cookie", `${this.cookie}`).
+                set("x-csrf-token",this.x_csrf_token);
+            }
+        }
+        await this.refreshCriteriaGroups();
+    }
+    /**
+     * Delete criteria groups
+     */
+    public async deleteCriteriaGroups(): Promise<void> {
+        for(const group of this.criterias) {
+            await superagent.delete(ConstructorApi.deleteCriteriaGroup(this.prolicense[0].id!,group.id)).
+            set("cookie", `${this.cookie}`).
+            set("x-csrf-token",this.x_csrf_token);
+        }
+        await this.refreshCriteriaGroups();
+    }
+    /**
+     * Unpublish a prolicense
+     */
+    public async unpublishProlicense(): Promise<void> {
+        await superagent.put(ConstructorApi.unpublishProlicense(this.prolicense[0].id!)).
+        set("cookie", `${this.cookie}`).
+        set("x-csrf-token",this.x_csrf_token);
+        await this.refreshProlicense();
     }
 }

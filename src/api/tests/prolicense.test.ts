@@ -1,159 +1,87 @@
 import {test, expect, describe} from "@jest/globals";
-import superagent from "superagent";
 import {TestData} from "../helpers/test-data";
 import {Prolicense} from "../helpers/prolicense";
-import {TCriterias, TDocuments} from "../helpers/types/prolicense.type";
 import {ProlicenseStatus} from "../helpers/enums/prolicense-status";
-import {Api} from "../helpers/api";
 import {Hooks} from "../helpers/hooks/hooks";
+import {ProlicTypes} from "../helpers/enums/prolic-types";
+import {InstanceApi} from "../helpers/api/instance.api";
 
 describe("Prolicense", () => {
     const prolicense = new Prolicense();
-    const api = new Api();
     Hooks.beforeProlic(prolicense);
-    Hooks.afterEachProlic(prolicense,api);
-    test("Creating a license project", async () => {
-        const response = await superagent.put(api.basicUrl + api.constructors.createProlicense).
-        send(prolicense.createProlicense()).
-        set("cookie", `${prolicense.cookie}`).
-        set("x-csrf-token",prolicense.x_csrf_token);
-        expect(response.body.data.id).toBeTruthy();
-        expect(response.body.data.type).toBe(prolicense.licTypes[0].name);
-        expect(response.body.data.season).toBe(prolicense.seasons[0].name);
-        expect(response.body.data.stateId).toBe(ProlicenseStatus.unpublished);
-        expect(response.body.data.begin && response.body.data.requestBegin).toBe(TestData.currentDate);
-        expect(response.body.data.end && response.body.data.requestEnd &&
-            response.body.data.docSubmitDate && response.body.data.dueDate &&
-            response.body.data.reviewDate && response.body.data.decisionDate).toBe(TestData.futureDate);
 
-        prolicense.fillProlicense(0,response);
+    test("Creating a prolicense", async () => {
+        await prolicense.createProlicense();
+        expect(prolicense.prolicense[0].id).toBeTruthy();
+        expect(prolicense.prolicense[0].stateId).toBe(ProlicenseStatus.unpublished);
+        expect(prolicense.prolicense[0].begin && prolicense.prolicense[0].requestBegin).toBe(TestData.currentDate);
+        expect(
+            prolicense.prolicense[0].end &&
+            prolicense.prolicense[0].requestEnd &&
+            prolicense.prolicense[0].docSubmitDate &&
+            prolicense.prolicense[0].dueDate &&
+            prolicense.prolicense[0].reviewDate &&
+            prolicense.prolicense[0].decisionDate).
+        toBe(TestData.futureDate);
     })
-    test("Changing the license project", async () => {
-        const response = await superagent.put(api.basicUrl + api.constructors.changeProlicense).
-        send(prolicense.changeProlicense()).
-        set("cookie", `${prolicense.cookie}`).
-        set("x-csrf-token",prolicense.x_csrf_token);
-        expect(response.body.status).toBe("SUCCESS");
-        await prolicense.refreshProlicense(api);
+    test("Changing a prolicense", async () => {
+        await prolicense.changeProlicense();
+        expect(prolicense.prolicense[0].proLicType).toBe(ProlicTypes.finControl);
+        expect(prolicense.prolicense[0].dueDate).toBeNull();
+        expect(prolicense.prolicense[0].begin).toBeNull();
+        expect(prolicense.prolicense[0].end).toBeNull();
     })
     test("Creating prolicense criteria groups", async () => {
-        prolicense.createCritGroups();
-        for (const criteriaGroup of prolicense.criterias) {
-            const response = await superagent.put(api.basicUrl + api.constructors.createCriteriaGrp).
-            query({groupId: criteriaGroup.id, experts: criteriaGroup.experts}).
-            set("cookie", `${prolicense.cookie}`).
-            set("x-csrf-token",prolicense.x_csrf_token);
-            expect(response.body.status).toBe("SUCCESS");
+        await prolicense.createCriteriaGroups();
+        for(const group of prolicense.criterias) {
+            expect(group.id).not.toBeNull();
+            expect(group.experts.length).toBe(prolicense.critGrpExpertsId.length);
         }
     })
     test("Creating prolicense criterias", async () => {
-        prolicense.createCriterias();
-        for(const criteriaGroup of prolicense.criterias){
-            for(let criteria of criteriaGroup.criterias) {
-                const index = criteriaGroup.criterias.indexOf(criteria);
-                const response = await superagent.put(api.basicUrl + api.constructors.createCriterias).
-                send(criteria).
-                set("cookie", `${prolicense.cookie}`).
-                set("x-csrf-token",prolicense.x_csrf_token);
-                expect(response.body.data.id).toBeTruthy();
-                expect(response.body.data.documents.length).toEqual(criteria.documents.length);
-                expect(response.body.data.number).toBe(criteria.number);
-                criteriaGroup.criterias[index] = response.body.data;
-            }
+        await prolicense.createCriterias();
+        for(const group of prolicense.criterias) {
+            expect(group.criterias).not.toBeNull();
         }
     })
     test("Changing prolicense criterias", async () => {
-        prolicense.changeCriterias();
-        for (const criteriaGroup of prolicense.criterias) {
-            for (const criteria of criteriaGroup.criterias) {
-                const response = await superagent.put(api.basicUrl + api.constructors.changeCriterias + criteria.id).
-                send(criteria).
-                set("cookie", `${prolicense.cookie}`).
-                set("x-csrf-token",prolicense.x_csrf_token);
-                expect(response.body.status).toBe("SUCCESS");
-            }
+        await prolicense.changeCriterias();
+    })
+    test("Clone a prolicense", async () => {
+        await prolicense.cloneProlicense();
+        expect(prolicense.prolicense[1].id).not.toBe(prolicense.prolicense[0].id);
+        expect(prolicense.prolicense[1].requestBegin).toBe(prolicense.prolicense[0].requestBegin);
+        expect(prolicense.prolicense[1].requestEnd).toBe(prolicense.prolicense[0].requestEnd);
+        expect(prolicense.prolicense[1].docSubmitDate).toBe(prolicense.prolicense[0].docSubmitDate);
+        expect(prolicense.prolicense[1].reviewDate).toBe(prolicense.prolicense[0].reviewDate);
+        expect(prolicense.prolicense[1].decisionDate).toBe(prolicense.prolicense[0].decisionDate);
+        expect(prolicense.prolicense[1].dueDate).toBe(prolicense.prolicense[0].dueDate);
+        expect(prolicense.prolicense[1].stateId).toBe(ProlicenseStatus.unpublished);
+        for(const document of prolicense.prolicense[1].documents) {
+            const docIndex: number = prolicense.prolicense[1].documents.indexOf(document);
+            expect(document.name).toBe(prolicense.prolicense[0].documents[docIndex].name);
         }
     })
-    test("Getting full information about prolicense criterias", async () => {
-        const response = await superagent.get(api.basicUrl + api.constructors.createCriterias).
-        set("cookie", `${prolicense.cookie}`).
-        set("x-csrf-token",prolicense.x_csrf_token);
-        expect(response.body.data.groups.length).toBeGreaterThan(0);
-        response.body.data.groups.forEach((criteriaGroup: TCriterias, index: number) => {
-            criteriaGroup.criterias.forEach((criteria, criteriaIndex) => {
-                expect(criteria.name).toBe(prolicense.criterias[index].criterias[criteriaIndex].name);
-                expect(criteria.number).toBe(prolicense.criterias[index].criterias[criteriaIndex].number);
-                expect(criteria.categoryId).toBe(prolicense.criterias[index].criterias[criteriaIndex].categoryId);
-                expect(criteria.documents).not.toEqual(prolicense.criterias[index].criterias[criteriaIndex].documents);
-                criteria.documents = prolicense.criterias[index].criterias[criteriaIndex].documents;
-            })
-        })
-    })
-    test("Copy the prolicense", async () => {
-        const response = await superagent.put(api.basicUrl + api.constructors.cloneProlicense).
-        send(prolicense.createSampleProlicense()).
-        set("cookie", `${prolicense.cookie}`).
-        set("x-csrf-token",prolicense.x_csrf_token);
-        expect(response.body.data.id).not.toBe(prolicense.prolicense[0].id);
-        expect(
-            response.body.data.end && response.body.data.requestEnd &&
-            response.body.data.docSubmitDate && response.body.data.dueDate &&
-            response.body.data.reviewDate && response.body.data.decisionDate
-        ).toBe(TestData.futureDate);
-        expect(response.body.data.begin && response.body.data.requestBegin).toBe(TestData.currentDate);
-        expect(response.body.data.stateId).toBe(1);
-        response.body.data.documents.forEach((document : TDocuments, index : number) =>{
-        expect(document.name).toBe(prolicense.prolicense[0].documents[index].name);
-            document.templates.forEach((template, index1) => {
-            expect(template.name).toBe(prolicense.prolicense[0].documents[index].templates[index1].name);
-            expect(template.storageId).toBe(prolicense.prolicense[0].documents[index].templates[index1].storageId);
-        })
-    })
-        prolicense.prolicense.push(response.body.data);
-    })
     test("Removing a prolicense", async () => {
-        const response = await superagent.delete(api.basicUrl + api.constructors.deleteProlicense).
-        set("cookie", `${prolicense.cookie}`).
-        set("x-csrf-token",prolicense.x_csrf_token);
-        expect(response.body.status).toBe("SUCCESS");
-        prolicense.prolicense.pop();
+        const responseStatus: string = await prolicense.deleteProlicense()
+        expect(responseStatus).toBe(InstanceApi.successResponseStatus);
     })
     test("Removing prolicense criterias", async () => {
-        for (const criteriaGroup of prolicense.criterias) {
-            if (criteriaGroup.id % 2 == 0) {
-                for (const criteria of criteriaGroup.criterias) {
-                    const response = await superagent.delete(api.basicUrl + api.constructors.changeCriterias + criteria.id).
-                    set("cookie", `${prolicense.cookie}`).
-                    set("x-csrf-token",prolicense.x_csrf_token);
-                    expect(response.body.status).toBe("SUCCESS");
-                }
-                criteriaGroup.criterias = [];
-            }
+        await prolicense.deleteCriterias();
+        for(const group of prolicense.criterias) {
+            expect(group.criterias.length).toBe(0);
         }
     })
     test("Removing criteria groups", async () => {
-        for (let i = 0; i<prolicense.criterias.length; i++) {
-            if (prolicense.criterias[i].id % 2 == 0) {
-                const response = await superagent.delete(api.basicUrl + api.constructors.deleteCriteriasGrp + prolicense.criterias[i].id).
-                set("cookie", `${prolicense.cookie}`).
-                set("x-csrf-token",prolicense.x_csrf_token);
-                expect(response.body.status).toBe("SUCCESS");
-                prolicense.criterias.splice(i,1);
-            }
-        }
+        await prolicense.deleteCriteriaGroups();
+        expect(prolicense.criterias.length).toBe(0);
     })
     test("Publish prolicense",async () => {
-        const response = await superagent.put(api.basicUrl+api.constructors.publishProlicense).
-        set("cookie", `${prolicense.cookie}`).
-        set("x-csrf-token",prolicense.x_csrf_token);
-        expect(response.body.status).toBe("SUCCESS");
-        prolicense.prolicense[0].stateId = ProlicenseStatus.published;
+        await prolicense.publishProlicense();
+        expect(prolicense.prolicense[0].stateId).toBe(ProlicenseStatus.published);
     })
-    test("Removing of the prolicense from publication", async () => {
-        const response = await superagent.put(api.basicUrl + api.constructors.unpublishProlicense).
-        set("cookie", `${prolicense.cookie}`).
-        set("x-csrf-token",prolicense.x_csrf_token);
-        expect(response.body.status).toBe("SUCCESS");
-        prolicense.prolicense[0].stateId = ProlicenseStatus.unpublished;
+    test("Unpublish a prolicense", async () => {
+        await prolicense.unpublishProlicense();
+        expect(prolicense.prolicense[0].stateId).toBe(ProlicenseStatus.unpublished);
     })
 })

@@ -6,30 +6,30 @@ export type TSeasons = {
     name: string
 }
 export type TCriteriaGroups = {
-    id : number,
-    name : string
+    id: number,
+    name: string
 }
 
 export type TLicTypes = {
-    id : number,
-    name : string,
-    sysName : string,
-    description : string
+    id: number,
+    name: string,
+    sysName: string,
+    description: string
 }
 export type TDocTypes = {
     id: number,
-    name : string,
-    description : string
+    name: string,
+    description: string
 }
 export type TRankCriteria = {
-    id : number,
-    code : string,
-    description : string
+    id: number,
+    code: string,
+    description: string
 }
 export type TCriteriaTypes = {
-    id : number,
-    name : string,
-    description : string
+    id: number,
+    name: string,
+    description: string
 }
 export type TLicAndDocStatus = {
     id: number,
@@ -38,15 +38,15 @@ export type TLicAndDocStatus = {
 }
 export type TClubWorkers = {
     id: number,
-    rfsId : number,
-    fio : string,
-    firstName : string,
-    middleName : string,
-    lastName : string,
-    birthDate : string,
-    orgName : string,
-    position : string,
-    sportRole : string
+    rfsId: number,
+    fio: string,
+    firstName: string,
+    middleName: string,
+    lastName: string,
+    birthDate: string,
+    orgName: string,
+    position: string,
+    sportRole: string
 }
 export type TOfi = {
     geo_lat: string,
@@ -99,8 +99,8 @@ export type TOrganization = {
     type: string
 }
 export type TParent = {
-    id : number,
-    fullName : string
+    id: number,
+    fullName: string
 }
 export type TRoles = {
     id: number,
@@ -118,13 +118,13 @@ export type TRights = {
 }
 export type TCommissionType = {
     id: number,
-    name : string,
-    description : string
+    name: string,
+    description: string
 }
 export type commissionDecision = {
     id: number,
-    name : string,
-    description : string
+    name: string,
+    description: string
 }
 export type TCommissionTypeMember = {
     id: number,
@@ -144,6 +144,9 @@ export type TCommissionTypeMember = {
     active: boolean
 }
 export type TFiles = {
-    name : string,
-    storageId : string
+    name: string,
+    storageId: string
+}
+export type TClubExperts = {
+    experts: number[]
 }
