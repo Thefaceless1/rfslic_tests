@@ -5,17 +5,17 @@ import {Elements} from "../../../framework/elements/elements.js";
 import {InputData} from "../../helpers/input-data.js";
 
 export class LicTextPage extends MainPage{
-    constructor(page : Page) {
+    constructor(page: Page) {
         super(page);
     }
     /**
      * Text field "Enter a text"
      */
-    private enterText : Locator = Elements.getElement(this.page,"//textarea[@placeholder='Введите текст']");
+    private enterText: Locator = Elements.getElement(this.page,"//textarea[@placeholder='Введите текст']")
     /**
      * Add license text
      */
-    public async addLicText() : Promise<void> {
+    public async addLicText(): Promise<void> {
         const text : string = InputData.randomWord;
         await this.adminMenuByEnum(AdminOptions.licenseText).click();
         await this.licType.click();

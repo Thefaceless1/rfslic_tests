@@ -6,25 +6,25 @@ import {InputData} from "../../helpers/input-data.js";
 import {Notifications} from "../../helpers/enums/notifications.js";
 
 export class CategoriesClassifierPage extends MainPage {
-    constructor(page : Page) {
+    constructor(page: Page) {
         super(page);
     }
     /**
      * Button "Add a rank"
      */
-    private addRankButton : Locator = Elements.getElement(this.page,"//button[text()='Добавить разряд']");
+    private addRankButton: Locator = Elements.getElement(this.page,"//button[text()='Добавить разряд']")
     /**
      * Field "Enter a code"
      */
-    private enterCode : Locator = Elements.getElement(this.page,"//input[@placeholder='Введите код' or @placeholder='Код']");
+    private enterCode: Locator = Elements.getElement(this.page,"//input[@placeholder='Введите код' or @placeholder='Код']")
     /**
      * column "Code"
      */
-    private codeColumn : Locator = Elements.getElement(this.page,"//td[contains(@class,'codeWrapperCell')]");
+    private codeColumn: Locator = Elements.getElement(this.page,"//td[contains(@class,'codeWrapperCell')]")
     /**
      * Add a category
      */
-    public async addCategory() : Promise<void> {
+    public async addCategory(): Promise<void> {
         await Elements.waitForVisible(this.codeColumn.first());
         const existingCodes : string[] =await this.codeColumn.allInnerTexts();
         await this.addRankButton.click();
@@ -36,7 +36,7 @@ export class CategoriesClassifierPage extends MainPage {
     /**
      * Get non-existent code
      */
-    private nonExistentCode(codes : string[]) : string {
+    private nonExistentCode(codes: string[]): string {
         const symbols : string = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz";
         const randomNumber : number = randomInt(0,symbols.length);
         return (codes.includes(symbols[randomNumber])) ?
@@ -46,7 +46,7 @@ export class CategoriesClassifierPage extends MainPage {
     /**
      * Change a category
      */
-    public async changeCategory() : Promise<void> {
+    public async changeCategory(): Promise<void> {
         await Elements.waitForVisible(this.editTableButton.first());
         const existingCodes : string[] =await this.codeColumn.allInnerTexts();
         await this.editTableButton.last().click();
@@ -60,7 +60,7 @@ export class CategoriesClassifierPage extends MainPage {
     /**
      * Delete a category
      */
-    public async deleteCategory() : Promise<void> {
+    public async deleteCategory(): Promise<void> {
         await Elements.waitForVisible(this.deleteTableButton.first());
         const createdCode : string = await this.codeColumn.last().innerText();
         const pendingNotification : string = `Разряд "${createdCode}" удален`;

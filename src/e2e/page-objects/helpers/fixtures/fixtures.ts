@@ -15,18 +15,18 @@ import {CategoriesClassifierPage} from "../../pages/admin/categories-classifier.
 import * as Process from "process";
 
 type Fixtures = {
-    setUser : AuthPage,
-    constructor : ConstructorNewPage,
-    requests : RequestPage,
-    roles : RolesPage,
-    users : UsersPage,
-    licenseText : LicTextPage,
-    commission : CommissionPage,
-    groupClassifier : GroupsClassifierPage,
-    categoriesClassifier : CategoriesClassifierPage
+    setUser: AuthPage,
+    constructor: ConstructorNewPage,
+    requests: RequestPage,
+    roles: RolesPage,
+    users: UsersPage,
+    licenseText: LicTextPage,
+    commission: CommissionPage,
+    groupClassifier: GroupsClassifierPage,
+    categoriesClassifier: CategoriesClassifierPage
 }
 export const test = base.extend<Fixtures>({
-    constructor : async ({page},use) => {
+    constructor: async ({page},use) => {
         const constructor = new ConstructorNewPage(page);
         await constructor.createUser();
         await constructor.login();
@@ -37,7 +37,7 @@ export const test = base.extend<Fixtures>({
             await constructor.deleteProdProlicense();
         }
     },
-    requests : async ({page},use) => {
+    requests: async ({page},use) => {
         const request = new RequestPage(page);
         await request.createUser();
         await request.login();
@@ -51,7 +51,7 @@ export const test = base.extend<Fixtures>({
             await request.deleteProdLicense();
         }
     },
-    roles : async ({page},use) => {
+    roles: async ({page},use) => {
         const roles = new RolesPage(page);
         await roles.createUser();
         await roles.login();
@@ -59,7 +59,7 @@ export const test = base.extend<Fixtures>({
         await use(roles);
         if(Process.env.BRANCH == "prod") await roles.deleteProdUser();
     },
-    users : async ({page},use) => {
+    users: async ({page},use) => {
         const users = new UsersPage(page);
         await users.createUser();
         await users.deleteTestedUser();
@@ -68,20 +68,20 @@ export const test = base.extend<Fixtures>({
         await use(users);
         if(Process.env.BRANCH == "prod") await users.deleteProdUser();
     },
-    setUser : async ({browser},use) => {
+    setUser: async ({browser},use) => {
         const page = await browser.newPage();
         const authPage = new AuthPage(page);
         await use(authPage);
         await page.close();
     },
-    licenseText : async ({page},use) => {
+    licenseText: async ({page},use) => {
         const licenseText = new LicTextPage(page);
         await licenseText.createUser();
         await licenseText.login();
         await use(licenseText);
         if(Process.env.BRANCH == "prod") await licenseText.deleteProdUser();
     },
-    commission : async ({page},use) => {
+    commission: async ({page},use) => {
         const commission = new CommissionPage(page);
         await commission.createUser();
         await commission.login();
@@ -89,7 +89,7 @@ export const test = base.extend<Fixtures>({
         await commission.commissionMenuByEnum(CommissionMenuOptions.meetings).click();
         await use(commission);
     },
-    groupClassifier : async ({page},use) => {
+    groupClassifier: async ({page},use) => {
         const groupClassifier = new GroupsClassifierPage(page);
         await groupClassifier.createUser();
         await groupClassifier.login();
@@ -97,7 +97,7 @@ export const test = base.extend<Fixtures>({
         await use(groupClassifier);
         if(Process.env.BRANCH == "prod") await groupClassifier.deleteProdUser();
     },
-    categoriesClassifier : async ({page},use) => {
+    categoriesClassifier: async ({page},use) => {
         const categoriesClassifier = new CategoriesClassifierPage(page);
         await categoriesClassifier.createUser();
         await categoriesClassifier.login();

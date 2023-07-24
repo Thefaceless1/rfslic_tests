@@ -15,119 +15,119 @@ import {ProlicStatus} from "../../helpers/enums/prolicstatus.js";
 import {DbHelper} from "../../../../db/db-helper.js";
 
 export class ConstructorNewPage extends ConstructorPage {
-    constructor(page : Page) {
+    constructor(page: Page) {
         super(page);
     }
     /**
      * The name of the created prolicense
      */
-    public createdProlicName : Locator = Elements.getElement(this.page,"//*[text()='Название пролицензии:']//following-sibling::*");
+    public createdProlicName: Locator = Elements.getElement(this.page,"//*[text()='Название пролицензии:']//following-sibling::*")
     /**
      * Field "Season"
      */
-    private season : Locator = Elements.getElement(this.page,"//*[contains(@class,'season__control')]");
+    private season: Locator = Elements.getElement(this.page,"//*[contains(@class,'season__control')]")
     /**
      * Field "Document name"
      */
-    private docName : Locator = Elements.getElement(this.page,"//input[@placeholder='Введите название документа']");
+    private docName: Locator = Elements.getElement(this.page,"//input[@placeholder='Введите название документа']")
     /**
      * Field "Add document"
      */
-    private addDocButton : Locator = Elements.getElement(this.page,"//span[text()='Добавить документ']");
+    private addDocButton: Locator = Elements.getElement(this.page,"//span[text()='Добавить документ']")
     /**
      * Action call button for prolicense
      */
-    private  actionButton : Locator = Elements.getElement(this.page,"//button[@name='proLic_btn_details']");
+    private  actionButton: Locator = Elements.getElement(this.page,"//button[@name='proLic_btn_details']")
     /**
      * Field "Criteria group name"
      */
-    private grpCrit = Elements.getElement(this.page,"//*[contains(@class,'groupName__placeholder')]");
+    private grpCrit = Elements.getElement(this.page,"//*[contains(@class,'groupName__placeholder')]")
     /**
      * Values of the drop-down list of the field "Criteria group name"
      */
-    private grpCritList : Locator = Elements.getElement(this.page,"//*[contains(@class,'groupName__option')]");
+    private grpCritList: Locator = Elements.getElement(this.page,"//*[contains(@class,'groupName__option')]")
     /**
      * Created criteria groups
      */
-    private createdGroups : Locator = Elements.getElement(this.page,"//span[contains(text(),'критерии')]");
+    private createdGroups: Locator = Elements.getElement(this.page,"//span[contains(text(),'критерии')]")
     /**
      * Action dropdown values
      */
-    private actionsList : Locator = Elements.getElement(this.page,"//*[contains(@class,'ContextMenuLevelCanary-Item')]");
+    private actionsList: Locator = Elements.getElement(this.page,"//*[contains(@class,'ContextMenuLevelCanary-Item')]")
     /**
      * Values of the drop-down list of the "Season" field
      */
-    private seasons : Locator = Elements.getElement(this.page,"//*[contains(@class,'season__option')]");
+    private seasons: Locator = Elements.getElement(this.page,"//*[contains(@class,'season__option')]")
     /**
      * Field "Criteria number"
      */
-    private criteriaNumber : Locator = Elements.getElement(this.page,"//input[@placeholder='Введите номер критерия']");
+    private criteriaNumber: Locator = Elements.getElement(this.page,"//input[@placeholder='Введите номер критерия']")
     /**
      * Field "Rank"
      */
-    private rankCriteria : Locator = Elements.getElement(this.page,"//*[contains(@class,'category__control')]");
+    private rankCriteria: Locator = Elements.getElement(this.page,"//*[contains(@class,'category__control')]")
     /**
      * Values of the drop-down list of the field "Rank"
      */
-    private rankList : Locator = Elements.getElement(this.page,"//*[contains(@class,'category__option')]");
+    private rankList: Locator = Elements.getElement(this.page,"//*[contains(@class,'category__option')]")
     /**
      * Field "Criteria name"
      */
-    private criteriaName : Locator = Elements.getElement(this.page,"//input[@placeholder='Введите название критерия']");
+    private criteriaName: Locator = Elements.getElement(this.page,"//input[@placeholder='Введите название критерия']")
     /**
      * Field "Criteria type"
      */
-    private criteriaType : Locator = Elements.getElement(this.page,"//*[contains(@class,'type__control')]");
+    private criteriaType: Locator = Elements.getElement(this.page,"//*[contains(@class,'type__control')]")
     /**
      * Values of the drop-down list of the field "Criteria type"
      */
-    private criteriaTypeList : Locator = Elements.getElement(this.page,"//*[contains(@class,'type__option')]");
+    private criteriaTypeList: Locator = Elements.getElement(this.page,"//*[contains(@class,'type__option')]")
     /**
      * Field "Additional data type"
      */
-    private additionalDataType : Locator = Elements.getElement(this.page,"//*[contains(@class,'additionalDocType__control')]");
+    private additionalDataType: Locator = Elements.getElement(this.page,"//*[contains(@class,'additionalDocType__control')]")
     /**
      * Values of the drop-down list of the field "Additional data type"
      */
-    private additionalDataTypeList : Locator = Elements.getElement(this.page,"//*[contains(@class,'additionalDocType__option')]");
+    private additionalDataTypeList: Locator = Elements.getElement(this.page,"//*[contains(@class,'additionalDocType__option')]")
     /**
      * Button "Publish"
      */
-    private publishButton : Locator = Elements.getElement(this.page,"//button[text()='Опубликовать']");
+    private publishButton: Locator = Elements.getElement(this.page,"//button[text()='Опубликовать']")
     /**
      * Button "Unpublish"
      */
-    private unpublishButton : Locator = Elements.getElement(this.page,"//button[text()='Снять с публикации']");
+    private unpublishButton: Locator = Elements.getElement(this.page,"//button[text()='Снять с публикации']")
     /**
      * Field "Document description"
      */
-    private docDescription : Locator = Elements.getElement(this.page,"//textarea[@placeholder='Добавьте описание документа']");
+    private docDescription: Locator = Elements.getElement(this.page,"//textarea[@placeholder='Добавьте описание документа']")
     /**
      * Created criteria name
      */
-    private createdCriteria : Locator = Elements.getElement(this.page,"//span[contains(text(),'Название')]");
+    private createdCriteria: Locator = Elements.getElement(this.page,"//span[contains(text(),'Название')]")
     /**
      * Field "Multiple criteria"
      */
-    private multipleCriteria : Locator = Elements.getElement(this.page,"//input[@name='isMulti']");
+    private multipleCriteria: Locator = Elements.getElement(this.page,"//input[@name='isMulti']")
     /**
      * Field "Minimal amount"
      */
-    private minAmount : Locator = Elements.getElement(this.page,"//input[@name='minCount']");
+    private minAmount: Locator = Elements.getElement(this.page,"//input[@name='minCount']")
     /**
      * Radio "Finance control"
      */
-    private finControl : Locator = Elements.getElement(this.page,"//button[@role='switch']");
+    private finControl: Locator = Elements.getElement(this.page,"//button[@role='switch']")
     /**
      * Current displayed prolicense status
      */
-    private prolicenseStatus(statusValue : string) : Locator {
+    private prolicenseStatus(statusValue: string): Locator {
         return Elements.getElement(this.page,`//*[text()='${statusValue}']`);
     }
     /**
      * Open Prolicense constructor
      */
-    public async openConstructor () : Promise<void> {
+    public async openConstructor(): Promise<void> {
         await Elements.waitForVisible(this.menuOptionByEnum(MainMenuOptions.constructor));
         await this.menuOptionByEnum(MainMenuOptions.constructor).click();
         await this.createProlicButton.click();
@@ -135,7 +135,7 @@ export class ConstructorNewPage extends ConstructorPage {
     /**
      * Get an action for a prolicense by enum
      */
-    private async actionByEnum (enumValue : ProlicenseActions) {
+    private async actionByEnum(enumValue: ProlicenseActions) {
         const actionArray = await this.actionsList.all();
         for (const action of actionArray) {
             if (await action.textContent() == enumValue) return action;
@@ -144,7 +144,7 @@ export class ConstructorNewPage extends ConstructorPage {
     /**
      * Fill in the fields of the block "General information"
      */
-    private async fillBasicInfo() : Promise<void> {
+    private async fillBasicInfo(): Promise<void> {
         await this.name.type(InputData.randomWord);
         await this.season.click();
         await this.seasons.last().click();
@@ -158,8 +158,8 @@ export class ConstructorNewPage extends ConstructorPage {
     /**
      * Change the values in the fields of the "General information" block
      */
-    public async changeBasicInfo() : Promise<void> {
-        const oldProlicName : string = await this.createdProlicName.innerText();
+    public async changeBasicInfo(): Promise<void> {
+        const oldProlicName: string = await this.createdProlicName.innerText();
         await this.editButton.first().click();
         await this.finControl.click();
         await this.name.clear();
@@ -174,15 +174,15 @@ export class ConstructorNewPage extends ConstructorPage {
     /**
      * Comparison of the old and new name of the prolicense
      */
-    private async compareProlicName(oldProlicName : string) : Promise<boolean> {
-        const newProlicName : string = await this.createdProlicName.innerText();
+    private async compareProlicName(oldProlicName: string): Promise<boolean> {
+        const newProlicName: string = await this.createdProlicName.innerText();
         return (oldProlicName != newProlicName) ? true : this.compareProlicName(oldProlicName);
     }
     /**
      * Fill in the fields of the block "Documents for filing an application"
      */
-    private async fillDocs() : Promise<void> {
-        const docsCount : number = 2;
+    private async fillDocs(): Promise<void> {
+        const docsCount: number = 2;
         for(let i = 1 ; i<=docsCount ; i++) {
             if (i != 1) await this.addDocButton.click();
             await this.docName.last().type(InputData.randomWord);
@@ -195,7 +195,7 @@ export class ConstructorNewPage extends ConstructorPage {
     /**
      * Create a prolicense
      */
-    public async createProlicense() : Promise<void> {
+    public async createProlicense(): Promise<void> {
          await this.fillBasicInfo();
          await this.fillDocs();
          await this.saveButton.click();
@@ -204,10 +204,10 @@ export class ConstructorNewPage extends ConstructorPage {
     /**
      * Copy a prolicense
      */
-    public async cloneProlicense() : Promise<void> {
-        const prolicNameBeforeClone : string = await this.createdProlicName.innerText();
+    public async cloneProlicense(): Promise<void> {
+        const prolicNameBeforeClone: string = await this.createdProlicName.innerText();
         await this.actionButton.click();
-        await this.actionsList.filter({hasText : ProlicenseActions.clone}).click();
+        await this.actionsList.filter({hasText: ProlicenseActions.clone}).click();
         await this.name.type(InputData.randomWord);
         await this.saveButton.click();
         await expect(this.compareProlicName(prolicNameBeforeClone)).toBeTruthy();
@@ -215,14 +215,14 @@ export class ConstructorNewPage extends ConstructorPage {
     /**
      * Publication of a prolicense
      */
-    public async publishProlicense(scenario : "lic" | "prolic") : Promise<void> {
+    public async publishProlicense(scenario: "lic" | "prolic"): Promise<void> {
         if(scenario == "prolic") {
             await this.filterByColumn(this.filterButtonByEnum(Columns.licName));
             await this.waitForColumnFilter();
             await this.tableRow.click();
         }
         await this.actionButton.click();
-        await this.actionsList.filter({hasText : ProlicenseActions.publish}).click();
+        await this.actionsList.filter({hasText: ProlicenseActions.publish}).click();
         await this.publishButton.click();
         if(scenario == "prolic") {
             await this.filterByColumn(this.filterButtonByEnum(Columns.licName));
@@ -234,16 +234,16 @@ export class ConstructorNewPage extends ConstructorPage {
     /**
      * Unpublish of a prolicense
      */
-    public async unpublishProlicense() : Promise<void> {
+    public async unpublishProlicense(): Promise<void> {
         await this.actionButton.click();
-        await this.actionsList.filter({hasText : ProlicenseActions.unpublish}).click();
+        await this.actionsList.filter({hasText: ProlicenseActions.unpublish}).click();
         await this.unpublishButton.click();
         await expect(this.prolicenseStatus(ProlicStatus.onEditing)).toBeVisible();
     }
     /**
      * Remove a prolicense
      */
-    public async deleteProlicense() : Promise<void> {
+    public async deleteProlicense(): Promise<void> {
         await this.actionButton.click();
         const deleteValue = await this.actionByEnum(ProlicenseActions.delete);
         if (deleteValue) {
@@ -255,8 +255,8 @@ export class ConstructorNewPage extends ConstructorPage {
     /**
      * Create criteria groups
      */
-    public async createGrpCrit() : Promise<void> {
-        const groupsCount : number = 2;
+    public async createGrpCrit(): Promise<void> {
+        const groupsCount: number = 2;
         for(let i = 0; i <groupsCount; i++) {
             await Elements.waitForVisible(this.addGrpCritButton);
             await this.addGrpCritButton.click();
@@ -278,14 +278,14 @@ export class ConstructorNewPage extends ConstructorPage {
     /**
      * Waiting for the visibility of all created criteria groups
      */
-    private async waitForVisibleAllGroups(groups : number) : Promise<void> {
-        const currentGroups : number = await this.createdGroups.count();
+    private async waitForVisibleAllGroups(groups: number): Promise<void> {
+        const currentGroups: number = await this.createdGroups.count();
         if(groups != currentGroups) await this.waitForVisibleAllGroups(groups);
     }
     /**
      * Fill in the criteria fields
      */
-    private async fillCriteriaInfo(index : number, critType : string) : Promise<void> {
+    private async fillCriteriaInfo(index: number, critType: string): Promise<void> {
         await this.plusButton.nth(index).click();
         await this.criteriaNumber.type(InputData.randomWord)
         await this.rankCriteria.click();
@@ -302,14 +302,14 @@ export class ConstructorNewPage extends ConstructorPage {
     /**
      * Fill in the fields of criteria documents
      */
-    private async fillCriteriaDocs() : Promise<void> {
+    private async fillCriteriaDocs(): Promise<void> {
         await this.addDocButton.click();
         await this.docName.last().type(InputData.randomWord);
         await this.docDescription.last().type(InputData.randomWord);
         await this.additionalDataType.last().click();
         await Elements.waitForVisible(this.additionalDataTypeList.last());
-        const dataTypeCount : number = await this.additionalDataTypeList.count();
-        const randomNumb : number = randomInt(0,dataTypeCount);
+        const dataTypeCount: number = await this.additionalDataTypeList.count();
+        const randomNumb: number = randomInt(0,dataTypeCount);
         await this.additionalDataTypeList.nth(randomNumb).click();
         if (this.checkDocType(randomNumb)) {
             await Input.uploadFiles(this.templates.last(),"all");
@@ -320,7 +320,7 @@ export class ConstructorNewPage extends ConstructorPage {
     /**
      * Checking whether to add files to the selected criteria document type
      */
-    private checkDocType(randomNumb : number) : boolean {
+    private checkDocType(randomNumb: number): boolean {
         return (
             randomNumb != NonFilesDoctypes.participantsList &&
             randomNumb != NonFilesDoctypes.organization &&
@@ -330,11 +330,11 @@ export class ConstructorNewPage extends ConstructorPage {
     /**
      * Create criterias
      */
-    public async createCriteria() : Promise<void> {
+    public async createCriteria(): Promise<void> {
         const groupsCount = await this.createdGroups.count();
-        const criteriaTypes : string[] = [`${CriteriaTypes.documents}`,`${CriteriaTypes.member}`,`${CriteriaTypes.ofi}`];
+        const criteriaTypes: string[] = [`${CriteriaTypes.documents}`,`${CriteriaTypes.member}`,`${CriteriaTypes.ofi}`];
         const docCount = 2;
-        let createdCriteriaCount : number = 0;
+        let createdCriteriaCount: number = 0;
         for(let i = 0; i < groupsCount; i++) {
             for (const type of criteriaTypes) {
                 await this.fillCriteriaInfo(i,type);
@@ -351,15 +351,15 @@ export class ConstructorNewPage extends ConstructorPage {
     /**
      * waiting for the filtered record to be displayed
      */
-    private async waitForColumnFilter() : Promise<void> {
-        const rowCount : number = await this.tableRow.count();
+    private async waitForColumnFilter(): Promise<void> {
+        const rowCount: number = await this.tableRow.count();
         if(rowCount > 1) await this.waitForColumnFilter();
         return;
     }
     /**
      * Delete created prolicense from pre-prod database
      */
-    public async deleteProdProlicense() : Promise<void> {
+    public async deleteProdProlicense(): Promise<void> {
         const dbHelper = new DbHelper();
         await dbHelper.deleteProlicense();
         await dbHelper.closeConnect();

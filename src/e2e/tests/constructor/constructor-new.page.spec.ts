@@ -2,7 +2,7 @@ import {test} from "../../page-objects/helpers/fixtures/fixtures.js";
 import {InputData} from "../../page-objects/helpers/input-data.js";
 
 test.describe("Пролицензии", () => {
-    test(`Дата запуска : ${InputData.currentDate}, Версия модуля: ${InputData.moduleVersion}`,
+    test(`Дата запуска: ${InputData.currentDate}, Версия модуля: ${InputData.moduleVersion}`,
         async ({constructor}) => {
         test.info().annotations.push
         (

@@ -23,148 +23,148 @@ export class RequestPage extends CommissionPage {
     /**
      * Tabs with criteria groups
      */
-    private criteriaGroups : Locator = Elements.getElement(this.page,"//button[contains(text(),'критерии')]");
+    private criteriaGroups: Locator = Elements.getElement(this.page,"//button[contains(text(),'критерии')]")
     /**
      * Criteria information field
      */
-    private criteriaInfo : Locator = Elements.getElement(this.page,"//span[contains(@class,'CriteriasInfoItem_collapse_title')]");
+    private criteriaInfo: Locator = Elements.getElement(this.page,"//span[contains(@class,'CriteriasInfoItem_collapse_title')]")
     /**
      * Member criteria information field
      */
-    private memberCriteriaInfo : Locator = Elements.getElement(this.page,"//*[text()='ФИО Участника:']");
+    private memberCriteriaInfo: Locator = Elements.getElement(this.page,"//*[text()='ФИО Участника:']")
     /**
      * OFI criteria information field
      */
-    private ofiCriteriaInfo : Locator = Elements.getElement(this.page,"//*[text()='Наименование ОФИ:']");
+    private ofiCriteriaInfo: Locator = Elements.getElement(this.page,"//*[text()='Наименование ОФИ:']")
     /**
      * Document status confirmation button
      */
-    private checkButton : Locator = Elements.getElement(this.page,"//button[.//span[contains(@class,'IconCheck')]]");
+    private checkButton: Locator = Elements.getElement(this.page,"//button[.//span[contains(@class,'IconCheck')]]")
     /**
      * Document status selection field
      */
-    private docStates : Locator = Elements.getElement(this.page,"//*[contains(@class,'docState__control')]");
+    private docStates: Locator = Elements.getElement(this.page,"//*[contains(@class,'docState__control')]")
     /**
      * Drop-down list values in the "Document Decision" field
      */
-    private docStatesList : Locator = Elements.getElement(this.page,"//*[contains(@class,'docState__option')]");
+    private docStatesList: Locator = Elements.getElement(this.page,"//*[contains(@class,'docState__option')]")
     /**
      * Selected status near the document name
      */
-    private statusNearDoc : Locator = Elements.getElement(this.page,"//*[contains(@class,'DocumentInfo')]//*[contains(@class,'Badge_view')]");
+    private statusNearDoc: Locator = Elements.getElement(this.page,"//*[contains(@class,'DocumentInfo')]//*[contains(@class,'Badge_view')]")
     /**
      * Selected status in the "Document Decision" field
      */
-    private selectedStatus : Locator = Elements.getElement(this.page,"//*[contains(@class,'docState__single-value') or contains(@class,'docState__placeholder')]");
+    private selectedStatus: Locator = Elements.getElement(this.page,"//*[contains(@class,'docState__single-value') or contains(@class,'docState__placeholder')]")
     /**
      * Expert comment
      */
-    private reviewComment : Locator = Elements.getElement(this.page,"//textarea[@name='reviewComment']");
+    private reviewComment: Locator = Elements.getElement(this.page,"//textarea[@name='reviewComment']")
     /**
      * Field "License decision"
      */
-    private selectLicStatus : Locator = Elements.getElement(this.page,"//*[contains(@class,'requestState__control')]");
+    private selectLicStatus : Locator = Elements.getElement(this.page,"//*[contains(@class,'requestState__control')]")
     /**
      * Field "Conclusion"
      */
-    private conclusion : Locator = Elements.getElement(this.page,"//textarea[@name='conclusion']");
+    private conclusion: Locator = Elements.getElement(this.page,"//textarea[@name='conclusion']")
     /**
      * Field "Recommendation"
      */
-    private recommendation : Locator = Elements.getElement(this.page,"//textarea[@name='recommendation']");
+    private recommendation: Locator = Elements.getElement(this.page,"//textarea[@name='recommendation']")
     /**
      * Field "RPS criterias"
      */
-    private rplCriterias : Locator = Elements.getElement(this.page,"//textarea[@name='rplCriterias']");
+    private rplCriterias: Locator = Elements.getElement(this.page,"//textarea[@name='rplCriterias']")
     /**
      * Button "Create a report"
      */
-    private createReport : Locator = Elements.getElement(this.page,"//button[text()='Сформировать отчет эксперта']");
+    private createReport: Locator = Elements.getElement(this.page,"//button[text()='Сформировать отчет эксперта']")
     /**
      * Button "Edit license status"
      */
-    private licEditButton : Locator = Elements.getElement(this.page,"//span[contains(@class,'iconEditReqStatus')]");
+    private licEditButton: Locator = Elements.getElement(this.page,"//span[contains(@class,'iconEditReqStatus')]")
     /**
      * "Criteria type" field value
      */
-    private critTypeValue : Locator = Elements.getElement(this.page,"//*[text()='Тип критерия:']//following-sibling::*");
+    private critTypeValue: Locator = Elements.getElement(this.page,"//*[text()='Тип критерия:']//following-sibling::*")
     /**
      * Field "Club worker comment"
      */
-    private clubWorkerComment : Locator = Elements.getElement(this.page,"//*[contains(@class,'DocumentInfo') and contains(@class,'hyphens')]");
+    private clubWorkerComment: Locator = Elements.getElement(this.page,"//*[contains(@class,'DocumentInfo') and contains(@class,'hyphens')]")
     /**
      * Button "submit a document for review"
      */
-    private submitReviewButton : Locator = Elements.getElement(this.page,"//span[contains(@class,'IconSendMessage')]");
+    private submitReviewButton: Locator = Elements.getElement(this.page,"//span[contains(@class,'IconSendMessage')]")
     /**
      * Button "Edit OFI"
      */
-    private editOfiButton : Locator = Elements.getElement(this.page,"//button[@name='editButtonOfi']");
+    private editOfiButton: Locator = Elements.getElement(this.page,"//button[@name='editButtonOfi']")
     /**
      * Document tooltip
      */
-    private docTooltip : Locator = Elements.getElement(this.page,"//span[contains(@class,'IconInfo')]");
+    private docTooltip: Locator = Elements.getElement(this.page,"//span[contains(@class,'IconInfo')]")
     /**
      * Button "Edit Member"
      */
-    private editMemberButton : Locator = Elements.getElement(this.page,"//button[@name='editButtonMember']");
+    private editMemberButton: Locator = Elements.getElement(this.page,"//button[@name='editButtonMember']")
     /**
      * Button "->" in the left corner of the table
      */
-    private arrow  : Locator = Elements.getElement(this.page,"(//td[contains(@class,'fix-left')]/button)[1]");
+    private arrow: Locator = Elements.getElement(this.page,"(//td[contains(@class,'fix-left')]/button)[1]")
 
     /**
      * Button "Go to request"
      */
-    private goToRequest : Locator = Elements.getElement(this.page,"//span[text()='Перейти к заявке']");
+    private goToRequest: Locator = Elements.getElement(this.page,"//span[text()='Перейти к заявке']")
     /**
      * Button "Publish a request"
      */
-    private publishReqButton : Locator = Elements.getElement(this.page,"//button[text()='Подать заявку']");
+    private publishReqButton: Locator = Elements.getElement(this.page,"//button[text()='Подать заявку']")
     /**
      * Field "Select a club"
      */
-    private selectClub : Locator = Elements.getElement(this.page,"//*[contains(@class,'club__control')]");
+    private selectClub: Locator = Elements.getElement(this.page,"//*[contains(@class,'club__control')]")
     /**
      * Values of the drop-down list of the field "Select a club"
      */
-    private selectClubList : Locator = Elements.getElement(this.page,"//*[contains(@class,'club__option')]");
+    private selectClubList: Locator = Elements.getElement(this.page,"//*[contains(@class,'club__option')]")
     /**
      * License title
      */
-    private licTitle : Locator = Elements.getElement(this.page,"//*[text()='Заявка на лицензирование клуба']");
+    private licTitle: Locator = Elements.getElement(this.page,"//*[text()='Заявка на лицензирование клуба']")
     /**
      * Name of the expert report file
      */
-    private expertReportFile : Locator = Elements.getElement(this.page,"//span[contains(text(),'Отчет эксперта')]");
+    private expertReportFile: Locator = Elements.getElement(this.page,"//span[contains(text(),'Отчет эксперта')]")
     /**
      * Currently displayed license status
      */
-    private currentLicStatus : Locator = Elements.getElement(this.page,"//*[contains(@class,'requestStateBadgeWrapper')]//*[contains(@class,'Badge_view_filled')]");
+    private currentLicStatus: Locator = Elements.getElement(this.page,"//*[contains(@class,'requestStateBadgeWrapper')]//*[contains(@class,'Badge_view_filled')]")
     /**
      * File attached to the document
      */
-    private attachedFile : Locator = Elements.getElement(this.page,"//*[contains(@class,'DocumentInfo_file_wrapper')][1]");
+    private attachedFile: Locator = Elements.getElement(this.page,"//*[contains(@class,'DocumentInfo_file_wrapper')][1]")
     /**
      * Title of the modal window "Change ticket status"
      */
-    private changeLicStatusTitle : Locator = Elements.getElement(this.page,"//*[contains(@class,'ChangeRequestStatusModal_modal_titleWrapper')]");
+    private changeLicStatusTitle: Locator = Elements.getElement(this.page,"//*[contains(@class,'ChangeRequestStatusModal_modal_titleWrapper')]")
     /**
      * Get the drop-down list value of the 'License decision' field by enum
      */
-    private selectLicStatusByEnum(statusValue : LicStatus ) : Locator {
+    private selectLicStatusByEnum(statusValue: LicStatus ): Locator {
         return Elements.getElement(this.page,`//*[contains(@class,'requestState__option') and text()='${statusValue}']`);
     }
     /**
      * Get tabs by enum
      */
-    private sectionByEnum(section : RequestSections) : Locator {
+    private sectionByEnum(section: RequestSections): Locator {
         return Elements.getElement(this.page,`//button[text()='${section}']`);
     }
     /**
      * Fill in experts and club workers for criteria groups
      */
-    public async addExperts() : Promise<void> {
+    public async addExperts(): Promise<void> {
         await this.page.reload();
         await this.page.waitForLoadState();
         await Elements.waitForVisible(this.sectionByEnum(RequestSections.criterias));
@@ -184,7 +184,7 @@ export class RequestPage extends CommissionPage {
     /**
      * Add experts to a criteria group
      */
-    private async fillExperts() : Promise<void> {
+    private async fillExperts(): Promise<void> {
         await this.experts.click();
         await Elements.waitForVisible(this.expertsList.first());
         await this.expertsList.first().click();
@@ -195,7 +195,7 @@ export class RequestPage extends CommissionPage {
     /**
      * Add data from the modal search window for club workers, organizations, ofi
      */
-    private async fillSearchModalData () : Promise<void> {
+    private async fillSearchModalData(): Promise<void> {
         const searchModal = new SearchModalPage(this.page);
         await this.searchDataButton.click();
         await searchModal.findButton.click();
@@ -209,19 +209,19 @@ export class RequestPage extends CommissionPage {
     /**
      * Add ofi and participants to criterias and fill criteria documents
      */
-    public async addDocInfo () : Promise<void> {
+    public async addDocInfo(): Promise<void> {
         const groupsCount = await this.criteriaGroups.count();
         for(let i = groupsCount-1; i >= 0; i--) {
             await this.criteriaGroups.nth(i).click();
             await Elements.waitForVisible(this.criteriaInfo.first())
-            const criteriaCount : number = await this.criteriaInfo.count();
+            const criteriaCount: number = await this.criteriaInfo.count();
             for(let m = 0; m < criteriaCount;m++) {
                 await this.criteriaInfo.nth(m).click();
                 await Elements.waitForVisible(this.critTypeValue.nth(m));
             }
-            let currMaxDocNumb : number = await this.submitReviewButton.count()/criteriaCount;
-            const step : number = currMaxDocNumb;
-            let currDocNumb : number = 0;
+            let currMaxDocNumb: number = await this.submitReviewButton.count()/criteriaCount;
+            const step: number = currMaxDocNumb;
+            let currDocNumb: number = 0;
             for (let x = 0; x < criteriaCount; x++) {
                 const critTypeName : string = await this.critTypeValue.nth(x).innerText();
                 switch (critTypeName) {
@@ -246,7 +246,7 @@ export class RequestPage extends CommissionPage {
     /**
      * Fill criteria documents in general info
      */
-    private async addGeneralDocInfo() : Promise<void> {
+    private async addGeneralDocInfo(): Promise<void> {
         await this.sectionByEnum(RequestSections.generalInfo).click();
         await Elements.waitForVisible(this.plusButton.last());
         const docsCount : number = await this.plusButton.count();
@@ -255,7 +255,7 @@ export class RequestPage extends CommissionPage {
     /**
      * Edit license status by enum
      */
-    public async editLicStatus(statusValue: LicStatus) : Promise<void> {
+    public async editLicStatus(statusValue: LicStatus): Promise<void> {
         await this.page.reload();
         await this.page.waitForLoadState();
         await this.licEditButton.click();
@@ -264,20 +264,20 @@ export class RequestPage extends CommissionPage {
         await this.selectLicStatusByEnum(statusValue).click();
         await this.saveButton.last().click();
         await Elements.waitForHidden(this.changeLicStatusTitle);
-        const licStatusValue : string = await this.currentLicStatus.innerText();
+        const licStatusValue: string = await this.currentLicStatus.innerText();
         await expect(licStatusValue.toLowerCase()).toBe(LicStatus.waitForCommission.toLowerCase());
     }
     /**
      * Fill in the fields "Comment" and "Decision on the document"
      */
-    private async fillStatusAndComment (docsCount : number,reason : "generalInfo" | "criterias") : Promise<void> {
-        let currentIndex : number = 0;
+    private async fillStatusAndComment(docsCount: number,reason: "generalInfo" | "criterias"): Promise<void> {
+        let currentIndex: number = 0;
         for (let i = 0; i < docsCount; i++) {
             await this.reviewComment.nth(i).type(InputData.randomWord);
             await this.docStates.nth(i).click();
             await Elements.waitForVisible(this.docStatesList.last());
             const randomStateNumb = randomInt(0,await this.docStatesList.count());
-            const selectedState : string = await this.docStatesList.nth(randomStateNumb).innerText();
+            const selectedState: string = await this.docStatesList.nth(randomStateNumb).innerText();
             await this.docStatesList.nth(randomStateNumb).click();
             (reason == "generalInfo") ?
                 await this.checkButton.nth(currentIndex).click() :
@@ -290,14 +290,14 @@ export class RequestPage extends CommissionPage {
     /**
      * Add comments and statuses for documents
      */
-    public async addExpertInfo() : Promise<void> {
-        let docsCount : number = await this.checkButton.count();
+    public async addExpertInfo(): Promise<void> {
+        let docsCount: number = await this.checkButton.count();
         await this.fillStatusAndComment(docsCount,"generalInfo");
         await this.sectionByEnum(RequestSections.criterias).click();
-        const groupsCount : number = await this.criteriaGroups.count();
+        const groupsCount: number = await this.criteriaGroups.count();
         for(let i = 0; i<groupsCount;i++) {
             await this.criteriaGroups.nth(i).click();
-            const criteriaCount : number = await this.criteriaInfo.count();
+            const criteriaCount: number = await this.criteriaInfo.count();
             for(let c = 0; c < criteriaCount; c++) {
                 await this.criteriaInfo.nth(c).click();
                 const criteriaType : string = await this.critTypeValue.nth(c).innerText();
@@ -309,13 +309,13 @@ export class RequestPage extends CommissionPage {
             await this.fillExpertSolution();
             await expect(this.expertReportFile).toBeVisible();
         }
-        const licStatusValue : string = await this.currentLicStatus.innerText();
+        const licStatusValue: string = await this.currentLicStatus.innerText();
         await expect(licStatusValue.toLowerCase()).toBe(LicStatus.readyForReport.toLowerCase());
     }
     /**
      * Fill the fields "Conclusion of the RFS manager", "Recommendations on sanctions", "RPL criterias"
      */
-    public async addConclusions() : Promise<void> {
+    public async addConclusions(): Promise<void> {
         await this.sectionByEnum(RequestSections.generalInfo).click();
         await Elements.waitForVisible(this.conclusion);
         await this.conclusion.type(InputData.randomWord);
@@ -323,17 +323,17 @@ export class RequestPage extends CommissionPage {
         await this.rplCriterias.type(InputData.randomWord);
         await this.saveButton.click();
         await Elements.waitForVisible(this.saveButton);
-        const conclusionText : string | null = await this.conclusion.textContent();
-        const recommendationText : string | null = await this.recommendation.textContent();
-        const rplCriteriasText : string | null = await this.rplCriterias.textContent();
+        const conclusionText: string | null = await this.conclusion.textContent();
+        const recommendationText: string | null = await this.recommendation.textContent();
+        const rplCriteriasText: string | null = await this.rplCriterias.textContent();
         await expect(conclusionText && recommendationText && rplCriteriasText).not.toBeNull();
     }
     /**
      * Waiting for a status update near the document name in accordance with the selected status
      */
-    private async waitForDisplayStatus (statusNumb : number) : Promise<void> {
-        const selectedStatusText : string = await this.selectedStatus.nth(statusNumb).innerText();
-        const nearDocStatusText : string = await this.statusNearDoc.nth(statusNumb).innerText();
+    private async waitForDisplayStatus(statusNumb: number): Promise<void> {
+        const selectedStatusText: string = await this.selectedStatus.nth(statusNumb).innerText();
+        const nearDocStatusText: string = await this.statusNearDoc.nth(statusNumb).innerText();
         if ((selectedStatusText == DocStatus.selectSolution && nearDocStatusText.toLowerCase() != DocStatus.underReview.toLowerCase()) ||
             (selectedStatusText.toLowerCase() != nearDocStatusText.toLowerCase() && selectedStatusText != DocStatus.selectSolution)) {
             await this.waitForDisplayStatus(statusNumb);
@@ -342,7 +342,7 @@ export class RequestPage extends CommissionPage {
     /**
      * Add an expert report
      */
-    private async fillExpertSolution() : Promise<void> {
+    private async fillExpertSolution(): Promise<void> {
         await this.recommendation.type(InputData.randomWord);
         await this.createReport.click();
         await Elements.waitForVisible(this.createReport);
@@ -350,7 +350,7 @@ export class RequestPage extends CommissionPage {
     /**
      * Send documents for verification
      */
-    private async sendForVerification(currDocNumb : number,currMaxDocNumb : number) : Promise<void> {
+    private async sendForVerification(currDocNumb: number,currMaxDocNumb: number): Promise<void> {
         for(let c = currDocNumb;c < currMaxDocNumb; c++) {
             await this.docTooltip.nth(c).click();
             await this.plusButton.first().click();
@@ -366,14 +366,14 @@ export class RequestPage extends CommissionPage {
     /**
      * Check entered comment value
      */
-    private async checkCommentValue(commentNumber : number) : Promise<void> {
-        const currentComment : string = await this.clubWorkerComment.nth(commentNumber).innerText();
+    private async checkCommentValue(commentNumber: number): Promise<void> {
+        const currentComment: string = await this.clubWorkerComment.nth(commentNumber).innerText();
         if(currentComment == "-") await this.checkCommentValue(commentNumber);
     }
     /**
      * Select a club from the dropdown list of values
      */
-    public async chooseClub() : Promise<void> {
+    public async chooseClub(): Promise<void> {
         await Elements.waitForVisible(this.selectClub);
         await this.selectClub.click();
         await Elements.waitForVisible(this.selectClubList.first());
@@ -382,7 +382,7 @@ export class RequestPage extends CommissionPage {
     /**
      * Create a prolicense with filled criteria groups and criterias
      */
-    public async createTestProlicense() : Promise<void> {
+    public async createTestProlicense(): Promise<void> {
         const constructor = new ConstructorNewPage(this.page);
         await constructor.openConstructor();
         await constructor.createProlicense();
@@ -395,7 +395,7 @@ export class RequestPage extends CommissionPage {
     /**
      * Create a request in the status "Draft"
      */
-    public async createDraft() : Promise<void> {
+    public async createDraft(): Promise<void> {
         await this.arrow.click();
         await this.goToRequest.click();
         await expect(this.licTitle).toBeVisible();
@@ -411,7 +411,7 @@ export class RequestPage extends CommissionPage {
     /**
      * Add files and comments for license documents
      */
-    protected async fillDocsAndComment() : Promise<void> {
+    protected async fillDocsAndComment(): Promise<void> {
         await Input.uploadFiles(this.templates.first(),"all");
         await Elements.waitForVisible(this.docIcon);
         await Elements.waitForVisible(this.xlsxIcon);
@@ -428,7 +428,7 @@ export class RequestPage extends CommissionPage {
     /**
      * Add commission decision for created license
      */
-    public async addCommissionDecision() : Promise<void> {
+    public async addCommissionDecision(): Promise<void> {
         await this.page.goto(Pages.commissionPage);
         await this.createMeeting();
         await this.addRequestsToMeeting();
@@ -437,7 +437,7 @@ export class RequestPage extends CommissionPage {
     /**
      * Delete created prolicense and license from pre-prod database
      */
-    public async deleteProdLicense() : Promise<void> {
+    public async deleteProdLicense(): Promise<void> {
         const dbHelper = new DbHelper();
         await dbHelper.deleteLicense();
         await dbHelper.deleteProlicense();

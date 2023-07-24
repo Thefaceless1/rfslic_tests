@@ -14,79 +14,79 @@ import * as Process from "process";
 import {Columns} from "../../helpers/enums/columns.js";
 
 export class CommissionPage extends MainPage {
-    constructor(page : Page) {
+    constructor(page: Page) {
         super(page);
     }
     /**
      * Button "Create a commission"
      */
-    private createMeetingButton : Locator = Elements.getElement(this.page,"//button[text()='Создать заседание']");
+    private createMeetingButton: Locator = Elements.getElement(this.page,"//button[text()='Создать заседание']")
     /**
      * Button "Create"
      */
-    private createButton : Locator = Elements.getElement(this.page,"//button[text()='Создать']");
+    private createButton: Locator = Elements.getElement(this.page,"//button[text()='Создать']")
     /**
      * Button "Add requests"
      */
-    private addRequestsButton : Locator = Elements.getElement(this.page,"//button[text()='Добавить заявки']");
+    private addRequestsButton: Locator = Elements.getElement(this.page,"//button[text()='Добавить заявки']")
     /**
      * Button "Edit decision"
      */
-    private editDecisionButton : Locator = Elements.getElement(this.page,"//*[contains(@class,'CommissionLicensesTab_endStateWrapper')]//button");
+    private editDecisionButton: Locator = Elements.getElement(this.page,"//*[contains(@class,'CommissionLicensesTab_endStateWrapper')]//button")
     /**
      * Field "Select a decision"
      */
-    private selectDecision : Locator = Elements.getElement(this.page,"//*[contains(@class,'newLicState__control')]");
+    private selectDecision: Locator = Elements.getElement(this.page,"//*[contains(@class,'newLicState__control')]")
     /**
      * Get the drop-down list values of the 'Select a decision' field
      */
-    private selectDecisionList : Locator = Elements.getElement(this.page,"//*[contains(@class,'newLicState__option')]");
+    private selectDecisionList: Locator = Elements.getElement(this.page,"//*[contains(@class,'newLicState__option')]")
     /**
      * Button "Materials"
      */
-    private materialsButton : Locator = Elements.getElement(this.page,"//button[text()='Материалы']");
+    private materialsButton: Locator = Elements.getElement(this.page,"//button[text()='Материалы']")
     /**
      * Field "Report type"
      */
-    private reportType : Locator = Elements.getElement(this.page,"//*[contains(@class,'reportType__control')]");
+    private reportType: Locator = Elements.getElement(this.page,"//*[contains(@class,'reportType__control')]")
     /**
      * Get the drop-down list values of the 'Report type' field
      */
-    private reportTypeList : Locator = Elements.getElement(this.page,"//*[contains(@class,'reportType__option')]");
+    private reportTypeList: Locator = Elements.getElement(this.page,"//*[contains(@class,'reportType__option')]")
     /**
      * Field "Commission name"
      */
-    private commissionName : Locator = Elements.getElement(this.page,"//*[contains(@class,'Text_weight_semibold') and contains(text(),'Заседание')]");
+    private commissionName: Locator = Elements.getElement(this.page,"//*[contains(@class,'Text_weight_semibold') and contains(text(),'Заседание')]")
     /**
      * Field "Requests"
      */
-    private requests : Locator = Elements.getElement(this.page,"//*[contains(@class,'requests__control')]");
+    private requests: Locator = Elements.getElement(this.page,"//*[contains(@class,'requests__control')]")
     /**
      * Get the drop-down list values of the 'Requests' field
      */
-    private requestsList : Locator = Elements.getElement(this.page,"//*[contains(@class,'requests__option')]");
+    private requestsList: Locator = Elements.getElement(this.page,"//*[contains(@class,'requests__option')]")
     /**
      * Button "Form"
      */
-    private formButton : Locator = Elements.getElement(this.page,"//button[text()='Сформировать']");
+    private formButton: Locator = Elements.getElement(this.page,"//button[text()='Сформировать']")
     /**
      * Accepted decision in the table
      */
-    private acceptedDecision : Locator = Elements.getElement(this.page,"//td[7]//*[contains(@class,'Badge_view_filled')]");
+    private acceptedDecision: Locator = Elements.getElement(this.page,"//td[7]//*[contains(@class,'Badge_view_filled')]")
     /**
      * Report name
      */
-    private report : Locator = Elements.getElement(this.page,"//span[contains(text(),'Отчет по')]");
+    private report: Locator = Elements.getElement(this.page,"//span[contains(text(),'Отчет по')]")
     /**
      * Protocol name
      */
-    private protocol(fileName : string) : Locator {
+    private protocol(fileName: string): Locator {
         return Elements.getElement(this.page,`//span[text()='${fileName}']`);
     }
     /**
      * Create a meeting
      */
-    public async createMeeting() : Promise<void> {
+    public async createMeeting(): Promise<void> {
         await this.createMeetingButton.click();
         await this.licType.click();
         await Elements.waitForVisible(this.licenseTypes.first());
@@ -99,13 +99,13 @@ export class CommissionPage extends MainPage {
     /**
      * Add requests to a meeting
      */
-    public async addRequestsToMeeting() : Promise<void> {
+    public async addRequestsToMeeting(): Promise<void> {
         await this.addRequestsButton.click();
         const searchModal = new SearchModalPage(this.page);
         await Elements.waitForHidden(searchModal.loadIndicator);
         if (Process.env.BRANCH == "prod") await this.filterByColumn(this.filterButtonByEnum(Columns.licName).last());
         await this.checkbox.first().check();
-        const requestsCount : number = await this.checkbox.count() - 1;
+        const requestsCount: number = await this.checkbox.count() - 1;
         await searchModal.selectButton.click();
         await this.closeNotifications("all");
         await Elements.waitForVisible(this.tableRow.first());
@@ -115,16 +115,16 @@ export class CommissionPage extends MainPage {
     /**
      * Add decision on requests
      */
-    public async addRequestDecision() : Promise<void> {
+    public async addRequestDecision(): Promise<void> {
         await Elements.waitForVisible(this.editDecisionButton.first());
-        const requestCount : number = await this.editDecisionButton.count();
+        const requestCount: number = await this.editDecisionButton.count();
         for(let i = 0; i < requestCount; i++) {
             await this.editDecisionButton.nth(i).click();
             await this.selectDecision.click();
             await Elements.waitForVisible(this.selectDecisionList.first());
-            const decisionCount : number = await this.selectDecisionList.count();
-            const randomNumb : number = randomInt(0,decisionCount);
-            const selectedDecisionName : string = await this.selectDecisionList.nth(randomNumb).innerText();
+            const decisionCount: number = await this.selectDecisionList.count();
+            const randomNumb: number = randomInt(0,decisionCount);
+            const selectedDecisionName: string = await this.selectDecisionList.nth(randomNumb).innerText();
             await this.selectDecisionList.nth(randomNumb).click();
             if(selectedDecisionName == LicStatus.issuedWithConditions || selectedDecisionName == LicStatus.returnForRevision) {
                 await Date.fillDateInput(this.dates,InputData.futureDate);
@@ -142,10 +142,10 @@ export class CommissionPage extends MainPage {
     /**
      * Add protocol and report for commission
      */
-    public async addReport() : Promise<void> {
+    public async addReport(): Promise<void> {
         await this.materialsButton.click();
-        const plusButtonCount : number = await this.plusButton.count();
-        const fileName : string = FileReader.getTestFiles[0].match(/\w+\.\w+/g)![0];
+        const plusButtonCount: number = await this.plusButton.count();
+        const fileName: string = FileReader.getTestFiles[0].match(/\w+\.\w+/g)![0];
         for(let i = 0; i < plusButtonCount; i++) {
             await this.plusButton.nth(i).click();
             if(i == 0) {
@@ -157,7 +157,7 @@ export class CommissionPage extends MainPage {
                 await this.licenseTypes.last().click();
                 await this.requests.click()
                 await Elements.waitForVisible(this.requestsList.first());
-                const requestCount : number = await this.requestsList.count();
+                const requestCount: number = await this.requestsList.count();
                 for(let c = 0; c<requestCount; c++) {
                     await this.requestsList.first().click()
                 }
@@ -174,12 +174,12 @@ export class CommissionPage extends MainPage {
     /**
      * Set status "Wait for a commission solution" for licenses
      */
-    public async changeLicensesStatus() : Promise<void> {
+    public async changeLicensesStatus(): Promise<void> {
         const dbHelper = new DbHelper();
-        const waitForCommissionStatusId : number = 4;
+        const waitForCommissionStatusId: number = 4;
         await this.menuOptionByEnum(MainMenuOptions.workWithRequest).click();
         await Elements.waitForVisible(this.numberLicenseColumn.first());
-        let licIds : string[] | number[] = await this.numberLicenseColumn.allTextContents();
+        let licIds: string[] | number[] = await this.numberLicenseColumn.allTextContents();
         licIds = licIds.map(licId => Number(licId));
         for(const licId of licIds) {
             await dbHelper.updateLicenseStatus(licId,waitForCommissionStatusId);

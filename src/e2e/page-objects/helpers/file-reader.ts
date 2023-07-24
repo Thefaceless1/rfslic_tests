@@ -1,12 +1,22 @@
 import * as fs from "fs";
+import path from "path";
+import { fileURLToPath} from "url";
 
 export class FileReader {
-    private static readonly path : string = "src/e2e/page-objects/helpers/testfiles/";
     /**
      * Get an array of test files with relative paths
      */
-    public static get getTestFiles () {
-        const fileNames : string[] = fs.readdirSync(this.path);
-        return fileNames.map(value => this.path+value);
+    public static get getTestFiles() {
+        const __filename = fileURLToPath(import.meta.url);
+        const __dirname = path.dirname(__filename);
+        const testFilesPath: string = path.resolve(__dirname, "testfiles");
+        const fileNames: string[] = fs.readdirSync(testFilesPath);
+        return fileNames.map(fileName => {
+            const obj = {
+                dir: testFilesPath,
+                base: fileName
+            }
+            return path.format(obj);
+        });
     }
 }

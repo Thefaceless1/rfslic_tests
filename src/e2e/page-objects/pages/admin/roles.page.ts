@@ -5,30 +5,30 @@ import {InputData} from "../../helpers/input-data.js";
 import {Notifications} from "../../helpers/enums/notifications.js";
 
 export class RolesPage extends MainPage {
-    constructor(page : Page) {
+    constructor(page: Page) {
         super(page);
     }
     /**
      * Button "Save as"
      */
-    private saveAsButton : Locator = Elements.getElement(this.page,"//button[text()='Сохранить как...']");
+    private saveAsButton: Locator = Elements.getElement(this.page,"//button[text()='Сохранить как...']")
     /**
      * Field "Role name"
      */
-    private enterRole : Locator = Elements.getElement(this.page,"//input[@placeholder='Введите название роли']");
+    private enterRole: Locator = Elements.getElement(this.page,"//input[@placeholder='Введите название роли']")
     /**
      * Field "Role description"
      */
-    private roleDescription : Locator = Elements.getElement(this.page,"//textarea[@placeholder='Введите описание роли']");
+    private roleDescription: Locator = Elements.getElement(this.page,"//textarea[@placeholder='Введите описание роли']")
     /**
      * Displayed role
      */
-    private displayedRole : Locator = Elements.getElement(this.page,"//*[contains(@class,'role__single-value')]");
+    private displayedRole: Locator = Elements.getElement(this.page,"//*[contains(@class,'role__single-value')]")
     /**
      * Add a role
      */
-    public async addRole() : Promise<void> {
-        const roleName : string = InputData.randomWord;
+    public async addRole(): Promise<void> {
+        const roleName: string = InputData.randomWord;
         await this.selectRole.click();
         await Elements.waitForVisible(this.rolesList.first());
         await this.rolesList.first().click();
@@ -45,14 +45,14 @@ export class RolesPage extends MainPage {
     /**
      * Comparison of expected and actual role name
      */
-    private async compareRoleNames(expectedName : string) : Promise<boolean> {
+    private async compareRoleNames(expectedName: string): Promise<boolean> {
         const actualRoleName : string = await this.displayedRole.innerText();
         return (expectedName == actualRoleName) ? true : await this.compareRoleNames(expectedName);
     }
     /**
      * Delete a role
      */
-    public async deleteRole() : Promise<void> {
+    public async deleteRole(): Promise<void> {
         await this.deleteButton.click();
         await this.deleteButton.last().click();
         await expect(this.notification(Notifications.roleDeleted)).toBeVisible();

@@ -9,39 +9,39 @@ import {Notifications} from "../../helpers/enums/notifications.js";
 export class UsersPage extends MainPage {
     private readonly testedUserId : number = 17500821
     private readonly testedUserRfsId : string = '826252'
-    constructor(page : Page) {
+    constructor(page: Page) {
         super(page);
     }
     /**
      * Button "Add" (+)
      */
-    private plusAddButton : Locator = Elements.getElement(this.page,"//*[text()='Список пользователей']//following-sibling::button");
+    private plusAddButton: Locator = Elements.getElement(this.page,"//*[text()='Список пользователей']//following-sibling::button")
     /**
      * Button "Edit a role"
      */
-    private editRoleButton : Locator = Elements.getElement(this.page,"//span[text()='Изменить роль']");
+    private editRoleButton: Locator = Elements.getElement(this.page,"//span[text()='Изменить роль']")
     /**
      * Button "Change a role"
      */
-    private changeRoleButton : Locator = Elements.getElement(this.page,"//button[text()='Сменить роль']");
+    private changeRoleButton: Locator = Elements.getElement(this.page,"//button[text()='Сменить роль']")
     /**
      * Field "Select groups"
      */
-    private selectGroups : Locator = Elements.getElement(this.page,"//*[contains(@class,'groups__control')]");
+    private selectGroups: Locator = Elements.getElement(this.page,"//*[contains(@class,'groups__control')]")
     /**
      * Values of the drop-down list of the field "Select groups"
      */
-    private selectGroupsList : Locator = Elements.getElement(this.page,"//*[contains(@class,'groups__option')]");
+    private selectGroupsList: Locator = Elements.getElement(this.page,"//*[contains(@class,'groups__option')]")
     /**
      * Get user tab elements by enum
      */
-    private userTabsByEnum(tabName : string) : Locator {
+    private userTabsByEnum(tabName: string): Locator {
         return Elements.getElement(this.page,`//button[text()='${tabName}']`);
     }
     /**
      * Add a user
      */
-    public async addUser() : Promise<void> {
+    public async addUser(): Promise<void> {
         const searchModal = new SearchModalPage(this.page);
         await this.plusAddButton.click();
         await Elements.waitForVisible(this.searchDataButton);
@@ -60,7 +60,7 @@ export class UsersPage extends MainPage {
     /**
      * Change a user role
      */
-    public async changeUserRole() : Promise<void> {
+    public async changeUserRole(): Promise<void> {
         await this.editRoleButton.click();
         await this.selectRole.click();
         await Elements.waitForVisible(this.rolesList.first());
@@ -72,7 +72,7 @@ export class UsersPage extends MainPage {
     /**
      * Change criteria groups for a user
      */
-    public async changeUserGrpCrit() : Promise<void> {
+    public async changeUserGrpCrit(): Promise<void> {
         await this.userTabsByEnum(UserTabs.grpCriterias).click();
         await this.selectGroups.click();
         await Elements.waitForVisible(this.selectGroupsList.first());
@@ -86,7 +86,7 @@ export class UsersPage extends MainPage {
     /**
      * Delete testing user before test run
      */
-    public async deleteTestedUser() : Promise<void> {
+    public async deleteTestedUser(): Promise<void> {
         const dbHelper = new DbHelper()
         await dbHelper.deleteProdUserData(this.testedUserId);
         await dbHelper.closeConnect();

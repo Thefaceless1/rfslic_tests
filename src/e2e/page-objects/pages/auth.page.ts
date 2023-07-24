@@ -9,58 +9,58 @@ import twoFactor from "node-2fa";
 import * as Process from "process";
 
 export class AuthPage extends BasePage {
-    private readonly userMail : string = "sync-license@rfs.ru"
-    private readonly userPassword : string = "RfsTest2023"
-    private readonly userNumber : number = 0
-    private readonly prodUserId : number = 17513354
-    protected userId : number = 0
-    constructor(page : Page) {
+    private readonly userMail: string = "sync-license@rfs.ru"
+    private readonly userPassword: string = "RfsTest2023"
+    private readonly userNumber: number = 0
+    private readonly prodUserId: number = 17513354
+    protected userId: number = 0
+    constructor(page: Page) {
         super(page)
     }
     /**
      * Picture to call the authorization menu
      */
-    private authAvatar : Locator = Elements.getElement(this.page,"//*[contains(@class,'login_avatar')]");
+    private authAvatar: Locator = Elements.getElement(this.page,"//*[contains(@class,'login_avatar')]")
     /**
      * 'Check user' button
      */
-    private selectUserButton : Locator = Elements.getElement(this.page,"//*[text()='Выбрать пользователя']");
+    private selectUserButton: Locator = Elements.getElement(this.page,"//*[text()='Выбрать пользователя']")
     /**
      * 'Check user' menu
      */
-    private selectUserMenu : Locator = Elements.getElement(this.page,"//*[contains(@class,'user__control')]");
+    private selectUserMenu: Locator = Elements.getElement(this.page,"//*[contains(@class,'user__control')]")
     /**
      * 'Check user' menu dropdown values
      */
-    private selectUserMenuList : Locator = Elements.getElement(this.page,"//*[contains(@class,'user__option')]");
+    private selectUserMenuList: Locator = Elements.getElement(this.page,"//*[contains(@class,'user__option')]")
     /**
      * Field "E-mail"
      */
-    private email : Locator = Elements.getElement(this.page,"//input[@placeholder='E-mail']");
+    private email: Locator = Elements.getElement(this.page,"//input[@placeholder='E-mail']")
     /**
      * Field "Password"
      */
-    private password : Locator = Elements.getElement(this.page,"//input[@name='password']");
+    private password: Locator = Elements.getElement(this.page,"//input[@name='password']")
     /**
      * Field "Confirmation code"
      */
-    private confirmationCode : Locator = Elements.getElement(this.page,"//input[@placeholder='Код подтверждения']");
+    private confirmationCode: Locator = Elements.getElement(this.page,"//input[@placeholder='Код подтверждения']")
     /**
      * Button "Confirm"
      */
-    private confirmButton : Locator = Elements.getElement(this.page,"//button[text()='ПОДТВЕРДИТЬ']");
+    private confirmButton: Locator = Elements.getElement(this.page,"//button[text()='ПОДТВЕРДИТЬ']")
     /**
      * Button "Enter"
      */
-    private enterButton : Locator = Elements.getElement(this.page,"//button[text()='ВОЙТИ']");
+    private enterButton: Locator = Elements.getElement(this.page,"//button[text()='ВОЙТИ']")
     /**
      * Message "Verification code entered incorrectly"
      */
-    private invalidCodeMessage : Locator = Elements.getElement(this.page,"//p[text()='Неверно введён проверочный код']");
+    private invalidCodeMessage: Locator = Elements.getElement(this.page,"//p[text()='Неверно введён проверочный код']")
     /**
      * Create a user with 'Administrator' role
      */
-    public async createUser() : Promise<void> {
+    public async createUser(): Promise<void> {
         const dbHelper = new DbHelper();
         if(Process.env.BRANCH == "prod") {
             await dbHelper.insertUser(this.prodUserId);
@@ -69,7 +69,7 @@ export class AuthPage extends BasePage {
         }
         else {
             const response = await this.page.request.get(Api.users);
-            const userId : number = await response.json().then(value => value.data[this.userNumber].id);
+            const userId: number = await response.json().then(value => value.data[this.userNumber].id);
             this.userId = userId;
             const dbUserData  = await dbHelper.select(workUsers.tableName,workUsers.columns.userId,userId);
             if (dbUserData[0][workUsers.columns.roleId] == Roles.admin) return;
@@ -85,7 +85,7 @@ export class AuthPage extends BasePage {
     /**
      * Log in to the system
      */
-    public async login() : Promise<void> {
+    public async login(): Promise<void> {
         await this.page.goto("");
         if (Process.env.BRANCH == "prod") {
             await Elements.waitForVisible(this.email);
@@ -109,7 +109,7 @@ export class AuthPage extends BasePage {
     /**
      * Delete user from pre-prod database
      */
-    public async deleteProdUser() : Promise<void> {
+    public async deleteProdUser(): Promise<void> {
         const dbHelper = new DbHelper();
         await dbHelper.deleteProdUserData(this.prodUserId);
         await dbHelper.closeConnect();
@@ -117,7 +117,7 @@ export class AuthPage extends BasePage {
     /**
      * Check for the 'Select user' button
      */
-    private async checkSelectUserButton() : Promise<void> {
+    private async checkSelectUserButton(): Promise<void> {
         await this.authAvatar.click();
         if(await this.selectUserButton.isVisible()) return;
         else setTimeout(() => this.checkSelectUserButton(),500);
@@ -125,14 +125,14 @@ export class AuthPage extends BasePage {
     /**
      * Get 2FA code
      */
-    private get get2FaToken() : string {
+    private get get2FaToken(): string {
         const token = twoFactor.generateToken("MFEONTQDSEYUEMWYXWJMPJY6QZSYO2U7");
         return (token) ? token.token : this.get2FaToken;
     }
     /**
      * Enter confirmation code
      */
-    private async setConfirmationCode() : Promise<void> {
+    private async setConfirmationCode(): Promise<void> {
         await this.confirmationCode.clear();
         await this.confirmationCode.type(this.get2FaToken);
         await this.confirmButton.click();

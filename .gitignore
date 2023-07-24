@@ -6,5 +6,5 @@
 /playwright/.cache/
 /src/api/report/*/
 /src/api/report/*.html
-/src/e2e/artifacts/screenshots/*.png
+/src/e2e/artifacts/screenshots/*/
 /src/e2e/artifacts/report/
