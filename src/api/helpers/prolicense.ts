@@ -1,22 +1,22 @@
 import {TestData} from "./test-data";
-import {TDocTypes} from "./types/catalogs.type";
+import {DocTypesInterface} from "./types/catalogs.interface";
 import {Catalogs} from "./catalogs";
 import superagent from "superagent";
 import {
-    TCriteria,
-    TCriteriaGroup,
-    TDocuments,
-    TProlicense,
-    TSampleProlicense
-} from "./types/prolicense.type";
+    CriteriaInterface,
+    CriteriaGroupInterface,
+    DocumentsInterface,
+    ProlicenseInterface,
+    SampleProlicInterface
+} from "./types/prolicense.interface";
 import {ProlicTypes} from "./enums/prolic-types";
 import {ConstructorApi} from "./api/constructor.api";
 import {randomInt} from "crypto";
 
 export class Prolicense extends Catalogs {
     constructor(
-        public  prolicense: TProlicense[] = [],
-        public criterias: TCriteriaGroup[] = []
+        public  prolicense: ProlicenseInterface[] = [],
+        public criterias: CriteriaGroupInterface[] = []
     ) {
         super();
     }
@@ -25,13 +25,13 @@ export class Prolicense extends Catalogs {
      */
     public async createProlicense(): Promise<void> {
         const docsCount: number = 5;
-        const docArray : TDocuments[] = [...Array(docsCount)].fill({
+        const docArray : DocumentsInterface[] = [...Array(docsCount)].fill({
             name: TestData.randomWord,
             description : TestData.descValue,
             docTypeId: this.docTypes[0].id,
             templates: this.files
         })
-        const requestBody: TProlicense = {
+        const requestBody: ProlicenseInterface = {
             name: TestData.randomWord,
             season: this.seasons[0].id,
             type: this.licTypes[0].id,
@@ -84,7 +84,7 @@ export class Prolicense extends Catalogs {
      * Copy a prolicense
      */
     public async cloneProlicense(): Promise<void> {
-        const requestBody: TSampleProlicense = {
+        const requestBody: SampleProlicInterface = {
             type : this.licTypes[0].id,
             season : this.seasons[0].id,
             name : TestData.randomWord
@@ -114,15 +114,15 @@ export class Prolicense extends Catalogs {
         for(const group of this.criterias) {
             for(const criteriaType of this.criteriaTypes) {
                 const typeIndex: number = this.criteriaTypes.indexOf(criteriaType);
-                const fileDocType: TDocTypes = this.docTypes.find(docType => docType.name == "Файл")!;
+                const fileDocType: DocTypesInterface = this.docTypes.find(docType => docType.name == "Файл")!;
                 const docsCount: number = 3;
-                const docArray: TDocuments[] = [...new Array(docsCount)].fill({
+                const docArray: DocumentsInterface[] = [...new Array(docsCount)].fill({
                     name: TestData.randomWord,
                     description: TestData.descValue,
                     docTypeId: fileDocType.id,
                     templates: this.files
                 })
-                const requestBody: TCriteria = {
+                const requestBody: CriteriaInterface = {
                     groupId: group.id,
                     number: TestData.randomWord,
                     categoryId: this.rankCriteria[0].id,

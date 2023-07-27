@@ -3,10 +3,10 @@ import {LicStatus} from "./enums/license-status";
 import {Authorization} from "./authorization";
 import {FileReader} from "./file-reader";
 import {
-    TClubWorkers, TCommissionType, TCommissionTypeMember, TCriteriaGroups, TCriteriaTypes,
-    TDocTypes, TLicAndDocStatus, TLicTypes, TOfi, TOrganization,
-    TRankCriteria, TRights, TRoles, TSeasons, commissionDecision, TFiles
-} from "./types/catalogs.type";
+    ClubWorkersInterface, CommissionTypeInterface, ComTypeMemberInterface, CriteriaGroupInterface, CriteriaTypesInterface,
+    DocTypesInterface, LicDocStatusInterface, LicTypesInterface, OfiInterface, OrganizationInterface,
+    RankCriteriaInterface, RightsInterface, RolesInterface, SeasonsInterface, ComDecisionInterface, FilesInterface
+} from "./types/catalogs.interface";
 import {RequestApi} from "./api/request.api";
 import {UserApi} from "./api/user.api";
 import {DictionaryApi} from "./api/dictionary.api";
@@ -17,24 +17,24 @@ import {CommissionApi} from "./api/commission.api";
 
 export class Catalogs extends Authorization {
     constructor(
-        public files: TFiles[] = [],
-        public  seasons: TSeasons[] = [],
-        public  criteriaGroups: TCriteriaGroups[] = [],
-        public  licTypes: TLicTypes[] = [],
-        public  docTypes: TDocTypes[] = [],
-        public  rankCriteria: TRankCriteria[] = [],
-        public  criteriaTypes: TCriteriaTypes[] = [],
-        public  licStatus: TLicAndDocStatus[] = [],
-        public  docStatus: TLicAndDocStatus[] = [],
-        public  critGrpExperts: TClubWorkers[] = [],
-        public  persons: TClubWorkers[] = [],
-        public  ofi: TOfi[] = [],
-        public organization: TOrganization[] = [],
-        public roles: TRoles[] = [],
-        public rights: TRights[] = [],
-        public commissionTypes: TCommissionType[] = [],
-        public commissionDecision: commissionDecision[] = [],
-        public commissionTypeMembers: TCommissionTypeMember[] = [],
+        public files: FilesInterface[] = [],
+        public  seasons: SeasonsInterface[] = [],
+        public  criteriaGroups: CriteriaGroupInterface[] = [],
+        public  licTypes: LicTypesInterface[] = [],
+        public  docTypes: DocTypesInterface[] = [],
+        public  rankCriteria: RankCriteriaInterface[] = [],
+        public  criteriaTypes: CriteriaTypesInterface[] = [],
+        public  licStatus: LicDocStatusInterface[] = [],
+        public  docStatus: LicDocStatusInterface[] = [],
+        public  critGrpExperts: ClubWorkersInterface[] = [],
+        public  persons: ClubWorkersInterface[] = [],
+        public  ofi: OfiInterface[] = [],
+        public organization: OrganizationInterface[] = [],
+        public roles: RolesInterface[] = [],
+        public rights: RightsInterface[] = [],
+        public commissionTypes: CommissionTypeInterface[] = [],
+        public commissionDecision: ComDecisionInterface[] = [],
+        public commissionTypeMembers: ComTypeMemberInterface[] = [],
     ) {
         super()
     }
@@ -71,7 +71,7 @@ export class Catalogs extends Authorization {
     /**
      * Get "License status" by enum
      */
-    public licStatusByEnum(statusValue : LicStatus): TLicAndDocStatus {
+    public licStatusByEnum(statusValue : LicStatus): LicDocStatusInterface {
         return this.licStatus.find(value => value.name == statusValue)!;
     }
     /**

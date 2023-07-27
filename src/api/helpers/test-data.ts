@@ -1,5 +1,5 @@
 import {randomInt} from "crypto";
-import {TRankCriteria} from "./types/catalogs.type";
+import {RankCriteriaInterface} from "./types/catalogs.interface";
 
 export class TestData {
     public static readonly commentValue: string = "Тестовый комментарий";
@@ -31,7 +31,7 @@ export class TestData {
     /**
      * Get random criteria rank "code"
      */
-    public static randomCode(criteriaRanks: TRankCriteria[]): string {
+    public static randomCode(criteriaRanks: RankCriteriaInterface[]): string {
         const symbols : string = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz";
         const randomNumber : number = randomInt(0,symbols.length);
         const codes : string[] = criteriaRanks.map(rank => rank.code);

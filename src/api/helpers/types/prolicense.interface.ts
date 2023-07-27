@@ -1,6 +1,6 @@
-import {TClubWorkers} from "./catalogs.type";
+import {ClubWorkersInterface} from "./catalogs.interface";
 
-export type TProlicense = {
+export interface ProlicenseInterface {
     id?: number
     type: number
     season: string | number
@@ -16,40 +16,45 @@ export type TProlicense = {
     reviewDate: string
     decisionDate: string
     stateId? : number
-    documents:  TDocuments[]
+    documents:  DocumentsInterface[]
 }
 
-export type TDocuments = {
+export interface DocumentsInterface {
     id?: number
     name: string,
     description: string
     docTypeId: number,
-    templates: Templates[]
+    templates: TemplatesInterface[]
 }
-export type TSampleProlicense = {
+
+export interface SampleProlicInterface {
     type: number,
     season: number,
     name: string
 }
-export type Templates = {
+
+export interface TemplatesInterface {
     id?: number,
     name: string,
     storageId: string
 }
-export type TDocumentsAndComments = {
-    files: Templates[],
+
+export interface DocAndCommentInterface {
+    files: TemplatesInterface[],
     comment: string
 }
-export type TCriteriaGroup = {
+
+export interface CriteriaGroupInterface {
     id: number,
     name: string,
     experts: number[],
     details: {
-        experts: TClubWorkers[]
+        experts: ClubWorkersInterface[]
     }
-    criterias: TCriteria[]
+    criterias: CriteriaInterface[]
 }
-export type TCriteria = {
+
+export interface CriteriaInterface {
     id?: number,
     groupId: number,
     number: string,
@@ -60,5 +65,5 @@ export type TCriteria = {
     reviewDate: string,
     isMulti: number | null,
     typeId: number,
-    documents: TDocuments[]
+    documents: DocumentsInterface[]
 }

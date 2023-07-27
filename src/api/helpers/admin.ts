@@ -3,15 +3,22 @@ import {TestData} from "./test-data";
 import superagent from "superagent";
 import {DbHelper} from "../../db/db-helper";
 import {operationsLog, workUsers} from "../../db/tables";
-import {TAddUser, TChangeUserRole, TCritGroup, TCritRank, TRole, TUser} from "./types/admin.type";
+import {
+    AddUserInterface,
+    ChangeRoleInterface,
+    CritGroupInterface,
+    CritRankInterface,
+    RoleInterface,
+    UserInterface
+} from "./types/admin.interface";
 import {AdminApi} from "./api/admin.api";
 
 export class Admin extends Catalogs {
     constructor(
-        public user: TUser[] = [],
-        public role: TRole[] = [],
-        public critGroups: TCritGroup[] = [],
-        public critRanks: TCritRank[] = [],
+        public user: UserInterface[] = [],
+        public role: RoleInterface[] = [],
+        public critGroups: CritGroupInterface[] = [],
+        public critRanks: CritRankInterface[] = [],
         public selectedUserRoleId: number = 0,
         public selectedUserId: number = 0
     ) {
@@ -23,7 +30,7 @@ export class Admin extends Catalogs {
     public async addUser(): Promise<void> {
         this.selectedUserRoleId = this.rolesId[0];
         this.selectedUserId = this.personsId[0];
-        const requestQuery: TAddUser = {roleId: this.selectedUserRoleId,userId: this.selectedUserId};
+        const requestQuery: AddUserInterface = {roleId: this.selectedUserRoleId,userId: this.selectedUserId};
         const response = await superagent.put(AdminApi.addUser).
         query(requestQuery).
         set("cookie", `${this.cookie}`).
@@ -49,7 +56,7 @@ export class Admin extends Catalogs {
      */
     public async changeUserRole(): Promise<void> {
         this.selectedUserRoleId = this.rolesId[this.rolesId.length-1];
-        const requestQuery: TChangeUserRole = {roleId: this.selectedUserRoleId};
+        const requestQuery: ChangeRoleInterface = {roleId: this.selectedUserRoleId};
         const response = await superagent.put(AdminApi.changeUserRole(this.user[0].id)).
         query(requestQuery).
         set("cookie", `${this.cookie}`).
@@ -60,7 +67,7 @@ export class Admin extends Catalogs {
      * Create a new role
      */
     public async addRole(): Promise<void> {
-        const requestBody: TRole = {
+        const requestBody: RoleInterface = {
             name : TestData.randomWord,
             isClub : true,
             description : TestData.descValue,
@@ -97,7 +104,7 @@ export class Admin extends Catalogs {
      * Add a criteria group
      */
     public async addCriteriaGroup(): Promise<void> {
-        const requestBody: TCritGroup = {name: TestData.randomWord};
+        const requestBody: CritGroupInterface = {name: TestData.randomWord};
         const response = await superagent.put(AdminApi.changeCriteriaGroup).
         send(requestBody).
         set("cookie", `${this.cookie}`).
@@ -108,7 +115,7 @@ export class Admin extends Catalogs {
      * Change a criteria group
      */
     public async changeCriteriaGroup(): Promise<void> {
-        const requestBody: TCritGroup = {
+        const requestBody: CritGroupInterface = {
             id: this.critGroups[0].id,
             name: TestData.randomWord,
             active: false
@@ -132,7 +139,7 @@ export class Admin extends Catalogs {
      * Add a criteria rank
      */
     public async addCriteriaRank(): Promise<void> {
-        const requestBody: TCritRank = {
+        const requestBody: CritRankInterface = {
             code : TestData.randomCode(this.rankCriteria),
             description : TestData.randomWord
         }
@@ -145,9 +152,9 @@ export class Admin extends Catalogs {
     /**
      * Change a criteria rank
      */
-    public async changeCriteriaRank(): Promise<TCritRank> {
-        const oldCriteriaRankData: TCritRank = this.critRanks[0];
-        const requestBody: TCritRank = {
+    public async changeCriteriaRank(): Promise<CritRankInterface> {
+        const oldCriteriaRankData: CritRankInterface = this.critRanks[0];
+        const requestBody: CritRankInterface = {
             id: this.critRanks[0].id,
             description: TestData.randomWord,
             code: TestData.randomCode(this.rankCriteria)

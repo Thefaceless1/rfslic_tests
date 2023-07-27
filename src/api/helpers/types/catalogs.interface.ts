@@ -1,42 +1,48 @@
-export type TSeasons = {
+export interface SeasonsInterface {
     id: number,
     current: boolean,
     dateStart: string,
     dateEnd: string,
     name: string
 }
-export type TCriteriaGroups = {
+
+export interface CriteriaGroupInterface {
     id: number,
     name: string
 }
 
-export type TLicTypes = {
+export interface LicTypesInterface {
     id: number,
     name: string,
     sysName: string,
     description: string
 }
-export type TDocTypes = {
+
+export interface DocTypesInterface {
     id: number,
     name: string,
     description: string
 }
-export type TRankCriteria = {
+
+export interface RankCriteriaInterface {
     id: number,
     code: string,
     description: string
 }
-export type TCriteriaTypes = {
+
+export interface CriteriaTypesInterface {
     id: number,
     name: string,
     description: string
 }
-export type TLicAndDocStatus = {
+
+export interface LicDocStatusInterface {
     id: number,
     name: string,
     description: string
 }
-export type TClubWorkers = {
+
+export interface ClubWorkersInterface {
     id: number,
     rfsId: number,
     fio: string,
@@ -48,7 +54,8 @@ export type TClubWorkers = {
     position: string,
     sportRole: string
 }
-export type TOfi = {
+
+export interface OfiInterface {
     geo_lat: string,
     geo_lon: string,
     id: number,
@@ -58,14 +65,15 @@ export type TOfi = {
     typeSysName: string,
     favorite: boolean,
     address: string,
-    logo: TLogo,
+    logo: LogoInterface,
     status: {
         code: number,
         description: string
     },
     timezone: string
 }
-export type TLogo = {
+
+export interface LogoInterface {
     id: number,
     fileName: string,
     contentType: string,
@@ -74,7 +82,8 @@ export type TLogo = {
     hash: string,
     storageId: string
 }
-export type TOrganization = {
+
+export interface OrganizationInterface {
     geo_lat: string,
     geo_lon: string,
     id: number,
@@ -91,18 +100,20 @@ export type TOrganization = {
     discriminator: string,
     favorite: boolean,
     isDuplicate: boolean,
-    logo: TLogo,
-    parent: TParent,
+    logo: LogoInterface,
+    parent: ParentInterface,
     status: string,
     statusName: string,
     timezone: string,
     type: string
 }
-export type TParent = {
+
+export interface ParentInterface {
     id: number,
     fullName: string
 }
-export type TRoles = {
+
+export interface RolesInterface {
     id: number,
     name: string,
     description: string,
@@ -110,23 +121,27 @@ export type TRoles = {
     isClub: boolean,
     rights: string[]
 }
-export type TRights = {
+
+export interface RightsInterface {
     id: string,
     name: string,
     description: string,
-    children: TRights[]
+    children: RightsInterface[]
 }
-export type TCommissionType = {
+
+export interface CommissionTypeInterface {
     id: number,
     name: string,
     description: string
 }
-export type commissionDecision = {
+
+export interface ComDecisionInterface {
     id: number,
     name: string,
     description: string
 }
-export type TCommissionTypeMember = {
+
+export interface ComTypeMemberInterface {
     id: number,
     details: {
         id: number,
@@ -143,10 +158,12 @@ export type TCommissionTypeMember = {
     roleId: number,
     active: boolean
 }
-export type TFiles = {
+
+export interface FilesInterface {
     name: string,
     storageId: string
 }
-export type TClubExperts = {
+
+export interface ClubExpertInterface {
     experts: number[]
 }

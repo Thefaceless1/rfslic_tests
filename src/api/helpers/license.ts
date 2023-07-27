@@ -1,16 +1,24 @@
 import {TestData} from "./test-data";
-import {TDocumentsAndComments} from "./types/prolicense.type";
+import {DocAndCommentInterface} from "./types/prolicense.interface";
 import {Prolicense} from "./prolicense";
 import superagent from "superagent";
 import {DocumentStatus} from "./enums/document-status";
 import {LicStatus} from "./enums/license-status";
 import {
-    TAddDocStatus, TChangeLicStatus, TConclusion, TCreateLicense, TCriteriaGroups,
-    TCriterias, TDocuments, TExpertReport,
-    TExternal, TLicense, TRfuExpert
-} from "./types/license.type";
+    AddDocStatusInterface,
+    ChangeLicStatusInterface,
+    ConclusionInterface,
+    CreateLicenseInterface,
+    CriteriaGroupsInterface,
+    CriteriasInterface,
+    DocumentsInterface,
+    ExpertReportInterface,
+    ExternalInterface,
+    LicenseInterface,
+    RfuExpertInterface
+} from "./types/license.interface";
 import {randomInt} from "crypto";
-import {TClubExperts, TClubWorkers, TLicAndDocStatus} from "./types/catalogs.type";
+import {ClubExpertInterface, ClubWorkersInterface, LicDocStatusInterface} from "./types/catalogs.interface";
 import {logger} from "../../logger/logger";
 import {CriteriaTypes} from "./enums/criteria-types";
 import {RequestApi} from "./api/request.api";
@@ -18,7 +26,7 @@ import {UserApi} from "./api/user.api";
 
 export class License extends Prolicense {
     constructor(
-        public license : TLicense[] = [],
+        public license : LicenseInterface[] = [],
         public selectedRfuExpertId : number = 0,
         public selectedOfiId : number = 0,
         public selectedClubWorkerId : number = 0,
@@ -32,7 +40,7 @@ export class License extends Prolicense {
      */
     public async createLicense(): Promise<void> {
         this.selectedLicenseClubId = this.organization[0].id;
-        const requestBody: TCreateLicense = {
+        const requestBody: CreateLicenseInterface = {
             proLicId : this.prolicense[0].id as number,
             clubId : this.selectedLicenseClubId
         }
@@ -46,7 +54,10 @@ export class License extends Prolicense {
      * Add documents and comments for a license request
      */
     public async addCommentsAndDocuments(): Promise<void> {
-        const requestBody: TDocumentsAndComments = {files: this.files,comment: TestData.commentValue};
+        const requestBody: DocAndCommentInterface = {
+            files: this.files,
+            comment: TestData.commentValue
+        };
         for(const document of this.license[0].documents) {
             await superagent.put(RequestApi.addGeneralInfoFiles(document.id)).
             send(requestBody).
@@ -69,7 +80,7 @@ export class License extends Prolicense {
      */
     public async addClubExperts() : Promise<void> {
         for(const group of this.license[0].criteriaGroups) {
-            const requestBody: TClubExperts = {experts: await this.selectClubExperts(group.groupId)};
+            const requestBody: ClubExpertInterface = {experts: await this.selectClubExperts(group.groupId)};
             await superagent.put(RequestApi.changeClubExperts(this.license[0].id,group.groupId)).
             send(requestBody).
             set("cookie", `${this.cookie}`).
@@ -84,7 +95,7 @@ export class License extends Prolicense {
         const response = await superagent.get(UserApi.clubExpertsByCriteriaGroup(this.license[0].id,grpId)).
         set("cookie", `${this.cookie}`).
         set("x-csrf-token",this.x_csrf_token);
-        const clubExpertIds: number[] = response.body.data.map((clubExpert: TClubWorkers) => clubExpert.id);
+        const clubExpertIds: number[] = response.body.data.map((clubExpert: ClubWorkersInterface) => clubExpert.id);
         if(clubExpertIds.length == 0) logger.info(`Отсутствуют сотрудники клуба для группы критериев ${grpId}`);
         return clubExpertIds
     }
@@ -93,7 +104,7 @@ export class License extends Prolicense {
      */
     public async addRfuExperts(): Promise<void> {
         this.selectedRfuExpertId = this.license[0].criteriaGroups[0].rfuExpertChoice[0];
-        const requestBody: TRfuExpert = {rfuExpert: this.selectedRfuExpertId};
+        const requestBody: RfuExpertInterface = {rfuExpert: this.selectedRfuExpertId};
         for(const group of this.license[0].criteriaGroups) {
             await superagent.put(RequestApi.changeRfuExpert(this.license[0].id,group.groupId)).
             send(requestBody).
@@ -106,7 +117,10 @@ export class License extends Prolicense {
      * Add files and comments for criteria documents
      */
     public async addDataToCritDoc(): Promise<void> {
-        const requestBody: TDocumentsAndComments = {files: this.files,comment: TestData.commentValue};
+        const requestBody: DocAndCommentInterface = {
+            files: this.files,
+            comment: TestData.commentValue
+        };
         for(const group of this.license[0].criteriaGroups) {
             for(const criteria of group.criterias) {
                 for(const document of criteria.documents) {
@@ -131,7 +145,10 @@ export class License extends Prolicense {
             status.name == DocumentStatus.acceptedWithCondition
         ).map(status => status.id);
         for(const document of this.license[0].documents) {
-            const requestBody: TAddDocStatus = {stateId: statusIds[randomInt(0,statusIds.length)],comment: TestData.commentValue};
+            const requestBody: AddDocStatusInterface = {
+                stateId: statusIds[randomInt(0,statusIds.length)],
+                comment: TestData.commentValue
+            };
             await superagent.put(RequestApi.changeGeneralInfoDocStatus(document.id)).
             send(requestBody).
             set("cookie", `${this.cookie}`).
@@ -140,7 +157,10 @@ export class License extends Prolicense {
         for(const group of this.license[0].criteriaGroups) {
             for(const criteria of group.criterias) {
                 for(const document of criteria.documents) {
-                    const requestBody: TAddDocStatus = {stateId: statusIds[randomInt(0,statusIds.length)],comment: TestData.commentValue};
+                    const requestBody: AddDocStatusInterface = {
+                        stateId: statusIds[randomInt(0,statusIds.length)],
+                        comment: TestData.commentValue
+                    };
                     await superagent.put(RequestApi.changeCriteriaDocStatus(document.id!)).
                     send(requestBody).
                     set("cookie", `${this.cookie}`).
@@ -179,13 +199,13 @@ export class License extends Prolicense {
     /**
      * Calculation of percentages of each criterias
      */
-    public criteriaPercent(criteriaGroup : TCriteriaGroups, criteria : TCriterias) : number {
+    public criteriaPercent(criteriaGroup : CriteriaGroupsInterface, criteria : CriteriasInterface) : number {
         let critPercent : number;
         if(criteria.external == null)
             critPercent = criteria.documents.filter(value => value.stateId != 2 && value.stateId != 1).length*100/criteria.documents.length;
         else {
-            const sameCriterias : TCriterias[] =[];
-            const sameCritDocs : TDocuments[] =[];
+            const sameCriterias : CriteriasInterface[] =[];
+            const sameCritDocs : DocumentsInterface[] =[];
             criteriaGroup.criterias.forEach((value) => {
                 if(value.name == criteria.name) sameCriterias.push(value);
             })
@@ -201,11 +221,11 @@ export class License extends Prolicense {
     /**
      * Get criteria documents
      */
-    public criteriaDocuments(criteriaGroup : TCriteriaGroups,criteria : TCriterias) : TDocuments[] {
+    public criteriaDocuments(criteriaGroup : CriteriaGroupsInterface,criteria : CriteriasInterface): DocumentsInterface[] {
         if(criteria.external == null) return criteria.documents;
         else {
-            const sameCriterias : TCriterias[] =[];
-            const sameCritDocs : TDocuments[] =[];
+            const sameCriterias : CriteriasInterface[] =[];
+            const sameCritDocs : DocumentsInterface[] =[];
             criteriaGroup.criterias.forEach((value) => {
                 if(value.name == criteria.name) sameCriterias.push(value);
             })
@@ -221,7 +241,7 @@ export class License extends Prolicense {
      * Add conclusions for a license
      */
     public async addConclusions(): Promise<void> {
-        const requestBody: TConclusion = {
+        const requestBody: ConclusionInterface = {
             conclusion: TestData.commentValue,
             recommendation: TestData.commentValue,
             rplCriterias: TestData.commentValue
@@ -237,7 +257,7 @@ export class License extends Prolicense {
      */
     public async addExpertReport(): Promise<void> {
         for(const group of this.license[0].criteriaGroups) {
-            const requestBody: TExpertReport = {
+            const requestBody: ExpertReportInterface = {
                 groupId : group.groupId,
                 recommendation : TestData.commentValue
             }
@@ -258,7 +278,7 @@ export class License extends Prolicense {
         for(const group of this.license[0].criteriaGroups) {
             for(const criteria of group.criterias) {
                 if(criteria.typeId == CriteriaTypes.file) continue;
-                const requestBody : TExternal = (criteria.typeId == CriteriaTypes.participant) ?
+                const requestBody: ExternalInterface = (criteria.typeId == CriteriaTypes.participant) ?
                     {externalId: this.selectedClubWorkerId} :
                     {externalId: this.selectedOfiId};
                 await superagent.put(RequestApi.addExternal(criteria.id!)).
@@ -281,8 +301,8 @@ export class License extends Prolicense {
      * Set the license status to "Waiting for the commission's decision"
      */
     public async changeLicStatus(): Promise<void> {
-        const waitForCommissionState: TLicAndDocStatus = this.licStatusByEnum(LicStatus.waitForCommission);
-        const requestBody: TChangeLicStatus = {
+        const waitForCommissionState: LicDocStatusInterface = this.licStatusByEnum(LicStatus.waitForCommission);
+        const requestBody: ChangeLicStatusInterface = {
             stateId: waitForCommissionState.id,
             notActualGroupIds: []
         }

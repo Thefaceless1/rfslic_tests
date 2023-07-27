@@ -1,26 +1,27 @@
-import {TFiles, TLicAndDocStatus} from "./types/catalogs.type";
+import {FilesInterface, LicDocStatusInterface} from "./types/catalogs.interface";
 import {Catalogs} from "./catalogs";
 import {TestData} from "./test-data";
 import superagent from "superagent";
-import {TLicense} from "./types/license.type";
+import {LicenseInterface} from "./types/license.interface";
 import {randomInt} from "crypto";
 import {DbHelper} from "../../db/db-helper";
 import {issuedLicense} from "../../db/tables";
 import {LicStatus} from "./enums/license-status";
 import {
-    TClubReport,
-    TCommission,
-    TDecision, TFormLicense,
-    TLicTypeReport,
-    TLicTypeText,
-    TMembers,
-    TRequests
-} from "./types/commission.type";
+    ClubReportInterface,
+    CommissionInterface,
+    DecisionInterface,
+    FormLicenseInterface,
+    LicTypeReportInterface,
+    LicTypeTextInterface,
+    MembersInterface,
+    RequestsInterface
+} from "./types/commission.interface";
 import {CommissionApi} from "./api/commission.api";
 import {RequestApi} from "./api/request.api";
 
 export class Commission extends Catalogs {
-    commission: TCommission = {name: "", typeId: 0, workDate: ""}
+    commission: CommissionInterface = {name: "", typeId: 0, workDate: ""}
     constructor() {
         super();
     }
@@ -28,7 +29,7 @@ export class Commission extends Catalogs {
      * Create a new commission
      */
     public async createCommission(): Promise<void> {
-        const requestBody: TCommission = {
+        const requestBody: CommissionInterface = {
             name: TestData.randomWord,
             typeId: this.commissionTypes[0].id,
             workDate: TestData.currentDate
@@ -47,8 +48,8 @@ export class Commission extends Catalogs {
         query({pageNum : 0, pageSize : 10}).
         set("cookie", `${this.cookie}`).
         set("x-csrf-token",this.x_csrf_token);
-        const licIds : number[] = response.body.data.map((license: TLicense) => license.id);
-        const requestBody: TRequests = {licIds: licIds};
+        const licIds : number[] = response.body.data.map((license: LicenseInterface) => license.id);
+        const requestBody: RequestsInterface = {licIds: licIds};
         const licStatusId : number = this.licStatusByEnum(LicStatus.waitForCommission).id;
         const dbHelper = new DbHelper();
         for(const licId of licIds) {
@@ -77,12 +78,12 @@ export class Commission extends Catalogs {
      * Add decision for a commission request
      */
     public async addDecision(): Promise<void> {
-        const filteredRequestStatus: TLicAndDocStatus[] = this.licStatus.
+        const filteredRequestStatus: LicDocStatusInterface[] = this.licStatus.
         filter(licStatus => licStatus.name == LicStatus.issued || licStatus.name == LicStatus.issuedWithConditions || licStatus.name == LicStatus.declined);
         for(const license of this.commission.licenses!) {
             const randomNumber: number = randomInt(0,filteredRequestStatus.length);
-            const randomDecision: TLicAndDocStatus = filteredRequestStatus[randomNumber];
-            const requestBody: TDecision = {
+            const randomDecision: LicDocStatusInterface = filteredRequestStatus[randomNumber];
+            const requestBody: DecisionInterface = {
                 licStateId : randomDecision.id,
                 controlDate : (randomDecision.name == LicStatus.issuedWithConditions) ? TestData.futureDate : "",
                 comment : TestData.commentValue
@@ -114,7 +115,7 @@ export class Commission extends Catalogs {
      */
     public async addCommissionTypeMembers(): Promise<string> {
         const selectedCommissionTypeId: number = this.commissionTypesId[0];
-        const requestBody: TMembers = {userIds: this.commissionTypeMembersId};
+        const requestBody: MembersInterface = {userIds: this.commissionTypeMembersId};
         const response = await superagent.put(CommissionApi.commissionTypeMembers(selectedCommissionTypeId)).
         send(requestBody).
         set("cookie", `${this.cookie}`).
@@ -125,7 +126,7 @@ export class Commission extends Catalogs {
      * Add members for a commission
      */
     public async addCommissionMembers(): Promise<string> {
-        const requestBody: TMembers = {userIds: this.commissionTypeMembersId};
+        const requestBody: MembersInterface = {userIds: this.commissionTypeMembersId};
         const response = await superagent.put(CommissionApi.commissionMembers(this.commission.id!)).
         send(requestBody).
         set("cookie", `${this.cookie}`).
@@ -135,8 +136,8 @@ export class Commission extends Catalogs {
     /**
      * Add protocol for a commission
      */
-    public async addProtocol(): Promise<TFiles> {
-        const requestBody: TFiles = this.files[0];
+    public async addProtocol(): Promise<FilesInterface> {
+        const requestBody: FilesInterface = this.files[0];
         await superagent.put(CommissionApi.addProtocol(this.commission.id!)).
         send(requestBody).
         set("cookie", `${this.cookie}`).
@@ -192,7 +193,7 @@ export class Commission extends Catalogs {
         })
         switch (type) {
             case "byType": {
-                const requestBody: TLicTypeReport = {licIds : mostPopLicTypeIds, licType : mostPopLicType.licTypeId};
+                const requestBody: LicTypeReportInterface = {licIds : mostPopLicTypeIds, licType : mostPopLicType.licTypeId};
                 const response = await superagent.post(CommissionApi.addReportByType(this.commission.id!)).
                 send(requestBody).
                 set("cookie", `${this.cookie}`).
@@ -201,7 +202,7 @@ export class Commission extends Catalogs {
                 return response.body.status
             }
             case "byClub": {
-                const requestBody: TClubReport = {licIds : mostPopLicIds, clubId : mostPopClub.clubId};
+                const requestBody: ClubReportInterface = {licIds : mostPopLicIds, clubId : mostPopClub.clubId};
                 const response = await superagent.post(CommissionApi.addReportByClub(this.commission.id!)).
                 send(requestBody).
                 set("cookie", `${this.cookie}`).
@@ -215,7 +216,10 @@ export class Commission extends Catalogs {
      * Add text for a license type
      */
     public async addLicTypeText(): Promise<string> {
-        const requestBody: TLicTypeText = {licType : this.licTypeIds[0], text : TestData.commentValue};
+        const requestBody: LicTypeTextInterface = {
+            licType : this.licTypeIds[0],
+            text : TestData.commentValue
+        };
         const response = await superagent.put(CommissionApi.addLicenseText).
         send(requestBody).
         set("cookie", `${this.cookie}`).
@@ -227,7 +231,7 @@ export class Commission extends Catalogs {
      */
     public async formLicense(): Promise<string> {
         const sendLicId: number = this.commission.licenses![0].licId;
-        const requestBody: TFormLicense = {licId: sendLicId};
+        const requestBody: FormLicenseInterface = {licId: sendLicId};
         const dbHelper = new DbHelper();
         await dbHelper.delete(issuedLicense.tableName,issuedLicense.columns.licId,sendLicId);
         await dbHelper.closeConnect();

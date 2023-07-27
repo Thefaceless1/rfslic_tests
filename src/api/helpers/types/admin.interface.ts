@@ -1,6 +1,6 @@
-import {TCriteriaGroups, TOrganization} from "./catalogs.type";
+import {CriteriaGroupInterface, OrganizationInterface} from "./catalogs.interface";
 
-export type TUser = {
+export interface UserInterface  {
     id: number,
     details: {
         id: number,
@@ -17,11 +17,12 @@ export type TUser = {
     roleId: number,
     active: boolean,
     rights: string[],
-    groups: TCriteriaGroups[] | number[],
-    clubs: TOrganization[] | number[],
+    groups: CriteriaGroupInterface[] | number[],
+    clubs: OrganizationInterface[] | number[],
     licTypes: []
 }
-export type TRole = {
+
+export interface RoleInterface {
     id?: number,
     name: string,
     description: string,
@@ -29,20 +30,24 @@ export type TRole = {
     isClub: boolean,
     rights: string[]
 }
-export type TCritGroup = {
+
+export interface CritGroupInterface {
     id?: number,
     active?: boolean,
     name: string
 }
-export type TCritRank = {
+
+export interface CritRankInterface {
     id?: number,
     code: string,
     description: string
 }
-export type TAddUser = {
+
+export interface AddUserInterface {
     roleId: number,
     userId: number
 }
-export type TChangeUserRole = {
+
+export interface ChangeRoleInterface {
     roleId: number
 }

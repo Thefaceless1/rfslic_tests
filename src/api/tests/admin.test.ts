@@ -2,7 +2,7 @@ import {test, expect, describe} from "@jest/globals";
 import {Admin} from "../helpers/admin";
 import {Hooks} from "../helpers/hooks/hooks";
 import {InstanceApi} from "../helpers/api/instance.api";
-import {TCritRank} from "../helpers/types/admin.type";
+import {CritRankInterface} from "../helpers/types/admin.interface";
 
 describe("Administration",() => {
     const admin = new Admin();
@@ -50,7 +50,7 @@ describe("Administration",() => {
         expect(admin.critRanks[0].id).not.toBeNull();
     })
     test("Changing a criteria rank",async () => {
-        const oldCriteriaRankData: TCritRank = await admin.changeCriteriaRank();
+        const oldCriteriaRankData: CritRankInterface = await admin.changeCriteriaRank();
         expect(oldCriteriaRankData.code).not.toBe(admin.critRanks[0].code);
         expect(oldCriteriaRankData.description).not.toBe(admin.critRanks[0].description);
     })

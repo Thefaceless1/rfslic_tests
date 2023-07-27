@@ -1,11 +1,12 @@
-import {Templates} from "./prolicense.type";
-import {TClubWorkers, TOfi, TOrganization} from "./catalogs.type";
+import {TemplatesInterface} from "./prolicense.interface";
+import {ClubWorkersInterface, OfiInterface, OrganizationInterface} from "./catalogs.interface";
 
-export type TCreateLicense = {
+export interface CreateLicenseInterface {
     proLicId: number,
     clubId: number
 }
-export type TLicense = {
+
+export interface LicenseInterface {
     id: number,
     proLicId: number,
     type: string,
@@ -39,18 +40,20 @@ export type TLicense = {
             name: string,
             storageId: string
         }[],
-        files : Templates[]
+        files : TemplatesInterface[]
     }[],
-    criteriaGroups : TCriteriaGroups[],
+    criteriaGroups : CriteriaGroupsInterface[],
     conclusion: string,
     recommendation: string,
     rplCriterias: string
 }
-export type TExpertReport = {
+
+export interface ExpertReportInterface {
     groupId: number,
     recommendation: string
 }
-export type TCriterias = {
+
+export interface CriteriasInterface {
     id?: number,
     proCritId: number,
     number: string,
@@ -62,15 +65,16 @@ export type TCriterias = {
     orderNum: number,
     docSubmitDate: string,
     reviewDate: string,
-    external : {user: TClubWorkers,ofi: TClubWorkers},
+    external : {user: ClubWorkersInterface,ofi: ClubWorkersInterface},
     externalId: number,
     comment: string,
     percent: number,
     stateId: number,
     state: string,
-    documents: TDocuments[]
+    documents: DocumentsInterface[]
 }
-export type TCriteriaGroups = {
+
+export interface CriteriaGroupsInterface {
     groupId: number,
     name: string,
     percent: number,
@@ -84,13 +88,14 @@ export type TCriteriaGroups = {
     rfuExpertChoice: number[],
     rfuExpert: number,
     details: {
-        experts: TClubWorkers[],
-        rfuExpertChoice: TClubWorkers[],
-        rfuExpert: TClubWorkers
+        experts: ClubWorkersInterface[],
+        rfuExpertChoice: ClubWorkersInterface[],
+        rfuExpert: ClubWorkersInterface
     }
-    criterias: TCriterias[]
+    criterias: CriteriasInterface[]
 }
-export type TDocuments = {
+
+export interface DocumentsInterface {
     id?: number,
     proDocId: number,
     name: string,
@@ -98,7 +103,7 @@ export type TDocuments = {
     comment: string,
     reviewComment: string,
     externalIds : number[],
-    externals : TOfi[] | TOrganization[],
+    externals : OfiInterface[] | OrganizationInterface[],
     stateId: number,
     state: string,
     templates: {
@@ -106,24 +111,29 @@ export type TDocuments = {
         name: string,
         storageId: string
     }[],
-    files: Templates[]
+    files: TemplatesInterface[]
 }
-export type TRfuExpert = {
+
+export interface RfuExpertInterface {
     rfuExpert: number
 }
-export type TExternal = {
+
+export interface ExternalInterface {
     externalId: number
 }
-export type TAddDocStatus = {
+
+export interface AddDocStatusInterface {
     stateId: number,
     comment: string
 }
-export type TConclusion = {
+
+export interface ConclusionInterface {
     conclusion: string,
     recommendation: string,
     rplCriterias: string
 }
-export type TChangeLicStatus = {
+
+export interface ChangeLicStatusInterface {
     stateId: number,
     notActualGroupIds: number[]
 }

@@ -6,26 +6,26 @@ import {UserRights} from "../e2e/page-objects/helpers/enums/user-rights.js";
 import * as Process from "process";
 
 export class DbHelper {
-   public readonly sql : postgres.Sql<Record<string, postgres.PostgresType> extends {} ? {} : any>
+   public readonly sql: postgres.Sql<Record<string, postgres.PostgresType> extends {} ? {} : any>
     constructor() {
        this.sql = postgres(this.configData())
     }
     /**
      * Delete data from tables
      */
-    public async delete(table : string,column : string,data : number | string) : Promise<void> {
+    public async delete(table: string,column: string,data: number | string): Promise<void> {
        await this.sql`DELETE FROM ${this.sql(table)} WHERE ${this.sql(column)} = ${data}`;
     }
     /**
      * Select data from tables
      */
-    public async select(table : string,column : string,data : number | string | boolean) : Promise<postgres.RowList<postgres.Row[]>> {
+    public async select(table: string,column: string,data: number | string | boolean): Promise<postgres.RowList<postgres.Row[]>> {
         return this.sql`SELECT * FROM ${this.sql(table)} WHERE ${this.sql(column)} = ${data}`
     }
     /**
      * Create a user in the license module system
      */
-    public async insertUser(userId : number) : Promise<void> {
+    public async insertUser(userId: number): Promise<void> {
         await this.sql`INSERT INTO ${this.sql(workUsers.tableName)} 
                        (${this.sql(workUsers.columns.userId)},${this.sql(workUsers.columns.isActive)},${this.sql(workUsers.columns.roleId)})
                         VALUES (${userId},true,${Roles.admin})
@@ -34,7 +34,7 @@ export class DbHelper {
     /**
      * Add rights for a user in table 'user rights'
      */
-    public async insertUserRights(userId : number) : Promise<void> {
+    public async insertUserRights(userId: number): Promise<void> {
         await this.sql`INSERT INTO ${this.sql(userRights.tableName)} 
                        (${this.sql(userRights.columns.userId)},${this.sql(userRights.columns.rightId)}) 
                        VALUES
@@ -70,7 +70,7 @@ export class DbHelper {
     /**
      * test.db.config.json and prod.db.config.json files parser
      */
-    public configData() : object {
+    public configData(): object {
        return (Process.env.BRANCH == "prod") ?
            JSON.parse(fs.readFileSync("./src/db/prod.db.config.json","utf-8")) :
            JSON.parse(fs.readFileSync("./src/db/test.db.config.json","utf-8"));
@@ -78,7 +78,7 @@ export class DbHelper {
     /**
      * Update state_id column in Licenses table
      */
-    public async updateLicenseStatus(licIds : number, licStatusId : number) : Promise<void> {
+    public async updateLicenseStatus(licIds: number, licStatusId: number): Promise<void> {
         await this.sql`UPDATE ${this.sql(licenses.tableName)}
                        SET ${this.sql(licenses.columns.stateId)} = ${licStatusId}
                        WHERE ${this.sql(licenses.columns.id)} = ${licIds}`;
@@ -86,13 +86,13 @@ export class DbHelper {
     /**
      * Close connect to databases
      */
-    public async closeConnect() : Promise<void> {
+    public async closeConnect(): Promise<void> {
         await this.sql.end();
     }
     /**
      * Delete prod user data from 'users' and 'operations_log' tables
      */
-    public async deleteProdUserData(prodUserId : number) : Promise<void> {
+    public async deleteProdUserData(prodUserId: number): Promise<void> {
         await this.sql`DELETE FROM ${this.sql(operationsLog.tableName)}
                        WHERE ${this.sql(operationsLog.columns.userId)} = ${prodUserId}`;
         await this.sql`DELETE FROM ${this.sql(workUsers.tableName)}
@@ -101,14 +101,14 @@ export class DbHelper {
     /**
      * Delete prolicense from 'nsi_prolicenses' table
      */
-    public async deleteProlicense() : Promise<void> {
+    public async deleteProlicense(): Promise<void> {
         await this.sql`DELETE FROM ${this.sql(prolicenses.tableName)}
                        WHERE ${this.sql(prolicenses.columns.licName)} like ('автотест%');`
     }
     /**
      * Delete license from 'licenses' table
      */
-    public async deleteLicense() : Promise<void> {
+    public async deleteLicense(): Promise<void> {
         await this.sql`DELETE FROM ${this.sql(licenses.tableName)}
                        WHERE ${this.sql(licenses.columns.id)} in
                        (SELECT ${this.sql(prolicenses.columns.id)}
@@ -120,7 +120,7 @@ export class DbHelper {
     /**
      * Delete commission from 'commissions' table
      */
-    public async deleteCommission() : Promise<void> {
+    public async deleteCommission(): Promise<void> {
         await this.sql`DELETE FROM ${this.sql(commissions.tableName)}
                        WHERE ${this.sql(commissions.columns.name)} like ('автотест%');`
     }

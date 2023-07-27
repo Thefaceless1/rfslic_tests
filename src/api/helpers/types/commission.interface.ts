@@ -1,7 +1,7 @@
-import {Templates} from "./prolicense.type";
-import {TClubWorkers} from "./catalogs.type";
+import {TemplatesInterface} from "./prolicense.interface";
+import {ClubExpertInterface} from "./catalogs.interface";
 
-export type TCommission = {
+export interface CommissionInterface {
     id?: number,
     typeId: number,
     type?: string,
@@ -9,11 +9,12 @@ export type TCommission = {
     workDate: string,
     protocolName?: string,
     protocolStorageId?: string,
-    licenses?: TLicenses[],
-    files?: Templates[],
-    members?: TClubWorkers[]
+    licenses?: LicensesInterface[],
+    files?: TemplatesInterface[],
+    members?: ClubExpertInterface[]
 }
-export type TLicenses = {
+
+export interface LicensesInterface {
     licId: number,
     clubId: number,
     clubName: string,
@@ -28,41 +29,36 @@ export type TLicenses = {
     endStateId: number,
     endState: string
 }
-export type TDecision = {
+
+export interface DecisionInterface {
     licStateId: number,
     controlDate: string,
     comment: string
 }
-export type TMembers = {
+
+export interface MembersInterface {
     userIds: number[]
 }
-export type TRequests = {
+
+export interface RequestsInterface {
     licIds: number[]
 }
-export type TFormLicense = {
+
+export interface FormLicenseInterface {
     licId: number
 }
-export type TLicTypeReport = {
+
+export interface LicTypeReportInterface {
     licIds: number[],
     licType: number
 }
-export type TClubReport = {
+
+export interface ClubReportInterface {
     licIds: number[],
     clubId: number
 }
-export type TLicTypeText = {
+
+export interface LicTypeTextInterface {
     licType: number,
     text: string
-}
-export interface Iface {
-    id?: number,
-    typeId: number,
-    type?: string,
-    name: string,
-    workDate: string,
-    protocolName?: string,
-    protocolStorageId?: string,
-    licenses?: TLicenses[],
-    files?: Templates[],
-    members?: TClubWorkers[]
 }

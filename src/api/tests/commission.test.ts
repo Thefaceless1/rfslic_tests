@@ -5,7 +5,7 @@ import {TestData} from "../helpers/test-data";
 import {ErrorMessages} from "../helpers/enums/error-messages";
 import {LicStatus} from "../helpers/enums/license-status";
 import {InstanceApi} from "../helpers/api/instance.api";
-import {TFiles} from "../helpers/types/catalogs.type";
+import {FilesInterface} from "../helpers/types/catalogs.interface";
 
 describe("Commissions",  () => {
     const commission  = new Commission();
@@ -48,7 +48,7 @@ describe("Commissions",  () => {
         expect(responseStatus).toBe(InstanceApi.successResponseStatus);
     })
     test("Adding protocol for a commission",async () => {
-        const addedFileData: TFiles = await commission.addProtocol();
+        const addedFileData: FilesInterface = await commission.addProtocol();
         expect(commission.commission.protocolName).toBe(addedFileData.name);
         expect(commission.commission.protocolStorageId).toBe(addedFileData.storageId);
     })
