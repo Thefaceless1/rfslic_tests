@@ -8,3 +8,4 @@
 /src/api/report/*.html
 /src/e2e/artifacts/screenshots/*/
 /src/e2e/artifacts/report/
+test.db.config.json
