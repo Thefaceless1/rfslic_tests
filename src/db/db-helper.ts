@@ -1,14 +1,13 @@
 import postgres from "postgres";
-import fs from "fs";
 import {commissions, licenses, operationsLog, prolicenses, userRights, workUsers} from "./tables.js";
 import {Roles} from "../e2e/page-objects/helpers/enums/roles.js";
 import {UserRights} from "../e2e/page-objects/helpers/enums/user-rights.js";
-import * as Process from "process";
+import {dbConfig} from "./db.config.js";
 
 export class DbHelper {
    public readonly sql: postgres.Sql<Record<string, postgres.PostgresType> extends {} ? {} : any>
     constructor() {
-       this.sql = postgres(this.configData())
+       this.sql = postgres(dbConfig)
     }
     /**
      * Delete data from tables
@@ -66,14 +65,6 @@ export class DbHelper {
                        (${userId},${UserRights["request.history"]}),
                        (${userId},${UserRights["request.viewAll"]})
                        on conflict do nothing;`
-    }
-    /**
-     * test.db.config.json and prod.db.config.json files parser
-     */
-    public configData(): object {
-       return (Process.env.BRANCH == "prod") ?
-           JSON.parse(fs.readFileSync("./src/db/prod.db.config.json","utf-8")) :
-           JSON.parse(fs.readFileSync("./src/db/test.db.config.json","utf-8"));
     }
     /**
      * Update state_id column in Licenses table

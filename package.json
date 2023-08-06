@@ -5,7 +5,6 @@
   "main": "index.js",
   "scripts": {
     "test": "jest --config jest.config.js",
-    "test:prod": "cross-env BRANCH=prod npx playwright test",
     "report": "npx playwright show-report src/e2e/artifacts/report"
   },
   "author": "shelekh mikhail",
@@ -17,7 +16,7 @@
     "@types/jest": "^29.2.4",
     "@types/node": "^18.11.13",
     "@types/superagent": "^4.1.16",
-    "cross-env": "^7.0.3",
+    "dotenv": "^16.3.1",
     "jest": "^29.3.1",
     "log4js": "^6.9.1",
     "node": "^19.2.0",

@@ -6,10 +6,6 @@ export class InputData {
      */
     public static currentDate: string = new Date().toLocaleDateString();
     /**
-     * Current module version
-     */
-    public static moduleVersion: string = "9.1.2.1";
-    /**
      * Future date
      */
     public static get futureDate(): string {
