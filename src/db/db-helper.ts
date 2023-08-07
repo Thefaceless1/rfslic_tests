@@ -84,10 +84,16 @@ export class DbHelper {
      * Delete prod user data from 'users' and 'operations_log' tables
      */
     public async deleteProdUserData(prodUserId: number): Promise<void> {
-        await this.sql`DELETE FROM ${this.sql(operationsLog.tableName)}
+        try {
+            await this.sql`DELETE FROM ${this.sql(operationsLog.tableName)}
                        WHERE ${this.sql(operationsLog.columns.userId)} = ${prodUserId}`;
-        await this.sql`DELETE FROM ${this.sql(workUsers.tableName)}
+            await this.sql`DELETE FROM ${this.sql(workUsers.tableName)}
                        WHERE ${this.sql(workUsers.columns.userId)} = ${prodUserId}`;
+        }
+        catch (err) {
+            await this.sql`DELETE FROM ${this.sql(workUsers.tableName)}
+                       WHERE ${this.sql(workUsers.columns.userId)} = ${prodUserId}`;
+        }
     }
     /**
      * Delete prolicense from 'nsi_prolicenses' table
