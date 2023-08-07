@@ -100,13 +100,13 @@ export class DbHelper {
      * Delete license from 'licenses' table
      */
     public async deleteLicense(): Promise<void> {
-        await this.sql`DELETE FROM ${this.sql(licenses.tableName)}
-                       WHERE ${this.sql(licenses.columns.id)} in
-                       (SELECT ${this.sql(licenses.columns.joinId)}
-                        FROM ${this.sql(licenses.tableName)}
-                        INNER JOIN ${this.sql(prolicenses.tableName)}
-                        on ${this.sql(licenses.columns.joinProlicId)} = ${this.sql(prolicenses.columns.joinId)}
-                        WHERE ${this.sql(prolicenses.columns.joinLicName)} like ('автотест%'));`
+        await this.sql`WITH pro as
+                       (SELECT ${this.sql(prolicenses.columns.id)}
+                        FROM ${this.sql(prolicenses.tableName)}
+                        WHERE ${this.sql(prolicenses.columns.licName)} LIKE ('автотест%'))
+                       DELETE FROM ${this.sql(licenses.tableName)}
+                       WHERE ${this.sql(licenses.columns.prolicId)} IN 
+                       (SELECT ${this.sql(prolicenses.columns.id)} FROM pro)`;
     }
     /**
      * Delete commission from 'commissions' table

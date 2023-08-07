@@ -361,6 +361,7 @@ export class ConstructorNewPage extends ConstructorPage {
      */
     public async deleteProdProlicense(): Promise<void> {
         const dbHelper = new DbHelper();
+        await dbHelper.deleteLicense();
         await dbHelper.deleteProlicense();
         await dbHelper.closeConnect();
     }

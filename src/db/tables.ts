@@ -42,8 +42,6 @@ export const licenses = {
     tableName : "rfslic.licenses",
     columns : {
         id : "id",
-        joinId: "rfslic.licenses.id",
-        joinProlicId: "rfslic.licenses.prolic_id",
         stateId : "state_id",
         prolicId : "prolic_id"
     }
@@ -52,9 +50,7 @@ export const prolicenses = {
     tableName : "rfslic.nsi_prolicenses",
     columns : {
         id : "id",
-        licName : "licname",
-        joinId : "rfslic.nsi_prolicenses.id",
-        joinLicName : "rfslic.nsi_prolicenses.licname"
+        licName : "licname"
     }
 }
 export const commissions = {
