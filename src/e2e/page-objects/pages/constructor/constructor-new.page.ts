@@ -145,14 +145,18 @@ export class ConstructorNewPage extends ConstructorPage {
      * Fill in the fields of the block "General information"
      */
     private async fillBasicInfo(): Promise<void> {
-        await this.name.type(InputData.randomWord);
+        const prolicName = InputData.randomWord
+        await this.name.type(prolicName);
         await this.season.click();
         await this.seasons.last().click();
         await this.licType.click();
         await this.licenseTypes.last().click();
         const allDates = await this.dates.all();
         for (const date of allDates) {
-            await Date.fillDateInput(date,InputData.currentDate);
+            const index = allDates.indexOf(date);
+            if(index == 0) await Date.fillDateInput(date,InputData.date1);
+            else if(index == 1) await Date.fillDateInput(date,InputData.date2);
+            else await Date.fillDateInput(date,InputData.currentDate);
         }
     }
     /**

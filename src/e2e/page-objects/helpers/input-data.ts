@@ -4,11 +4,13 @@ export class InputData {
     /**
      * Get current date
      */
-    public static currentDate: string = new Date().toLocaleDateString('ru-RU');
+    public static currentDate: string = new Date().toLocaleDateString('ru');
     /**
      * Test annotation date
      */
-    public static testAnnotationDate: string = new Date().toLocaleString('ru-RU');
+    public static testAnnotationDate: string = new Date().toLocaleString('ru');
+    public static date1: string = new Date(Date.now() + 2000000000).toLocaleDateString();
+    public static date2: string = new Date(Date.now() + 5000000000).toLocaleDateString();
     /**
      * Future date
      */

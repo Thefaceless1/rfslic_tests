@@ -3,7 +3,7 @@ import {LicStatus} from "../../page-objects/helpers/enums/licstatus.js";
 import * as Process from "process";
 import {InputData} from "../../page-objects/helpers/input-data.js";
 
-test.describe("Заявки", () => {
+test.describe.only("Заявки", () => {
     test(`Дата запуска : ${InputData.currentDate}, Версия модуля: ${Process.env.APP_VERSION}`,
         async ({requests}) => {
         test.info().annotations.push
