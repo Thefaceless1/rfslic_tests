@@ -91,8 +91,7 @@ export class DbHelper {
                        WHERE ${this.sql(workUsers.columns.userId)} = ${prodUserId}`;
         }
         catch (err) {
-            await this.sql`DELETE FROM ${this.sql(workUsers.tableName)}
-                       WHERE ${this.sql(workUsers.columns.userId)} = ${prodUserId}`;
+            setTimeout(async () => await this.deleteProdUserData(prodUserId),1000);
         }
     }
     /**
