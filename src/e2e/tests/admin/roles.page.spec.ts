@@ -7,7 +7,7 @@ test.describe("Роли",() => {
         async ({roles}) => {
         test.info().annotations.push
         (
-            {type: "Дата и время запуска",description: `${new Date().toLocaleString()}`},
+            {type: "Дата и время запуска",description: `${InputData.testAnnotationDate}`},
             {type: "Версия модуля",description: `${Process.env.APP_VERSION}`}
         );
         await test.step("Добавление роли",async () => await roles.addRole());

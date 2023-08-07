@@ -7,7 +7,7 @@ test.describe("Пользователи",() => {
         async ({users}) => {
         test.info().annotations.push
         (
-            {type: "Дата и время запуска",description: `${new Date().toLocaleString()}`},
+            {type: "Дата и время запуска",description: `${InputData.testAnnotationDate}`},
             {type: "Версия модуля",description: `${Process.env.APP_VERSION}`}
         );
         await test.step("Добавление нового пользователя",async () => await users.addUser());

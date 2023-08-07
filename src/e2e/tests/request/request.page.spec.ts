@@ -8,7 +8,7 @@ test.describe("Заявки", () => {
         async ({requests}) => {
         test.info().annotations.push
         (
-            {type: "Дата и время запуска",description: `${new Date().toLocaleString()}`},
+            {type: "Дата и время запуска",description: `${InputData.testAnnotationDate}`},
             {type: "Версия модуля",description: `${Process.env.APP_VERSION}`}
         );
         await test.step("Создание заявки в статусе Черновик",async () => await requests.createDraft());
