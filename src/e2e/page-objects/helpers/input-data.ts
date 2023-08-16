@@ -14,7 +14,9 @@ export class InputData {
      * Future date
      */
     public static get futureDate(): string {
-        return new Date(Date.now() + 5000000000).toLocaleDateString()
+        const millisecondsInOneDay = 24 * 60 * 60 * 1000;
+        const daysToAdd = 10;
+        return new Date(Date.now() + (millisecondsInOneDay * daysToAdd)).toLocaleDateString();
     }
     /**
      * Random set of letters

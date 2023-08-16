@@ -10,8 +10,18 @@ test.describe("Классификатор разрядов критериев",(
             {type: "Дата и время запуска",description: `${InputData.testAnnotationDate}`},
             {type: "Версия модуля",description: `${Process.env.APP_VERSION}`}
         );
-        await test.step("Добавление разряда критерия",async () => await categoriesClassifier.addCategory());
-        await test.step("Изменение разряда критерия",async () => await categoriesClassifier.changeCategory());
-        await test.step("Удаление разряда критерия",async () => await categoriesClassifier.deleteCategory());
+
+        await test.step(
+            "Добавление разряда критерия",
+            async () => await categoriesClassifier.addCategory()
+        );
+        await test.step(
+            "Изменение разряда критерия",
+            async () => await categoriesClassifier.changeCategory()
+        );
+        await test.step(
+            "Удаление разряда критерия",
+            async () => await categoriesClassifier.deleteCategory()
+        );
     })
 })

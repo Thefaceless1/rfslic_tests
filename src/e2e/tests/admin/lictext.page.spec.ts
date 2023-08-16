@@ -10,6 +10,10 @@ test.describe("Тексты лицензий", () => {
             {type: "Дата и время запуска",description: `${InputData.testAnnotationDate}`},
             {type: "Версия модуля",description: `${Process.env.APP_VERSION}`}
         );
-        await test.step("Добавление текста для типа лицензии",async () => await licenseText.addLicText());
+
+        await test.step(
+            "Добавление текста для типа лицензии",
+            async () => await licenseText.addLicText()
+        );
     })
 })

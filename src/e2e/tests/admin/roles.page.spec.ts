@@ -10,8 +10,18 @@ test.describe("Роли",() => {
             {type: "Дата и время запуска",description: `${InputData.testAnnotationDate}`},
             {type: "Версия модуля",description: `${Process.env.APP_VERSION}`}
         );
-        await test.step("Добавление роли",async () => await roles.addRole());
-        await test.step("Изменение прав роли",async () => await roles.changeRoleRights("roles"));
-        await test.step("Удаление роли",async () => await roles.deleteRole());
+
+        await test.step(
+            "Добавление роли",
+            async () => await roles.addRole()
+        );
+        await test.step(
+            "Изменение прав роли",
+            async () => await roles.changeRoleRights("roles")
+        );
+        await test.step(
+            "Удаление роли",
+            async () => await roles.deleteRole()
+        );
     })
 })

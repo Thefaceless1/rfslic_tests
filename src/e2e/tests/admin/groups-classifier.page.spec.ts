@@ -10,8 +10,18 @@ test.describe("Классификатор групп критериев",() => {
             {type: "Дата и время запуска",description: `${InputData.testAnnotationDate}`},
             {type: "Версия модуля",description: `${Process.env.APP_VERSION}`}
         );
-        await test.step("Добавление группы критериев",async () => await groupClassifier.addGroup());
-        await test.step("Изменение группы критериев",async () => await groupClassifier.changeGroup());
-        await test.step("Удаление группы критериев",async () => await groupClassifier.deleteGroup());
+
+        await test.step(
+            "Добавление группы критериев",
+            async () => await groupClassifier.addGroup()
+        );
+        await test.step(
+            "Изменение группы критериев",
+            async () => await groupClassifier.changeGroup()
+        );
+        await test.step(
+            "Удаление группы критериев",
+            async () => await groupClassifier.deleteGroup()
+        );
     })
 })
