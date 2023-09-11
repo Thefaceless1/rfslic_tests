@@ -1,5 +1,4 @@
-import {expect} from "@playwright/test";
-import {Locator, Page} from "@playwright/test";
+import {expect, Locator, Page} from "@playwright/test";
 import {RequestSections} from "../../helpers/enums/request-sections.js";
 import {Elements} from "../../../framework/elements/elements.js";
 import {SearchModalPage} from "../search-modal.page.js";
@@ -15,6 +14,8 @@ import {Pages} from "../../helpers/enums/pages.js";
 import {CommissionPage} from "../commissions/commission.page.js";
 import * as Process from "process";
 import {DbHelper} from "../../../../db/db-helper.js";
+import {ProlicType} from "../../helpers/types/prolic.type.js";
+import {Date} from "../../../framework/elements/date.js";
 
 export class RequestPage extends CommissionPage {
     constructor(page : Page) {
@@ -77,9 +78,13 @@ export class RequestPage extends CommissionPage {
      */
     private rplCriterias: Locator = Elements.getElement(this.page,"//textarea[@name='rplCriterias']")
     /**
-     * Button "Create a report"
+     * Button "Create an expert report"
      */
-    private createReport: Locator = Elements.getElement(this.page,"//button[text()='Сформировать отчет эксперта']")
+    private createExpertReport: Locator = Elements.getElement(this.page,"//button[text()='Сформировать отчет эксперта']")
+    /**
+     * Button "Create a working group member report"
+     */
+    private createWorkingGrpMemberReport: Locator = Elements.getElement(this.page,"//button[text()='Сформировать отчет члена рабочей группы']")
     /**
      * Button "Edit license status"
      */
@@ -130,13 +135,29 @@ export class RequestPage extends CommissionPage {
      */
     private selectClubList: Locator = Elements.getElement(this.page,"//*[contains(@class,'club__option')]")
     /**
-     * License title
+     * Request license title
      */
-    private licTitle: Locator = Elements.getElement(this.page,"//*[text()='Заявка на лицензирование клуба']")
+    private requestLicTitle: Locator = Elements.getElement(this.page,"//*[text()='Заявка на лицензирование клуба']")
     /**
-     * Name of the expert report file
+     * Request finance control title
+     */
+    private requestFinTitle: Locator = Elements.getElement(this.page,"//*[text()='Заявка на финансовый контроль']")
+    /**
+     * Name of an expert report file
      */
     private expertReportFile: Locator = Elements.getElement(this.page,"//span[contains(text(),'Отчет эксперта')]")
+    /**
+     * Value of deadline for submission of documents
+     */
+    private submissionDocDateValue: Locator = Elements.getElement(this.page,"//*[contains(text(),'Срок подачи документации:')]//following-sibling::*")
+    /**
+     * Value of deadline for review of documents
+     */
+    private reviewDocDateValue: Locator = Elements.getElement(this.page,"//*[contains(text(),'Срок рассмотрения документации:')]//following-sibling::*")
+    /**
+     * Name of a working group member report file
+     */
+    private workingMemberReportFile: Locator = Elements.getElement(this.page,"//span[contains(text(),'Отчет члена рабочей группы')]")
     /**
      * Currently displayed license status
      */
@@ -165,8 +186,6 @@ export class RequestPage extends CommissionPage {
      * Fill in experts and club workers for criteria groups
      */
     public async addExperts(): Promise<void> {
-        await this.page.reload();
-        await this.page.waitForLoadState();
         await Elements.waitForVisible(this.sectionByEnum(RequestSections.criterias));
         await this.sectionByEnum(RequestSections.criterias).click();
         const groupsCount = await this.criteriaGroups.count();
@@ -265,7 +284,7 @@ export class RequestPage extends CommissionPage {
         await this.saveButton.last().click();
         await Elements.waitForHidden(this.changeLicStatusTitle);
         const licStatusValue: string = await this.currentLicStatus.innerText();
-        await expect(licStatusValue.toLowerCase()).toBe(LicStatus.waitForCommission.toLowerCase());
+        expect(licStatusValue.toLowerCase()).toBe(LicStatus.waitForCommission.toLowerCase());
     }
     /**
      * Fill in the fields "Comment" and "Decision on the document"
@@ -290,7 +309,7 @@ export class RequestPage extends CommissionPage {
     /**
      * Add comments and statuses for documents
      */
-    public async addExpertInfo(): Promise<void> {
+    public async addExpertInfo(prolicType: ProlicType): Promise<void> {
         let docsCount: number = await this.checkButton.count();
         await this.fillStatusAndComment(docsCount,"generalInfo");
         await this.sectionByEnum(RequestSections.criterias).click();
@@ -306,27 +325,32 @@ export class RequestPage extends CommissionPage {
             }
             docsCount = await this.checkButton.count();
             await this.fillStatusAndComment(docsCount,"criterias");
-            await this.fillExpertSolution();
-            await expect(this.expertReportFile).toBeVisible();
+            await this.fillExpertSolution(prolicType);
+            (prolicType == "lic") ?
+                await expect(this.expertReportFile).toBeVisible() :
+                await expect(this.workingMemberReportFile).toBeVisible();
         }
         const licStatusValue: string = await this.currentLicStatus.innerText();
-        await expect(licStatusValue.toLowerCase()).toBe(LicStatus.readyForReport.toLowerCase());
+        expect(licStatusValue.toLowerCase()).toBe(LicStatus.readyForReport.toLowerCase());
     }
     /**
      * Fill the fields "Conclusion of the RFS manager", "Recommendations on sanctions", "RPL criterias"
      */
-    public async addConclusions(): Promise<void> {
+    public async addConclusions(prolicType: ProlicType): Promise<void> {
         await this.sectionByEnum(RequestSections.generalInfo).click();
         await Elements.waitForVisible(this.conclusion);
         await this.conclusion.type(InputData.randomWord);
         await this.recommendation.type(InputData.randomWord);
-        await this.rplCriterias.type(InputData.randomWord);
+        if(prolicType == "lic") await this.rplCriterias.type(InputData.randomWord);
         await this.saveButton.click();
         await Elements.waitForVisible(this.saveButton);
         const conclusionText: string | null = await this.conclusion.textContent();
         const recommendationText: string | null = await this.recommendation.textContent();
-        const rplCriteriasText: string | null = await this.rplCriterias.textContent();
-        await expect(conclusionText && recommendationText && rplCriteriasText).not.toBeNull();
+        if(prolicType == "lic") {
+            const rplCriteriasText: string | null = await this.rplCriterias.textContent();
+            expect(conclusionText && recommendationText && rplCriteriasText).not.toBeNull();
+        }
+        else expect(conclusionText && recommendationText).not.toBeNull();
     }
     /**
      * Waiting for a status update near the document name in accordance with the selected status
@@ -342,10 +366,16 @@ export class RequestPage extends CommissionPage {
     /**
      * Add an expert report
      */
-    private async fillExpertSolution(): Promise<void> {
+    private async fillExpertSolution(prolicType: ProlicType): Promise<void> {
         await this.recommendation.type(InputData.randomWord);
-        await this.createReport.click();
-        await Elements.waitForVisible(this.createReport);
+        if(prolicType == "lic") {
+            await this.createExpertReport.click();
+            await Elements.waitForVisible(this.createExpertReport);
+        }
+        else {
+            await this.createWorkingGrpMemberReport.click();
+            await Elements.waitForVisible(this.createWorkingGrpMemberReport);
+        }
     }
     /**
      * Send documents for verification
@@ -382,10 +412,10 @@ export class RequestPage extends CommissionPage {
     /**
      * Create a prolicense with filled criteria groups and criterias
      */
-    public async createTestProlicense(): Promise<void> {
+    public async createTestProlicense(prolicType: ProlicType): Promise<void> {
         const constructor = new ConstructorNewPage(this.page);
         await constructor.openConstructor();
-        await constructor.createProlicense();
+        await constructor.createProlicense(prolicType);
         await constructor.createGrpCrit();
         await constructor.createCriteria();
         this.prolicenseName = await constructor.createdProlicName.innerText();
@@ -395,10 +425,12 @@ export class RequestPage extends CommissionPage {
     /**
      * Create a request in the status "Draft"
      */
-    public async createDraft(): Promise<void> {
+    public async createDraft(prolicType: ProlicType): Promise<void> {
         await this.arrow.click();
         await this.goToRequest.click();
-        await expect(this.licTitle).toBeVisible();
+        (prolicType == "lic") ?
+            await expect(this.requestLicTitle).toBeVisible() :
+            await expect(this.requestFinTitle).toBeVisible();
     }
     /**
      * Publish a license
@@ -416,21 +448,22 @@ export class RequestPage extends CommissionPage {
         await Elements.waitForVisible(this.docIcon);
         await Elements.waitForVisible(this.xlsxIcon);
         await this.comment.type(InputData.randomWord);
+        await this.addButton.click();
         try {
-            await this.addButton.click();
+            await Elements.waitForHidden(this.addButton);
         }
         catch (err) {
             await this.addButton.click();
+            await Elements.waitForHidden(this.addButton);
         }
-        await Elements.waitForHidden(this.addButton);
         await this.closeNotifications("last");
     }
     /**
      * Add commission decision for created license
      */
-    public async addCommissionDecision(): Promise<void> {
+    public async addCommissionDecision(prolicType: ProlicType): Promise<void> {
         await this.page.goto(Pages.commissionPage);
-        await this.createMeeting();
+        await this.createMeeting(prolicType);
         await this.addRequestsToMeeting();
         await this.addRequestDecision();
     }
@@ -443,5 +476,25 @@ export class RequestPage extends CommissionPage {
         await dbHelper.deleteProlicense();
         await dbHelper.deleteCommission();
         await dbHelper.closeConnect();
+    }
+    /**
+     * Change the deadlines for submission and review of documentation
+     */
+    public async updateDeadlineOfDates(prolicType: ProlicType): Promise<void> {
+        if(prolicType == "fin") {
+            await Elements.waitForVisible(this.sectionByEnum(RequestSections.generalInfo));
+            await this.sectionByEnum(RequestSections.generalInfo).click();
+        }
+        await this.submissionDocDateValue.click({clickCount: 2});
+        await Date.fillDateInput(this.dates,InputData.futureDate);
+        await this.checkButton.first().click();
+        await Elements.waitForHidden(this.dates);
+        await this.reviewDocDateValue.click({clickCount: 2});
+        await Date.fillDateInput(this.dates,InputData.futureDate);
+        await this.checkButton.first().click();
+        await Elements.waitForHidden(this.dates);
+        await this.page.waitForTimeout(1000);
+        expect(await this.submissionDocDateValue.innerText()).toBe(InputData.futureDate);
+        expect(await this.reviewDocDateValue.innerText()).toBe(InputData.futureDate);
     }
 }

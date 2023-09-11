@@ -79,7 +79,12 @@ export class Commission extends Catalogs {
      */
     public async addDecision(): Promise<void> {
         const filteredRequestStatus: LicDocStatusInterface[] = this.licStatus.
-        filter(licStatus => licStatus.name == LicStatus.issued || licStatus.name == LicStatus.issuedWithConditions || licStatus.name == LicStatus.declined);
+        filter(
+            licStatus =>
+                licStatus.name == LicStatus.issued ||
+                licStatus.name == LicStatus.issuedWithConditions ||
+                licStatus.name == LicStatus.declined
+        );
         for(const license of this.commission.licenses!) {
             const randomNumber: number = randomInt(0,filteredRequestStatus.length);
             const randomDecision: LicDocStatusInterface = filteredRequestStatus[randomNumber];

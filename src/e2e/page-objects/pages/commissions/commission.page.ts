@@ -12,6 +12,7 @@ import {DbHelper} from "../../../../db/db-helper.js";
 import {FileReader} from "../../helpers/file-reader.js";
 import * as Process from "process";
 import {Columns} from "../../helpers/enums/columns.js";
+import {ProlicType} from "../../helpers/types/prolic.type";
 
 export class CommissionPage extends MainPage {
     constructor(page: Page) {
@@ -86,11 +87,11 @@ export class CommissionPage extends MainPage {
     /**
      * Create a meeting
      */
-    public async createMeeting(): Promise<void> {
+    public async createMeeting(prolicType: ProlicType): Promise<void> {
         await this.createMeetingButton.click();
         await this.licType.click();
         await Elements.waitForVisible(this.licenseTypes.first());
-        await this.licenseTypes.first().click();
+        (prolicType == "lic") ? await this.licenseTypes.first().click() : await this.licenseTypes.last().click();
         await Date.fillDateInput(this.dates,InputData.currentDate);
         await this.name.type(InputData.randomWord);
         await this.createButton.click();
@@ -109,7 +110,7 @@ export class CommissionPage extends MainPage {
         await searchModal.selectButton.click();
         await this.closeNotifications("all");
         await Elements.waitForVisible(this.tableRow.first());
-        const rowCount : number = await this.tableRow.count();
+        const rowCount: number = await this.tableRow.count();
         expect(requestsCount).toBe(rowCount);
     }
     /**

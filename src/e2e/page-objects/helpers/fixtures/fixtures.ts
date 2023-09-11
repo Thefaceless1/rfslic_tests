@@ -17,7 +17,8 @@ import * as Process from "process";
 type Fixtures = {
     setUser: AuthPage,
     constructor: ConstructorNewPage,
-    requests: RequestPage,
+    licRequests: RequestPage,
+    finRequests: RequestPage,
     roles: RolesPage,
     users: UsersPage,
     licenseText: LicTextPage,
@@ -37,11 +38,25 @@ export const test = base.extend<Fixtures>({
             await constructor.deleteProdProlicense();
         }
     },
-    requests: async ({page},use) => {
+    licRequests: async ({page},use) => {
         const request = new RequestPage(page);
         await request.createUser();
         await request.login();
-        await request.createTestProlicense();
+        await request.createTestProlicense("lic");
+        await request.goto(Pages.requestNewPage);
+        await request.chooseClub();
+        await request.filterByColumn(request.filterButtonByEnum(Columns.licName));
+        await use(request);
+        if(Process.env.BRANCH == "prod") {
+            await request.deleteProdUser();
+            await request.deleteProdLicense();
+        }
+    },
+    finRequests: async ({page},use) => {
+        const request = new RequestPage(page);
+        await request.createUser();
+        await request.login();
+        await request.createTestProlicense("fin");
         await request.goto(Pages.requestNewPage);
         await request.chooseClub();
         await request.filterByColumn(request.filterButtonByEnum(Columns.licName));

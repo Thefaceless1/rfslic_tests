@@ -3,9 +3,9 @@ import {LicStatus} from "../../page-objects/helpers/enums/licstatus.js";
 import * as Process from "process";
 import {InputData} from "../../page-objects/helpers/input-data.js";
 
-test.describe("Заявки", () => {
+test.describe("Заявки на лицензирование", () => {
     test(`Дата запуска : ${InputData.currentDate}, Версия модуля: ${Process.env.APP_VERSION}`,
-        async ({requests}) => {
+        async ({licRequests}) => {
         test.info().annotations.push
         (
             {type: "Дата и время запуска",description: `${InputData.testAnnotationDate}`},
@@ -13,37 +13,40 @@ test.describe("Заявки", () => {
         );
 
         await test.step(
-            "Создание заявки в статусе Черновик",
-            async () => await requests.createDraft()
+            "Создание заявки на лицензирование в статусе Черновик",
+            async () => await licRequests.createDraft("lic")
         );
         await test.step(
-            "Подача заявки",
-            async () => await requests.publishLic()
+            "Подача заявки на лицензирование",
+            async () => await licRequests.publishLic()
+        );
+        await test.step(
+            "Изменение сроков подачи и рассмотрения документации",
+            async () => await licRequests.updateDeadlineOfDates("lic")
         );
         await test.step(
             "Добавление экспертов и сотрудников для групп критериев",
-            async () => await requests.addExperts()
+            async () => await licRequests.addExperts()
         );
         await test.step(
             "Заполнение документов критериев, сотрудников и офи",
-            async () => await requests.addDocInfo()
+            async () => await licRequests.addDocInfo()
         );
         await test.step(
             "Добавление комментариев и решений по документам экспертов групп критериев",
-            async () => await requests.addExpertInfo()
+            async () => await licRequests.addExpertInfo("lic")
         );
         await test.step(
-            "Добавление решения по заявки",
-            async () => await requests.addConclusions()
+            "Добавление решения по заявке на лицензирование",
+            async () => await licRequests.addConclusions("lic")
         );
         await test.step(
             "Проставление статуса 'Ожидает решения комиссии'",
-            async () => await requests.editLicStatus(LicStatus.waitForCommission)
+            async () => await licRequests.editLicStatus(LicStatus.waitForCommission)
         );
-        if (Process.env.BRANCH == "prod")
-            await test.step(
-                "Вынесение решения комиссии по заявке",
-                async () => await requests.addCommissionDecision()
-            );
+        await test.step(
+            "Вынесение решения комиссии по заявке на лицензирование",
+            async () => await licRequests.addCommissionDecision("lic")
+        );
     })
 })

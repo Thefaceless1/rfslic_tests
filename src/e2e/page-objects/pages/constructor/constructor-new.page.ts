@@ -13,6 +13,8 @@ import {CriteriaTypes} from "../../helpers/enums/criteriatypes.js";
 import {Notifications} from "../../helpers/enums/notifications.js";
 import {ProlicStatus} from "../../helpers/enums/prolicstatus.js";
 import {DbHelper} from "../../../../db/db-helper.js";
+import {ProlicType} from "../../helpers/types/prolic.type.js";
+import {ScenarioType} from "../../helpers/types/scenario.type.js";
 
 export class ConstructorNewPage extends ConstructorPage {
     constructor(page: Page) {
@@ -144,8 +146,9 @@ export class ConstructorNewPage extends ConstructorPage {
     /**
      * Fill in the fields of the block "General information"
      */
-    private async fillBasicInfo(): Promise<void> {
+    private async fillBasicInfo(prolicType: ProlicType): Promise<void> {
         await this.name.type(InputData.randomWord);
+        if(prolicType == "fin") await this.finControl.click();
         await this.season.click();
         await this.seasons.last().click();
         await this.licType.click();
@@ -169,7 +172,7 @@ export class ConstructorNewPage extends ConstructorPage {
             await Date.fillDateInput(date,InputData.futureDate);
         }
         await this.saveButton.click();
-        await expect(this.compareProlicName(oldProlicName)).toBeTruthy();
+        expect(this.compareProlicName(oldProlicName)).toBeTruthy();
     }
     /**
      * Comparison of the old and new name of the prolicense
@@ -195,8 +198,8 @@ export class ConstructorNewPage extends ConstructorPage {
     /**
      * Create a prolicense
      */
-    public async createProlicense(): Promise<void> {
-         await this.fillBasicInfo();
+    public async createProlicense(prolicType: ProlicType): Promise<void> {
+         await this.fillBasicInfo(prolicType);
          await this.fillDocs();
          await this.saveButton.click();
          await expect(this.createdProlicName).toBeVisible();
@@ -210,12 +213,12 @@ export class ConstructorNewPage extends ConstructorPage {
         await this.actionsList.filter({hasText: ProlicenseActions.clone}).click();
         await this.name.type(InputData.randomWord);
         await this.saveButton.click();
-        await expect(this.compareProlicName(prolicNameBeforeClone)).toBeTruthy();
+        expect(this.compareProlicName(prolicNameBeforeClone)).toBeTruthy();
     }
     /**
      * Publication of a prolicense
      */
-    public async publishProlicense(scenario: "lic" | "prolic"): Promise<void> {
+    public async publishProlicense(scenario: ScenarioType): Promise<void> {
         if(scenario == "prolic") {
             await this.filterByColumn(this.filterButtonByEnum(Columns.licName));
             await this.waitForColumnFilter();

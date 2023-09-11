@@ -13,7 +13,7 @@ test.describe("Пролицензии", () => {
 
         await test.step(
             "Создание пролицензии",
-            async () => await constructor.createProlicense()
+            async () => await constructor.createProlicense("lic")
         );
         await test.step(
             "Изменение общей информации пролицензии",
