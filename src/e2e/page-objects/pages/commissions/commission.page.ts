@@ -10,7 +10,6 @@ import {Input} from "../../../framework/elements/input.js";
 import {MainMenuOptions} from "../../helpers/enums/main-menu-options.js";
 import {DbHelper} from "../../../../db/db-helper.js";
 import {FileReader} from "../../helpers/file-reader.js";
-import * as Process from "process";
 import {Columns} from "../../helpers/enums/columns.js";
 import {ProlicType} from "../../helpers/types/prolic.type";
 
@@ -100,18 +99,14 @@ export class CommissionPage extends MainPage {
     /**
      * Add requests to a meeting
      */
-    public async addRequestsToMeeting(): Promise<void> {
+    public async addRequestToMeeting(): Promise<void> {
         await this.addRequestsButton.click();
         const searchModal = new SearchModalPage(this.page);
         await Elements.waitForHidden(searchModal.loadIndicator);
-        if (Process.env.BRANCH == "prod") await this.filterByColumn(this.filterButtonByEnum(Columns.licName).last());
+        await this.filterByColumn(this.filterButtonByEnum(Columns.licName).last());
         await this.checkbox.first().check();
-        const requestsCount: number = await this.checkbox.count() - 1;
         await searchModal.selectButton.click();
-        await this.closeNotifications("all");
         await Elements.waitForVisible(this.tableRow.first());
-        const rowCount: number = await this.tableRow.count();
-        expect(requestsCount).toBe(rowCount);
     }
     /**
      * Add decision on requests
@@ -136,7 +131,6 @@ export class CommissionPage extends MainPage {
                 await this.checkbox.first().click();
                 await this.saveButton.last().click();
             }
-            await this.closeNotifications("all");
             await expect(this.acceptedDecision.nth(i)).toBeVisible();
         }
     }

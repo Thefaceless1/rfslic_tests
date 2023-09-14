@@ -12,7 +12,6 @@ import {CommissionPage} from "../../pages/commissions/commission.page.js";
 import {CommissionMenuOptions} from "../enums/commission-menu-options.js";
 import {GroupsClassifierPage} from "../../pages/admin/groups-classifier.page.js";
 import {CategoriesClassifierPage} from "../../pages/admin/categories-classifier.page.js";
-import * as Process from "process";
 
 type Fixtures = {
     setUser: AuthPage,
@@ -29,17 +28,16 @@ type Fixtures = {
 export const test = base.extend<Fixtures>({
     constructor: async ({page},use) => {
         const constructor = new ConstructorNewPage(page);
+        await constructor.deleteUser();
         await constructor.createUser();
         await constructor.login();
         await constructor.openConstructor();
         await use(constructor);
-        if(Process.env.BRANCH == "prod") {
-            await constructor.deleteProdUser();
-            await constructor.deleteProdProlicense();
-        }
+        await constructor.deleteCreatedData();
     },
     licRequests: async ({page},use) => {
         const request = new RequestPage(page);
+        await request.deleteUser();
         await request.createUser();
         await request.login();
         await request.createTestProlicense("lic");
@@ -47,13 +45,11 @@ export const test = base.extend<Fixtures>({
         await request.chooseClub();
         await request.filterByColumn(request.filterButtonByEnum(Columns.licName));
         await use(request);
-        if(Process.env.BRANCH == "prod") {
-            await request.deleteProdUser();
-            await request.deleteProdLicense();
-        }
+        await request.deleteCreatedData();
     },
     finRequests: async ({page},use) => {
         const request = new RequestPage(page);
+        await request.deleteUser();
         await request.createUser();
         await request.login();
         await request.createTestProlicense("fin");
@@ -61,27 +57,24 @@ export const test = base.extend<Fixtures>({
         await request.chooseClub();
         await request.filterByColumn(request.filterButtonByEnum(Columns.licName));
         await use(request);
-        if(Process.env.BRANCH == "prod") {
-            await request.deleteProdUser();
-            await request.deleteProdLicense();
-        }
+        await request.deleteCreatedData();
     },
     roles: async ({page},use) => {
         const roles = new RolesPage(page);
+        await roles.deleteUser();
         await roles.createUser();
         await roles.login();
         await roles.adminMenuByEnum(AdminOptions.roles).click();
         await use(roles);
-        if(Process.env.BRANCH == "prod") await roles.deleteProdUser();
     },
     users: async ({page},use) => {
         const users = new UsersPage(page);
+        await users.deleteUser();
         await users.createUser();
         await users.deleteTestedUser();
         await users.login();
         await users.adminMenuByEnum(AdminOptions.users).click();
         await use(users);
-        if(Process.env.BRANCH == "prod") await users.deleteProdUser();
     },
     setUser: async ({browser},use) => {
         const page = await browser.newPage();
@@ -91,13 +84,14 @@ export const test = base.extend<Fixtures>({
     },
     licenseText: async ({page},use) => {
         const licenseText = new LicTextPage(page);
+        await licenseText.deleteUser();
         await licenseText.createUser();
         await licenseText.login();
         await use(licenseText);
-        if(Process.env.BRANCH == "prod") await licenseText.deleteProdUser();
     },
     commission: async ({page},use) => {
         const commission = new CommissionPage(page);
+        await commission.deleteUser();
         await commission.createUser();
         await commission.login();
         await commission.changeLicensesStatus();
@@ -106,18 +100,18 @@ export const test = base.extend<Fixtures>({
     },
     groupClassifier: async ({page},use) => {
         const groupClassifier = new GroupsClassifierPage(page);
+        await groupClassifier.deleteUser();
         await groupClassifier.createUser();
         await groupClassifier.login();
         await groupClassifier.adminMenuByEnum(AdminOptions.groupsClassifier).click();
         await use(groupClassifier);
-        if(Process.env.BRANCH == "prod") await groupClassifier.deleteProdUser();
     },
     categoriesClassifier: async ({page},use) => {
         const categoriesClassifier = new CategoriesClassifierPage(page);
+        await categoriesClassifier.deleteUser();
         await categoriesClassifier.createUser();
         await categoriesClassifier.login();
         await categoriesClassifier.adminMenuByEnum(AdminOptions.categoriesClassifier).click();
         await use(categoriesClassifier);
-        if(Process.env.BRANCH == "prod") await categoriesClassifier.deleteProdUser();
     }
 })

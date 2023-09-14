@@ -88,7 +88,7 @@ export class UsersPage extends MainPage {
      */
     public async deleteTestedUser(): Promise<void> {
         const dbHelper = new DbHelper()
-        await dbHelper.deleteProdUserData(this.testedUserId);
+        await dbHelper.deleteUserData(this.testedUserId);
         await dbHelper.closeConnect();
     }
 }

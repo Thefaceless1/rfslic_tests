@@ -81,17 +81,17 @@ export class DbHelper {
         await this.sql.end();
     }
     /**
-     * Delete prod user data from 'users' and 'operations_log' tables
+     * Delete user data from 'users' and 'operations_log' tables
      */
-    public async deleteProdUserData(prodUserId: number): Promise<void> {
+    public async deleteUserData(userId: number): Promise<void> {
         try {
             await this.sql`DELETE FROM ${this.sql(operationsLog.tableName)}
-                       WHERE ${this.sql(operationsLog.columns.userId)} = ${prodUserId}`;
+                       WHERE ${this.sql(operationsLog.columns.userId)} = ${userId}`;
             await this.sql`DELETE FROM ${this.sql(workUsers.tableName)}
-                       WHERE ${this.sql(workUsers.columns.userId)} = ${prodUserId}`;
+                       WHERE ${this.sql(workUsers.columns.userId)} = ${userId}`;
         }
         catch (err) {
-            setTimeout(async () => await this.deleteProdUserData(prodUserId),1000);
+             await this.deleteUserData(userId);
         }
     }
     /**

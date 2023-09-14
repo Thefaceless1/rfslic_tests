@@ -4,5 +4,5 @@ import {logger} from "../logger/logger.js";
 transporter.sendMail(mailOptions,(err) => {
     (err) ?
         logger.error(`Ошибка отправки отчета ${err}`) :
-        logger.info(`Отчет отправлен на почту`);
+        logger.info(`Отчет отправлен на указанные адреса`);
 })

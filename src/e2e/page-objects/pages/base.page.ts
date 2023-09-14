@@ -3,6 +3,7 @@ import {expect, Locator, Page} from "@playwright/test";
 import {Elements} from "../../framework/elements/elements.js";
 import {Columns} from "../helpers/enums/columns.js";
 import {Notifications} from "../helpers/enums/notifications.js";
+import {DbHelper} from "../../../db/db-helper.js";
 
 export class BasePage extends PlaywrightDevPage{
     protected prolicenseName: string
@@ -193,5 +194,15 @@ export class BasePage extends PlaywrightDevPage{
             if(await this.closeNotifyButton.last().isVisible())
                 await this.closeNotifyButton.last().click();
         }
+    }
+    /**
+     * Delete created licenses, prolicenses and commissions
+     */
+    public async deleteCreatedData(): Promise<void> {
+        const dbHelper = new DbHelper();
+        await dbHelper.deleteLicense();
+        await dbHelper.deleteProlicense();
+        await dbHelper.deleteCommission();
+        await dbHelper.closeConnect();
     }
 }

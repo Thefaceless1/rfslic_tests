@@ -2,18 +2,14 @@ import {Locator, Page} from "@playwright/test";
 import {BasePage} from "./base.page.js";
 import {Elements} from "../../framework/elements/elements.js";
 import {DbHelper} from "../../../db/db-helper.js";
-import {operationsLog, workUsers} from "../../../db/tables.js";
-import {Api} from "../helpers/enums/api.js";
-import {Roles} from "../helpers/enums/roles.js";
 import twoFactor from "node-2fa";
 import * as Process from "process";
 
 export class AuthPage extends BasePage {
-    private readonly userMail: string = "sync-license@rfs.ru"
-    private readonly userPassword: string = "RfsTest2023"
-    private readonly userNumber: number = 0
-    private readonly prodUserId: number = 17513354
-    protected userId: number = 0
+    private readonly prodUserMail: string = "sync-license@rfs.ru"
+    private readonly prodUserPassword: string = "RfsTest2023"
+    private readonly userId: number = (Process.env.BRANCH == "prod") ? 17513354 : 11309600
+    private readonly userName: string = "Бугаев Александр"
     constructor(page: Page) {
         super(page)
     }
@@ -32,7 +28,7 @@ export class AuthPage extends BasePage {
     /**
      * 'Check user' menu dropdown values
      */
-    private selectUserMenuList: Locator = Elements.getElement(this.page,"//*[contains(@class,'user__option')]")
+    private selectedUser: Locator = Elements.getElement(this.page,`//*[contains(@class,'user__option') and contains(text(),'${this.userName}')]`)
     /**
      * Field "E-mail"
      */
@@ -62,25 +58,9 @@ export class AuthPage extends BasePage {
      */
     public async createUser(): Promise<void> {
         const dbHelper = new DbHelper();
-        if(Process.env.BRANCH == "prod") {
-            await dbHelper.insertUser(this.prodUserId);
-            await dbHelper.insertUserRights(this.prodUserId);
-            await dbHelper.closeConnect();
-        }
-        else {
-            const response = await this.page.request.get(Api.users);
-            const userId: number = await response.json().then(value => value.data[this.userNumber].id);
-            this.userId = userId;
-            const dbUserData  = await dbHelper.select(workUsers.tableName,workUsers.columns.userId,userId);
-            if (dbUserData[0][workUsers.columns.roleId] == Roles.admin) return;
-            else {
-                await dbHelper.delete(operationsLog.tableName,operationsLog.columns.userId,userId);
-                await dbHelper.delete(workUsers.tableName,workUsers.columns.userId,userId);
-                await dbHelper.insertUser(userId);
-                await dbHelper.insertUserRights(userId);
-                await dbHelper.closeConnect();
-            }
-        }
+        await dbHelper.insertUser(this.userId);
+        await dbHelper.insertUserRights(this.userId);
+        await dbHelper.closeConnect();
     }
     /**
      * Log in to the system
@@ -89,8 +69,8 @@ export class AuthPage extends BasePage {
         await this.page.goto("");
         if (Process.env.BRANCH == "prod") {
             await Elements.waitForVisible(this.email);
-            await this.email.type(this.userMail);
-            await this.password.type(this.userPassword);
+            await this.email.type(this.prodUserMail);
+            await this.password.type(this.prodUserPassword);
             await this.enterButton.click();
             await Elements.waitForVisible(this.confirmationCode);
             await this.setConfirmationCode();
@@ -101,17 +81,17 @@ export class AuthPage extends BasePage {
             await this.selectUserButton.click();
             await Elements.waitForVisible(this.selectUserMenu);
             await this.selectUserMenu.click();
-            await Elements.waitForVisible(this.selectUserMenuList.first());
-            await this.selectUserMenuList.nth(this.userNumber).click();
+            await Elements.waitForVisible(this.selectedUser);
+            await this.selectedUser.click();
             await this.saveButton.click();
         }
     }
     /**
      * Delete user from pre-prod database
      */
-    public async deleteProdUser(): Promise<void> {
+    public async deleteUser(): Promise<void> {
         const dbHelper = new DbHelper();
-        await dbHelper.deleteProdUserData(this.prodUserId);
+        await dbHelper.deleteUserData(this.userId);
         await dbHelper.closeConnect();
     }
     /**

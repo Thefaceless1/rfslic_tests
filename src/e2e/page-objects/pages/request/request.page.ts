@@ -13,7 +13,6 @@ import {Notifications} from "../../helpers/enums/notifications.js";
 import {Pages} from "../../helpers/enums/pages.js";
 import {CommissionPage} from "../commissions/commission.page.js";
 import * as Process from "process";
-import {DbHelper} from "../../../../db/db-helper.js";
 import {ProlicType} from "../../helpers/types/prolic.type.js";
 import {Date} from "../../../framework/elements/date.js";
 
@@ -223,7 +222,13 @@ export class RequestPage extends CommissionPage {
         await searchModal.selectButton.click();
         await this.saveButton.click();
         await this.closeNotifications("last");
-        await Elements.waitForHidden(this.saveButton);
+        try {
+            await Elements.waitForHidden(this.saveButton);
+        }
+        catch (err) {
+            await this.saveButton.click();
+            await Elements.waitForHidden(this.saveButton);
+        }
     }
     /**
      * Add ofi and participants to criterias and fill criteria documents
@@ -464,18 +469,8 @@ export class RequestPage extends CommissionPage {
     public async addCommissionDecision(prolicType: ProlicType): Promise<void> {
         await this.page.goto(Pages.commissionPage);
         await this.createMeeting(prolicType);
-        await this.addRequestsToMeeting();
+        await this.addRequestToMeeting();
         await this.addRequestDecision();
-    }
-    /**
-     * Delete created prolicense and license from pre-prod database
-     */
-    public async deleteProdLicense(): Promise<void> {
-        const dbHelper = new DbHelper();
-        await dbHelper.deleteLicense();
-        await dbHelper.deleteProlicense();
-        await dbHelper.deleteCommission();
-        await dbHelper.closeConnect();
     }
     /**
      * Change the deadlines for submission and review of documentation

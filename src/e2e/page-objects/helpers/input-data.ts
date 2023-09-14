@@ -9,7 +9,9 @@ export class InputData {
     /**
      * Test annotation date
      */
-    public static testAnnotationDate: string = new Date().toLocaleString('ru-RU',dateConfig)
+    public static get testAnnotationDate(): string {
+        return new Date().toLocaleString('ru-RU',dateConfig);
+    }
     /**
      * Future date
      */
