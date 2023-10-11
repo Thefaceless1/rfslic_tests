@@ -1,5 +1,4 @@
 import {randomInt} from "crypto";
-import {dateConfig} from "./date.config.js";
 
 export class InputData {
     /**
@@ -10,7 +9,7 @@ export class InputData {
      * Test annotation date
      */
     public static get testAnnotationDate(): string {
-        return new Date().toLocaleString('ru-RU',dateConfig);
+        return new Date().toLocaleString('ru-RU',{timeZone: 'Europe/Moscow'});
     }
     /**
      * Future date

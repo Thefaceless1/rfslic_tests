@@ -389,7 +389,7 @@ export class RequestPage extends CommissionPage {
         for(let c = currDocNumb;c < currMaxDocNumb; c++) {
             await this.docTooltip.nth(c).click();
             await this.plusButton.first().click();
-            await Elements.waitForVisible(this.addButton);
+            await Elements.waitForVisible(this.saveButton);
             await this.fillDocsAndComment();
             await this.checkCommentValue(c);
             await expect(this.attachedFile.nth(c)).toBeVisible();
@@ -453,13 +453,13 @@ export class RequestPage extends CommissionPage {
         await Elements.waitForVisible(this.docIcon);
         await Elements.waitForVisible(this.xlsxIcon);
         await this.comment.type(InputData.randomWord);
-        await this.addButton.click();
+        await this.saveButton.click();
         try {
-            await Elements.waitForHidden(this.addButton);
+            await Elements.waitForHidden(this.saveButton);
         }
         catch (err) {
-            await this.addButton.click();
-            await Elements.waitForHidden(this.addButton);
+            await this.saveButton.click();
+            await Elements.waitForHidden(this.saveButton);
         }
         await this.closeNotifications("last");
     }
