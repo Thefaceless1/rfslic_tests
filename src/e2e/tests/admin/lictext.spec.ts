@@ -3,7 +3,7 @@ import {InputData} from "../../page-objects/helpers/input-data.js";
 import Process from "process";
 import config from "../../../../playwright.config.js";
 
-test.describe("Тексты лицензий", () => {
+test.describe("Тексты итоговых документов", () => {
     test(`Дата запуска : ${InputData.currentDate}, Версия модуля: ${Process.env.APP_VERSION}`,
         async ({licenseText}) => {
         test.info().annotations.push
@@ -14,7 +14,7 @@ test.describe("Тексты лицензий", () => {
         );
 
         await test.step(
-            "Добавление текста для типа лицензии",
+            "Добавление текста для итогового документа",
             async () => await licenseText.addLicText()
         );
     })

@@ -18,6 +18,7 @@ type Fixtures = {
     constructor: ConstructorNewPage,
     licRequests: RequestPage,
     finRequests: RequestPage,
+    certRequests: RequestPage,
     roles: RolesPage,
     users: UsersPage,
     licenseText: LicTextPage,
@@ -53,6 +54,18 @@ export const test = base.extend<Fixtures>({
         await request.createUser();
         await request.login();
         await request.createTestProlicense("fin");
+        await request.goto(Pages.requestNewPage);
+        await request.chooseClub();
+        await request.filterByColumn(request.filterButtonByEnum(Columns.licName));
+        await use(request);
+        await request.deleteCreatedData();
+    },
+    certRequests: async ({page},use) => {
+        const request = new RequestPage(page);
+        await request.deleteUser();
+        await request.createUser();
+        await request.login();
+        await request.createTestProlicense("cert");
         await request.goto(Pages.requestNewPage);
         await request.chooseClub();
         await request.filterByColumn(request.filterButtonByEnum(Columns.licName));

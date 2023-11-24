@@ -1,1 +1,1 @@
-export type ProlicType = "lic" | "fin";
+export type ProlicType = "lic" | "fin" | "cert";

@@ -142,6 +142,10 @@ export class RequestPage extends CommissionPage {
      */
     private requestFinTitle: Locator = Elements.getElement(this.page,"//*[text()='Заявка на финансовый контроль']")
     /**
+     * Request certification title
+     */
+    private requestCertificationTitle: Locator = Elements.getElement(this.page,"//*[text()='Заявка на аттестацию клуба']")
+    /**
      * Name of an expert report file
      */
     private expertReportFile: Locator = Elements.getElement(this.page,"//span[contains(text(),'Отчет эксперта')]")
@@ -170,6 +174,14 @@ export class RequestPage extends CommissionPage {
      */
     private changeLicStatusTitle: Locator = Elements.getElement(this.page,"//*[contains(@class,'ChangeRequestStatusModal_modal_titleWrapper')]")
     /**
+     * Field 'number of appointed experts'
+     */
+    private appointedExpertsCount: Locator = Elements.getElement(this.page,"//span[contains(@class,'NExpertsSpan')]")
+    /**
+     * Criteria status value
+     */
+    private criteriaStatus: Locator = Elements.getElement(this.page,"//div[contains(@class,'CriteriasInfoItem_badgeWrapper')]")
+    /**
      * Get the drop-down list value of the 'License decision' field by enum
      */
     private selectLicStatusByEnum(statusValue: LicStatus ): Locator {
@@ -197,6 +209,10 @@ export class RequestPage extends CommissionPage {
                 await this.fillExperts();
                 await expect(this.tableRow.nth(c)).toBeVisible();
             }
+            const regExp: RegExp = /\d/;
+            const appointedExpertCount = await this.appointedExpertsCount.innerText().then(value => value.match(regExp));
+            const filledExpertsCount = i + 1;
+            if(appointedExpertCount) expect(+appointedExpertCount[0]).toBe(filledExpertsCount);
         }
     }
     /**
@@ -319,10 +335,10 @@ export class RequestPage extends CommissionPage {
         await this.fillStatusAndComment(docsCount,"generalInfo");
         await this.sectionByEnum(RequestSections.criterias).click();
         const groupsCount: number = await this.criteriaGroups.count();
-        for(let i = 0; i<groupsCount;i++) {
+        for(let i = 0; i<groupsCount; i++) {
             await this.criteriaGroups.nth(i).click();
             const criteriaCount: number = await this.criteriaInfo.count();
-            for(let c = 0; c < criteriaCount; c++) {
+            for(let c = 0; c<criteriaCount; c++) {
                 await this.criteriaInfo.nth(c).click();
                 const criteriaType : string = await this.critTypeValue.nth(c).innerText();
                 if(criteriaType == CriteriaTypes.member) await this.memberCriteriaInfo.click();
@@ -330,13 +346,42 @@ export class RequestPage extends CommissionPage {
             }
             docsCount = await this.checkButton.count();
             await this.fillStatusAndComment(docsCount,"criterias");
+            await this.checkCriteriaStatuses(docsCount,criteriaCount);
             await this.fillExpertSolution(prolicType);
-            (prolicType == "lic") ?
+            (prolicType == "lic" || prolicType == "cert") ?
                 await expect(this.expertReportFile).toBeVisible() :
                 await expect(this.workingMemberReportFile).toBeVisible();
         }
         const licStatusValue: string = await this.currentLicStatus.innerText();
         expect(licStatusValue.toLowerCase()).toBe(LicStatus.readyForReport.toLowerCase());
+    }
+    /**
+     * Checking criteria statuses based on child documents
+     */
+    private async checkCriteriaStatuses(docsCount: number, criteriaCount: number): Promise<void> {
+        const criteriaStatuses: string[] = await this.criteriaStatus.allInnerTexts();
+        const docsStatuses: string[] = await this.docStates.allInnerTexts();
+        const docsCountPerCriteria: number = docsCount/criteriaCount;
+        let startIndexForDocsArray: number = 0;
+        criteriaStatuses.forEach(criteriaStatus => {
+            const docsArrayForCurrentCriteria: string[] = docsStatuses.slice(startIndexForDocsArray, docsCountPerCriteria + startIndexForDocsArray);
+            if(docsArrayForCurrentCriteria.includes(DocStatus.form)) {
+                expect(criteriaStatus.toLowerCase()).toBe(DocStatus.form.toLowerCase());
+            }
+            else if(docsArrayForCurrentCriteria.includes(DocStatus.notAccepted)) {
+                expect(criteriaStatus.toLowerCase()).toBe(DocStatus.notAccepted.toLowerCase());
+            }
+            else if(docsArrayForCurrentCriteria.includes(DocStatus.underReview)) {
+                expect(criteriaStatus.toLowerCase()).toBe(DocStatus.underReview.toLowerCase());
+            }
+            else if(docsArrayForCurrentCriteria.includes(DocStatus.acceptedWithCondition)) {
+                expect(criteriaStatus.toLowerCase()).toBe(DocStatus.acceptedWithCondition.toLowerCase());
+            }
+            else {
+                expect(criteriaStatus.toLowerCase()).toBe(DocStatus.accepted.toLowerCase());
+            }
+            startIndexForDocsArray += docsCountPerCriteria;
+        })
     }
     /**
      * Fill the fields "Conclusion of the RFS manager", "Recommendations on sanctions", "RPL criterias"
@@ -346,12 +391,12 @@ export class RequestPage extends CommissionPage {
         await Elements.waitForVisible(this.conclusion);
         await this.conclusion.type(InputData.randomWord);
         await this.recommendation.type(InputData.randomWord);
-        if(prolicType == "lic") await this.rplCriterias.type(InputData.randomWord);
+        if(prolicType == "lic" || prolicType == "cert") await this.rplCriterias.type(InputData.randomWord);
         await this.saveButton.click();
         await Elements.waitForVisible(this.saveButton);
         const conclusionText: string | null = await this.conclusion.textContent();
         const recommendationText: string | null = await this.recommendation.textContent();
-        if(prolicType == "lic") {
+        if(prolicType == "lic" || prolicType == "cert") {
             const rplCriteriasText: string | null = await this.rplCriterias.textContent();
             expect(conclusionText && recommendationText && rplCriteriasText).not.toBeNull();
         }
@@ -373,7 +418,7 @@ export class RequestPage extends CommissionPage {
      */
     private async fillExpertSolution(prolicType: ProlicType): Promise<void> {
         await this.recommendation.type(InputData.randomWord);
-        if(prolicType == "lic") {
+        if(prolicType == "lic" || prolicType == "cert") {
             await this.createExpertReport.click();
             await Elements.waitForVisible(this.createExpertReport);
         }
@@ -433,9 +478,20 @@ export class RequestPage extends CommissionPage {
     public async createDraft(prolicType: ProlicType): Promise<void> {
         await this.arrow.click();
         await this.goToRequest.click();
-        (prolicType == "lic") ?
-            await expect(this.requestLicTitle).toBeVisible() :
-            await expect(this.requestFinTitle).toBeVisible();
+        switch (prolicType) {
+            case "lic": {
+                await expect(this.requestLicTitle).toBeVisible()
+                break;
+            }
+            case "fin": {
+                await expect(this.requestFinTitle).toBeVisible()
+                break;
+            }
+            case "cert": {
+                await expect(this.requestCertificationTitle).toBeVisible()
+                break;
+            }
+        }
     }
     /**
      * Publish a license
@@ -480,16 +536,24 @@ export class RequestPage extends CommissionPage {
             await Elements.waitForVisible(this.sectionByEnum(RequestSections.generalInfo));
             await this.sectionByEnum(RequestSections.generalInfo).click();
         }
-        await this.submissionDocDateValue.click({clickCount: 2});
+        await this.clickOnDateValue(this.submissionDocDateValue);
         await Date.fillDateInput(this.dates,InputData.futureDate);
         await this.checkButton.first().click();
         await Elements.waitForHidden(this.dates);
-        await this.reviewDocDateValue.click({clickCount: 2});
+        await this.clickOnDateValue(this.reviewDocDateValue);
         await Date.fillDateInput(this.dates,InputData.futureDate);
         await this.checkButton.first().click();
         await Elements.waitForHidden(this.dates);
         await this.page.waitForTimeout(1000);
         expect(await this.submissionDocDateValue.innerText()).toBe(InputData.futureDate);
         expect(await this.reviewDocDateValue.innerText()).toBe(InputData.futureDate);
+    }
+    /**
+     * Clicking on the selected date value and checking the visibility of the element
+     */
+    private async clickOnDateValue(elementForClick: Locator): Promise<void> {
+        await elementForClick.click({clickCount: 2});
+        await this.page.waitForTimeout(1000);
+        if(!await this.dates.isVisible()) await this.clickOnDateValue(elementForClick);
     }
 }

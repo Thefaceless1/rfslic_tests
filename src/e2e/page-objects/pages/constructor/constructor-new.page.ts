@@ -14,6 +14,7 @@ import {Notifications} from "../../helpers/enums/notifications.js";
 import {ProlicStatus} from "../../helpers/enums/prolicstatus.js";
 import {ProlicType} from "../../helpers/types/prolic.type.js";
 import {ScenarioType} from "../../helpers/types/scenario.type.js";
+import {ProlicTypes} from "../../helpers/enums/ProlicTypes.js";
 
 export class ConstructorNewPage extends ConstructorPage {
     constructor(page: Page) {
@@ -106,7 +107,7 @@ export class ConstructorNewPage extends ConstructorPage {
     /**
      * Created criteria name
      */
-    private createdCriteria: Locator = Elements.getElement(this.page,"//span[contains(text(),'Название')]")
+    private createdCriteria: Locator = Elements.getElement(this.page,"//*[contains(@class,'CriteriaView')]//div[1]//div[1]//span")
     /**
      * Field "Multiple criteria"
      */
@@ -116,14 +117,20 @@ export class ConstructorNewPage extends ConstructorPage {
      */
     private minAmount: Locator = Elements.getElement(this.page,"//input[@name='minCount']")
     /**
-     * Radio "Finance control"
+     * Field 'Prolicense type'
      */
-    private finControl: Locator = Elements.getElement(this.page,"//button[@role='switch']")
+    private prolicType: Locator = Elements.getElement(this.page,"//*[contains(@class,'proLicType__control')]")
     /**
      * Current displayed prolicense status
      */
     private prolicenseStatus(statusValue: string): Locator {
         return Elements.getElement(this.page,`//*[text()='${statusValue}']`);
+    }
+    /**
+     * selected field 'Prolicense type' dropdown value
+     */
+    private prolicTypeValue(selectedType: ProlicTypes): Locator {
+        return Elements.getElement(this.page,`//*[contains(@class,'proLicType__option') and text()='${selectedType}']`);
     }
     /**
      * Open Prolicense constructor
@@ -146,8 +153,25 @@ export class ConstructorNewPage extends ConstructorPage {
      * Fill in the fields of the block "General information"
      */
     private async fillBasicInfo(prolicType: ProlicType): Promise<void> {
+        await this.prolicType.click();
+        switch (prolicType) {
+            case "lic": {
+                await Elements.waitForVisible(this.prolicTypeValue(ProlicTypes.licensing));
+                await this.prolicTypeValue(ProlicTypes.licensing).click();
+                break;
+            }
+            case "fin": {
+                await Elements.waitForVisible(this.prolicTypeValue(ProlicTypes.finControl));
+                await this.prolicTypeValue(ProlicTypes.finControl).click();
+                break;
+            }
+            case "cert": {
+                await Elements.waitForVisible(this.prolicTypeValue(ProlicTypes.certification));
+                await this.prolicTypeValue(ProlicTypes.certification).click();
+                break;
+            }
+        }
         await this.name.type(InputData.randomWord);
-        if(prolicType == "fin") await this.finControl.click();
         await this.season.click();
         await this.seasons.last().click();
         await this.licType.click();
@@ -163,7 +187,6 @@ export class ConstructorNewPage extends ConstructorPage {
     public async changeBasicInfo(): Promise<void> {
         const oldProlicName: string = await this.createdProlicName.innerText();
         await this.editButton.first().click();
-        await this.finControl.click();
         await this.name.clear();
         await this.name.type(InputData.randomWord);
         const allDates = await this.dates.all();
@@ -357,5 +380,23 @@ export class ConstructorNewPage extends ConstructorPage {
         const rowCount: number = await this.tableRow.count();
         if(rowCount > 1) await this.waitForColumnFilter();
         return;
+    }
+    /**
+     * Change criteria for published prolicense
+     */
+    public async changeCriteria(): Promise<void> {
+        await this.createdGroups.first().click();
+        const criteriaEditButtonNumber = 4;
+        await this.editButton.nth(criteriaEditButtonNumber).click();
+        await this.criteriaName.fill(InputData.randomWord);
+        if(await this.minAmount.isVisible()) {
+            const minAmountValue: number = +(await this.minAmount.getAttribute("value") ?? 0);
+            if(minAmountValue > 1) await this.minAmount.fill(String(minAmountValue - 1));
+        }
+        await this.docName.first().fill(InputData.randomWord);
+        await this.deleteIcon.first().click();
+        await this.fillCriteriaDocs();
+        await this.saveButton.click();
+        await expect(this.notification(Notifications.criteriaChanged)).toBeVisible();
     }
 }

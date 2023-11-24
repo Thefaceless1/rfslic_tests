@@ -78,7 +78,7 @@ export class BasePage extends PlaywrightDevPage{
     /**
      * Fields with date type
      */
-    protected dates: Locator = Elements.getElement(this.page,"//*[contains(@class,'datepicker')]//input")
+    protected dates: Locator = Elements.getElement(this.page,"//*[contains(@class,'datepicker')]//input[not(@disabled)]")
     /**
      * Values of the drop-down list of the "License type" field
      */
@@ -95,6 +95,10 @@ export class BasePage extends PlaywrightDevPage{
      * column "Number of a license" in Licenses table
      */
     protected numberLicenseColumn: Locator = Elements.getElement(this.page,"//td[@class='ant-table-cell'][2]")
+    /**
+     * Delete icon
+     */
+    protected deleteIcon: Locator = Elements.getElement(this.page,"//button[not(@disabled)]//span[contains(@class,'IconTrash')]")
     /**
      * Button "Delete"
      */

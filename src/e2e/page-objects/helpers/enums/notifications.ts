@@ -6,6 +6,7 @@ export enum Notifications {
     categoryChanged = "Разряд изменен",
     groupAdded = "Группа добавлена",
     groupChanged = "Группа изменена",
+    criteriaChanged = "Критерий изменен",
     groupDeleted = "Группа удалена",
     rightsChanged = "Права изменены",
     roleDeleted = "Роль удалена",

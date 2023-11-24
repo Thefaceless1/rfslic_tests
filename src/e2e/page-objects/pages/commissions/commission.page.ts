@@ -12,6 +12,7 @@ import {DbHelper} from "../../../../db/db-helper.js";
 import {FileReader} from "../../helpers/file-reader.js";
 import {Columns} from "../../helpers/enums/columns.js";
 import {ProlicType} from "../../helpers/types/prolic.type";
+import {CommissionTypes} from "../../helpers/enums/CommissionTypes.js";
 
 export class CommissionPage extends MainPage {
     constructor(page: Page) {
@@ -78,19 +79,44 @@ export class CommissionPage extends MainPage {
      */
     private report: Locator = Elements.getElement(this.page,"//span[contains(text(),'Отчет по')]")
     /**
+     * Field 'Commission type'
+     */
+    private commissionType: Locator = Elements.getElement(this.page,"//*[contains(@class,'type__control')]")
+    /**
      * Protocol name
      */
     private protocol(fileName: string): Locator {
         return Elements.getElement(this.page,`//span[text()='${fileName}']`);
     }
     /**
+     * Selected drop down value of field 'Commission type'
+     */
+    private commissionTypeValue(selectedValue: CommissionTypes): Locator {
+        return Elements.getElement(this.page,`//*[contains(@class,'type__option') and text()='${selectedValue}']`);
+    }
+    /**
      * Create a meeting
      */
     public async createMeeting(prolicType: ProlicType): Promise<void> {
         await this.createMeetingButton.click();
-        await this.licType.click();
-        await Elements.waitForVisible(this.licenseTypes.first());
-        (prolicType == "lic") ? await this.licenseTypes.first().click() : await this.licenseTypes.last().click();
+        await this.commissionType.click();
+        switch (prolicType) {
+            case "lic": {
+                await Elements.waitForVisible(this.commissionTypeValue(CommissionTypes.licensing));
+                await this.commissionTypeValue(CommissionTypes.licensing).click();
+                break;
+            }
+            case "fin": {
+                await Elements.waitForVisible(this.commissionTypeValue(CommissionTypes.finControl));
+                await this.commissionTypeValue(CommissionTypes.finControl).click();
+                break;
+            }
+            case "cert": {
+                await Elements.waitForVisible(this.commissionTypeValue(CommissionTypes.certification));
+                await this.commissionTypeValue(CommissionTypes.certification).click();
+                break;
+            }
+        }
         await Date.fillDateInput(this.dates,InputData.currentDate);
         await this.name.type(InputData.randomWord);
         await this.createButton.click();

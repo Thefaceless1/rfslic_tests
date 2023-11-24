@@ -42,6 +42,14 @@ test.describe("Пролицензии", () => {
             async () => await constructor.publishProlicense("prolic")
         );
         await test.step(
+            "Изменение общей информации опубликованной пролицезии",
+            async () => await constructor.changeBasicInfo()
+        );
+        await test.step(
+            "Изменение критерия опубликованной пролицензии",
+            async () => await constructor.changeCriteria()
+        );
+        await test.step(
             "Снятие с публикации пролицензии",
             async () => await constructor.unpublishProlicense()
         );

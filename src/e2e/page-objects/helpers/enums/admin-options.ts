@@ -2,7 +2,7 @@ export enum AdminOptions {
     roles = "Роли",
     experts = "Эксперты",
     users = "Пользователи",
-    licenseText = "Тексты лицензий",
+    licenseText = "Тексты итоговых документов",
     groupsClassifier = "Классификатор групп критериев",
     categoriesClassifier = "Классификатор разрядов критериев"
 }
