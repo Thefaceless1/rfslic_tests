@@ -175,7 +175,8 @@ export class ConstructorNewPage extends ConstructorPage {
         await this.season.click();
         await this.seasons.last().click();
         await this.licType.click();
-        await this.licenseTypes.last().click();
+        (prolicType != "cert") ? await Elements.waitForVisible(this.rfsWomanLicType) : await Elements.waitForVisible(this.certificateFnlLicType);
+        (prolicType != "cert") ? await this.rfsWomanLicType.click() : await this.certificateFnlLicType.click();
         const allDates = await this.dates.all();
         for (const date of allDates) {
             await Date.fillDateInput(date,InputData.currentDate);

@@ -16,5 +16,6 @@ export enum Notifications {
     userGroupsChanged = "Группы критериев пользователя изменены",
     prolicenseRemoved = "Пролицензия удалена",
     requestAdded = "Заявка подана",
+    sanctionRemoved = "Санкция удалена",
     subscriptionChanged = "Подписка обновлена"
 }

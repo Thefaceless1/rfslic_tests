@@ -5,11 +5,8 @@ import {Date} from "../../../framework/elements/date.js";
 import {InputData} from "../../helpers/input-data.js";
 import {SearchModalPage} from "../search-modal.page.js";
 import {randomInt} from "crypto";
-import {LicStatus} from "../../helpers/enums/licstatus.js";
-import {Input} from "../../../framework/elements/input.js";
 import {MainMenuOptions} from "../../helpers/enums/main-menu-options.js";
 import {DbHelper} from "../../../../db/db-helper.js";
-import {FileReader} from "../../helpers/file-reader.js";
 import {Columns} from "../../helpers/enums/columns.js";
 import {ProlicType} from "../../helpers/types/prolic.type";
 import {CommissionTypes} from "../../helpers/enums/CommissionTypes.js";
@@ -27,6 +24,26 @@ export class CommissionPage extends MainPage {
      */
     private createButton: Locator = Elements.getElement(this.page,"//button[text()='Создать']")
     /**
+     * Button "Next"
+     */
+    private nextButton: Locator = Elements.getElement(this.page,"//button[text()='Далее']")
+    /**
+     * Button "Approve"
+     */
+    private approveButton: Locator = Elements.getElement(this.page,"//button[text()='Утвердить']")
+    /**
+     * Button "Add requests"
+     */
+    private approvalSanctionButton: Locator = Elements.getElement(this.page,"//button[text()='Утверждение санкций']")
+    /**
+     * Field with the fine amount for editing
+     */
+    private fineAmountFieldEdition: Locator = Elements.getElement(this.page,"//input[@name='fine']")
+    /**
+     * Field 'Fine amount'
+     */
+    private fineAmount: Locator = Elements.getElement(this.page,"//td[contains(@class,'ant-table-selection-column')]//following-sibling::td[contains(@class,'RequestSanctions_fineWrapper')]")
+    /**
      * Button "Add requests"
      */
     private addRequestsButton: Locator = Elements.getElement(this.page,"//button[text()='Добавить заявки']")
@@ -39,55 +56,29 @@ export class CommissionPage extends MainPage {
      */
     private selectDecision: Locator = Elements.getElement(this.page,"//*[contains(@class,'newLicState__control')]")
     /**
-     * Get the drop-down list values of the 'Select a decision' field
+     * Value of the drop-down list for selecting solutions for the application "license issued"
      */
-    private selectDecisionList: Locator = Elements.getElement(this.page,"//*[contains(@class,'newLicState__option')]")
+    private licenseIssuedDecision: Locator = Elements.getElement(this.page,"//*[contains(@class,'newLicState__option') and text()='Выдана']")
     /**
-     * Button "Materials"
+     * Value of the drop-down list for selecting solutions for the application "passed"
      */
-    private materialsButton: Locator = Elements.getElement(this.page,"//button[text()='Материалы']")
-    /**
-     * Field "Report type"
-     */
-    private reportType: Locator = Elements.getElement(this.page,"//*[contains(@class,'reportType__control')]")
-    /**
-     * Get the drop-down list values of the 'Report type' field
-     */
-    private reportTypeList: Locator = Elements.getElement(this.page,"//*[contains(@class,'reportType__option')]")
+    private passedDecision: Locator = Elements.getElement(this.page,"//*[contains(@class,'newLicState__option') and text()='Пройден']")
     /**
      * Field "Commission name"
      */
     private commissionName: Locator = Elements.getElement(this.page,"//*[contains(@class,'Text_weight_semibold') and contains(text(),'Заседание')]")
     /**
-     * Field "Requests"
-     */
-    private requests: Locator = Elements.getElement(this.page,"//*[contains(@class,'requests__control')]")
-    /**
-     * Get the drop-down list values of the 'Requests' field
-     */
-    private requestsList: Locator = Elements.getElement(this.page,"//*[contains(@class,'requests__option')]")
-    /**
-     * Button "Form"
-     */
-    private formButton: Locator = Elements.getElement(this.page,"//button[text()='Сформировать']")
-    /**
      * Accepted decision in the table
      */
-    private acceptedDecision: Locator = Elements.getElement(this.page,"//td[7]//*[contains(@class,'Badge_view_filled')]")
-    /**
-     * Report name
-     */
-    private report: Locator = Elements.getElement(this.page,"//span[contains(text(),'Отчет по')]")
+    protected acceptedDecision: Locator = Elements.getElement(this.page,"//td[7]//*[contains(@class,'Badge_view_filled')]")
     /**
      * Field 'Commission type'
      */
     private commissionType: Locator = Elements.getElement(this.page,"//*[contains(@class,'type__control')]")
     /**
-     * Protocol name
+     * Edit buttons for sanctions with fine
      */
-    private protocol(fileName: string): Locator {
-        return Elements.getElement(this.page,`//span[text()='${fileName}']`);
-    }
+    private sanctionFineEditButton: Locator = Elements.getElement(this.page,"//td[contains(@class,'RequestSanctions_fine') and text()!='-']//following-sibling::td//following-sibling::td//div//div[contains(@class,'RequestSanctions_editWrapper')]")
     /**
      * Selected drop down value of field 'Commission type'
      */
@@ -137,59 +128,26 @@ export class CommissionPage extends MainPage {
     /**
      * Add decision on requests
      */
-    public async addRequestDecision(): Promise<void> {
+    public async addRequestDecision(prolicType: ProlicType): Promise<void> {
         await Elements.waitForVisible(this.editDecisionButton.first());
         const requestCount: number = await this.editDecisionButton.count();
         for(let i = 0; i < requestCount; i++) {
             await this.editDecisionButton.nth(i).click();
             await this.selectDecision.click();
-            await Elements.waitForVisible(this.selectDecisionList.first());
-            const decisionCount: number = await this.selectDecisionList.count();
-            const randomNumb: number = randomInt(0,decisionCount);
-            const selectedDecisionName: string = await this.selectDecisionList.nth(randomNumb).innerText();
-            await this.selectDecisionList.nth(randomNumb).click();
-            if(selectedDecisionName == LicStatus.issuedWithConditions || selectedDecisionName == LicStatus.returnForRevision) {
-                await Date.fillDateInput(this.dates,InputData.futureDate);
-            }
-            await this.comment.type(InputData.randomWord);
-            await this.saveButton.click();
-            if(selectedDecisionName == LicStatus.returnForRevision) {
-                await this.checkbox.first().click();
-                await this.saveButton.last().click();
-            }
-            await expect(this.acceptedDecision.nth(i)).toBeVisible();
-        }
-    }
-    /**
-     * Add protocol and report for commission
-     */
-    public async addReport(): Promise<void> {
-        await this.materialsButton.click();
-        const plusButtonCount: number = await this.plusButton.count();
-        const fileName: string = FileReader.getTestFiles[0].match(/\w+\.\w+/g)![0];
-        for(let i = 0; i < plusButtonCount; i++) {
-            await this.plusButton.nth(i).click();
-            if(i == 0) {
-                await this.reportType.click();
-                await Elements.waitForVisible(this.reportTypeList.first());
-                await this.reportTypeList.first().click();
-                await this.licType.click();
-                await Elements.waitForVisible(this.licenseTypes.first());
-                await this.licenseTypes.last().click();
-                await this.requests.click()
-                await Elements.waitForVisible(this.requestsList.first());
-                const requestCount: number = await this.requestsList.count();
-                for(let c = 0; c<requestCount; c++) {
-                    await this.requestsList.first().click()
-                }
-                await this.formButton.click();
+            if(prolicType == "fin") {
+                await Elements.waitForVisible(this.passedDecision);
+                await this.passedDecision.click();
             }
             else {
-                await Input.uploadFiles(this.templates,"one");
-                await Elements.waitForVisible(this.docIcon);
-                await this.saveButton.click();
+                await Elements.waitForVisible(this.licenseIssuedDecision);
+                await this.licenseIssuedDecision.click();
             }
-            (i == 0) ? await expect(this.report).toBeVisible() : await expect(this.protocol(fileName)).toBeVisible();
+            await this.comment.type(InputData.randomWord);
+            await this.approvalSanctionButton.click();
+            await this.editFineAmount();
+            await this.approveButton.click();
+            await this.saveButton.click();
+            await expect(this.acceptedDecision.nth(i)).toBeVisible();
         }
     }
     /**
@@ -207,5 +165,27 @@ export class CommissionPage extends MainPage {
         }
         await dbHelper.closeConnect();
         await this.page.goBack();
+    }
+    /**
+     * Edit fine amount
+     */
+    private async editFineAmount(): Promise<void> {
+        const sanctionWithFineCount: number = await this.sanctionFineEditButton.count();
+        if(sanctionWithFineCount == 0) return;
+        else {
+            (sanctionWithFineCount == 1) ? await this.sanctionFineEditButton.click() : await this.sanctionFineEditButton.first().click();
+            await Elements.waitForVisible(this.fineAmountFieldEdition);
+            const currentFineAmount: string | null = await this.fineAmountFieldEdition.getAttribute("value");
+            if(!currentFineAmount) return;
+            else {
+                const randomFine: string = String(randomInt(1,+currentFineAmount));
+                await this.fineAmountFieldEdition.fill(randomFine);
+                await this.nextButton.click();
+                const actualFine: string = (sanctionWithFineCount == 1) ?
+                    await this.fineAmount.innerText().then(result => result.split(" ").join("")) :
+                    await this.fineAmount.first().innerText().then(result => result.split(" ").join(""));
+                expect(actualFine).toBe(randomFine);
+            }
+        }
     }
 }

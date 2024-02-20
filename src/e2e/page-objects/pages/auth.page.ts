@@ -9,7 +9,7 @@ export class AuthPage extends BasePage {
     private readonly prodUserMail: string = "sync-license@rfs.ru"
     private readonly prodUserPassword: string = "RfsTest2023"
     private readonly userId: number = (Process.env.BRANCH == "prod") ? 17513354 : 11309600
-    private readonly userName: string = "Бугаев Александр"
+    private readonly userName: string = "Агвеуб Нсеадклра"
     constructor(page: Page) {
         super(page)
     }

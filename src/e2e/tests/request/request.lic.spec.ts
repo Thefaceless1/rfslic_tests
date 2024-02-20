@@ -39,6 +39,18 @@ test.describe("Заявки на лицензирование", () => {
             async () => await licRequests.addExpertInfo("lic")
         );
         await test.step(
+            "Ручное добавление санкции к заявке",
+            async () => await licRequests.addSanction()
+        );
+        await test.step(
+            "Удаление ручной санкции",
+            async () => await licRequests.deleteSanction()
+        );
+        await test.step(
+            "Формирование санкции в связи с возвратом отчета эксперта РФС на доработку",
+            async () => await licRequests.formExpertReportSanction()
+        );
+        await test.step(
             "Добавление решения по заявке на лицензирование",
             async () => await licRequests.addConclusions("lic")
         );
@@ -47,8 +59,12 @@ test.describe("Заявки на лицензирование", () => {
             async () => await licRequests.editLicStatus(LicStatus.waitForCommission)
         );
         await test.step(
-            "Вынесение решения комиссии по заявке на лицензирование",
+            "Вынесение решения и утверждение санкций(в т.ч изменение суммы штрафа) комиссией по заявке на лицензирование",
             async () => await licRequests.addCommissionDecision("lic")
+        );
+        await test.step(
+            "Просмотр утвержденных санкций на табе 'Комиссии' в заявке",
+            async () => await licRequests.viewApprovedSanctions()
         );
     })
 })

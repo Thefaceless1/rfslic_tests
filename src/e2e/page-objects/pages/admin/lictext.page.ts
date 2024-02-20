@@ -4,7 +4,7 @@ import {AdminOptions} from "../../helpers/enums/admin-options.js";
 import {Elements} from "../../../framework/elements/elements.js";
 import {InputData} from "../../helpers/input-data.js";
 
-export class LicTextPage extends MainPage{
+export class LicTextPage extends MainPage {
     constructor(page: Page) {
         super(page);
     }
@@ -19,11 +19,11 @@ export class LicTextPage extends MainPage{
         const text : string = InputData.randomWord;
         await this.adminMenuByEnum(AdminOptions.licenseText).click();
         await this.licType.click();
-        await Elements.waitForVisible(this.licenseTypes.first());
-        await this.licenseTypes.first().click();
+        await Elements.waitForVisible(this.rfsWomanLicType);
+        await this.rfsWomanLicType.click();
         await this.enterText.clear();
         await this.enterText.type(text);
         await this.saveButton.click();
-        await expect(await this.enterText.textContent()).toBe(text);
+        expect(await this.enterText.textContent()).toBe(text);
     }
 }

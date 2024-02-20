@@ -5,5 +5,6 @@ export enum LicStatus {
     readyForReport = "Готова к формированию отчета",
     waitForCommission = "Ожидает решения комиссии",
     returnForRevision = "Вернуть на доработку",
+    inWork = "В работе",
     leaveUnchanged = "Оставить без изменений"
 }

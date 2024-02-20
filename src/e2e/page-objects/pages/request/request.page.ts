@@ -17,6 +17,7 @@ import {ProlicType} from "../../helpers/types/prolic.type.js";
 import {Date} from "../../../framework/elements/date.js";
 
 export class RequestPage extends CommissionPage {
+    private manualSanctionCount: number = 3
     constructor(page : Page) {
         super(page);
     }
@@ -182,6 +183,46 @@ export class RequestPage extends CommissionPage {
      */
     private criteriaStatus: Locator = Elements.getElement(this.page,"//div[contains(@class,'CriteriasInfoItem_badgeWrapper')]")
     /**
+     * Title 'Specify groups for revision'
+     */
+    private specifyGroupForRevision: Locator = Elements.getElement(this.page,"//*[text()='Укажите группы для доработки']")
+    /**
+     * Field 'Select violation'
+     */
+    private selectViolation: Locator = Elements.getElement(this.page,"//*[contains(@class,'violation__dropdown-indicator')]")
+    /**
+     * 'Select violation' field dropdown values
+     */
+    private violationValues: Locator = Elements.getElement(this.page,"//*[contains(@class,'violation__option')]")
+    /**
+     * Violation name
+     */
+    private violationName: Locator = Elements.getElement(this.page,"//td[contains(@class,'RequestSanctions_violationName')]")
+    /**
+     * Expert Report Sanction
+     */
+    private expertReportSanction: Locator = Elements.getElement(this.page,"//td[contains(@class,'RequestSanctions_violationName') and text()='Возврат отчета эксперта РФС на доработку']")
+    /**
+     * Message 'Obligatory field'
+     */
+    private obligatoryField: Locator = Elements.getElement(this.page,"//*[text()='Обязательное поле']")
+    /**
+     * Field 'Type of sanction'
+     */
+    private sanctionType: Locator = Elements.getElement(this.page,"//*[contains(@class,'sanction__control') and not(contains(@class,'disabled'))]")
+    /**
+     * 'Type of sanction' field dropdown values
+     */
+    private sanctionValues: Locator = Elements.getElement(this.page,"//*[contains(@class,'sanction__option')]")
+    /**
+     * Icon 'Delete sanction'
+     */
+    private deleteSanctionIcon: Locator = Elements.getElement(this.page,"//*[contains(@class,'RequestSanctions_deleteWrapper')]")
+    /**
+     * 'Save sanction' button
+     */
+    private saveSanctionButton: Locator = Elements.getElement(this.page,"//*[contains(@class,'RequestSanctions')]//button[text()='Сохранить']")
+    /**
      * Get the drop-down list value of the 'License decision' field by enum
      */
     private selectLicStatusByEnum(statusValue: LicStatus ): Locator {
@@ -303,9 +344,16 @@ export class RequestPage extends CommissionPage {
         await Elements.waitForVisible(this.selectLicStatusByEnum(statusValue));
         await this.selectLicStatusByEnum(statusValue).click();
         await this.saveButton.last().click();
+        if(statusValue == LicStatus.inWork) {
+            await Elements.waitForVisible(this.specifyGroupForRevision);
+            await this.checkbox.nth(1).click();
+            await this.saveButton.last().click();
+        }
         await Elements.waitForHidden(this.changeLicStatusTitle);
-        const licStatusValue: string = await this.currentLicStatus.innerText();
-        expect(licStatusValue.toLowerCase()).toBe(LicStatus.waitForCommission.toLowerCase());
+        if(statusValue == LicStatus.waitForCommission) {
+            const licStatusValue: string = await this.currentLicStatus.innerText();
+            expect(licStatusValue.toLowerCase()).toBe(LicStatus.waitForCommission.toLowerCase());
+        }
     }
     /**
      * Fill in the fields "Comment" and "Decision on the document"
@@ -346,7 +394,7 @@ export class RequestPage extends CommissionPage {
             }
             docsCount = await this.checkButton.count();
             await this.fillStatusAndComment(docsCount,"criterias");
-            await this.checkCriteriaStatuses(docsCount,criteriaCount);
+            await this.checkCriteriaStates(docsCount,criteriaCount);
             await this.fillExpertSolution(prolicType);
             (prolicType == "lic" || prolicType == "cert") ?
                 await expect(this.expertReportFile).toBeVisible() :
@@ -358,7 +406,7 @@ export class RequestPage extends CommissionPage {
     /**
      * Checking criteria statuses based on child documents
      */
-    private async checkCriteriaStatuses(docsCount: number, criteriaCount: number): Promise<void> {
+    private async checkCriteriaStates(docsCount: number, criteriaCount: number): Promise<void> {
         const criteriaStatuses: string[] = await this.criteriaStatus.allInnerTexts();
         const docsStatuses: string[] = await this.docStates.allInnerTexts();
         const docsCountPerCriteria: number = docsCount/criteriaCount;
@@ -387,20 +435,18 @@ export class RequestPage extends CommissionPage {
      * Fill the fields "Conclusion of the RFS manager", "Recommendations on sanctions", "RPL criterias"
      */
     public async addConclusions(prolicType: ProlicType): Promise<void> {
-        await this.sectionByEnum(RequestSections.generalInfo).click();
+        if(prolicType != "lic") await this.sectionByEnum(RequestSections.generalInfo).click();
         await Elements.waitForVisible(this.conclusion);
         await this.conclusion.type(InputData.randomWord);
-        await this.recommendation.type(InputData.randomWord);
         if(prolicType == "lic" || prolicType == "cert") await this.rplCriterias.type(InputData.randomWord);
         await this.saveButton.click();
         await Elements.waitForVisible(this.saveButton);
         const conclusionText: string | null = await this.conclusion.textContent();
-        const recommendationText: string | null = await this.recommendation.textContent();
         if(prolicType == "lic" || prolicType == "cert") {
             const rplCriteriasText: string | null = await this.rplCriterias.textContent();
-            expect(conclusionText && recommendationText && rplCriteriasText).not.toBeNull();
+            expect(conclusionText && rplCriteriasText).not.toBeNull();
         }
-        else expect(conclusionText && recommendationText).not.toBeNull();
+        else expect(conclusionText).not.toBeNull();
     }
     /**
      * Waiting for a status update near the document name in accordance with the selected status
@@ -526,7 +572,7 @@ export class RequestPage extends CommissionPage {
         await this.page.goto(Pages.commissionPage);
         await this.createMeeting(prolicType);
         await this.addRequestToMeeting();
-        await this.addRequestDecision();
+        await this.addRequestDecision(prolicType);
     }
     /**
      * Change the deadlines for submission and review of documentation
@@ -555,5 +601,53 @@ export class RequestPage extends CommissionPage {
         await elementForClick.click({clickCount: 2});
         await this.page.waitForTimeout(1000);
         if(!await this.dates.isVisible()) await this.clickOnDateValue(elementForClick);
+    }
+    /**
+     * Add sanctions
+     */
+    public async addSanction(): Promise<void> {
+        await this.sectionByEnum(RequestSections.generalInfo).click();
+        for(let i=0; i<this.manualSanctionCount; i++) {
+            await this.addButton.click();
+            await this.selectViolation.click();
+            await Elements.waitForVisible(this.violationValues.first());
+            await this.violationValues.first().click();
+            await this.saveSanctionButton.click();
+            if(await this.obligatoryField.isVisible()) {
+                await this.sanctionType.click();
+                await Elements.waitForVisible(this.sanctionValues.first());
+                await this.sanctionValues.first().click();
+                await this.saveSanctionButton.click();
+            }
+        }
+        expect(await this.violationName.count()).toBe(this.manualSanctionCount);
+    }
+    /**
+     * Remove a sanction
+     */
+    public async deleteSanction(): Promise<void> {
+        await this.deleteSanctionIcon.last().click();
+        await this.deleteButton.click();
+        await expect(this.notification(Notifications.sanctionRemoved)).toBeVisible();
+    }
+    /**
+     * Formation of the sanction “Return of the RFU expert’s report for revision”
+     */
+    public async formExpertReportSanction(): Promise<void> {
+        await this.editLicStatus(LicStatus.inWork);
+        await this.sectionByEnum(RequestSections.criterias).click();
+        await this.createExpertReport.click();
+        await Elements.waitForVisible(this.createExpertReport);
+        await this.sectionByEnum(RequestSections.generalInfo).click();
+        await expect(this.expertReportSanction).toBeVisible();
+    }
+    /**
+     * View approved sanctions
+     */
+    public async viewApprovedSanctions(): Promise<void> {
+        await this.acceptedDecision.click();
+        await this.sectionByEnum(RequestSections.commissions).click();
+        await Elements.waitForVisible(this.violationName.first());
+        expect(await this.violationName.count()).toBe(this.manualSanctionCount);
     }
 }

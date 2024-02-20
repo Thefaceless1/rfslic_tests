@@ -80,9 +80,13 @@ export class BasePage extends PlaywrightDevPage{
      */
     protected dates: Locator = Elements.getElement(this.page,"//*[contains(@class,'datepicker')]//input[not(@disabled)]")
     /**
-     * Values of the drop-down list of the "License type" field
+     * License type 'РФС Ж'
      */
-    protected licenseTypes: Locator = Elements.getElement(this.page,"//*[contains(@class,'type__option') or contains(@class,'licType__option')]")
+    protected rfsWomanLicType: Locator = Elements.getElement(this.page,"//*[(contains(@class,'type__option') or contains(@class,'licType__option')) and text()='РФС Ж']")
+    /**
+     * License type 'Аттестат ФНЛ'
+     */
+    protected certificateFnlLicType: Locator = Elements.getElement(this.page,"//*[(contains(@class,'type__option') or contains(@class,'licType__option')) and text()='Аттестат ФНЛ']")
     /**
      * Prolicense or License table row
      */
@@ -121,7 +125,7 @@ export class BasePage extends PlaywrightDevPage{
      * Button "Add"
      */
     protected get addButton(): Locator {
-        return Elements.getElement(this.page,"//button[text()='Добавить']");
+        return Elements.getElement(this.page,"//*[text()='Добавить']");
     }
     /**
      * Field "Description"
