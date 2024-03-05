@@ -1,9 +1,9 @@
-import {MainPage} from "../main.page.js";
+import {MainPage} from "../MainPage.js";
 import {expect, Locator, Page} from "@playwright/test";
-import {Elements} from "../../../framework/elements/elements.js";
+import {Elements} from "../../../framework/elements/Elements.js";
 import {randomInt} from "crypto";
-import {InputData} from "../../helpers/input-data.js";
-import {Notifications} from "../../helpers/enums/notifications.js";
+import {InputData} from "../../helpers/InputData.js";
+import {Notifications} from "../../helpers/enums/Notifications.js";
 
 export class CategoriesClassifierPage extends MainPage {
     constructor(page: Page) {

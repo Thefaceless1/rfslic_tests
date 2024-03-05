@@ -1,13 +1,13 @@
-import {MainPage} from "../main.page.js";
+import {MainPage} from "../MainPage.js";
 import {expect, Locator, Page} from "@playwright/test";
-import {Elements} from "../../../framework/elements/elements.js";
-import {Date} from "../../../framework/elements/date.js";
-import {InputData} from "../../helpers/input-data.js";
-import {SearchModalPage} from "../search-modal.page.js";
+import {Elements} from "../../../framework/elements/Elements.js";
+import {Date} from "../../../framework/elements/Dates.js";
+import {InputData} from "../../helpers/InputData.js";
+import {SearchModalPage} from "../SearchModalPage.js";
 import {randomInt} from "crypto";
-import {MainMenuOptions} from "../../helpers/enums/main-menu-options.js";
+import {MainMenuOptions} from "../../helpers/enums/MainMenuOptions.js";
 import {DbHelper} from "../../../../db/db-helper.js";
-import {Columns} from "../../helpers/enums/columns.js";
+import {TableColumn} from "../../helpers/enums/TableColumn.js";
 import {ProlicType} from "../../helpers/types/prolic.type";
 import {CommissionTypes} from "../../helpers/enums/CommissionTypes.js";
 
@@ -35,10 +35,6 @@ export class CommissionPage extends MainPage {
      * Button "Add requests"
      */
     private approvalSanctionButton: Locator = Elements.getElement(this.page,"//button[text()='Утверждение санкций']")
-    /**
-     * Field with the fine amount for editing
-     */
-    private fineAmountFieldEdition: Locator = Elements.getElement(this.page,"//input[@name='fine']")
     /**
      * Field 'Fine amount'
      */
@@ -120,7 +116,7 @@ export class CommissionPage extends MainPage {
         await this.addRequestsButton.click();
         const searchModal = new SearchModalPage(this.page);
         await Elements.waitForHidden(searchModal.loadIndicator);
-        await this.filterByColumn(this.filterButtonByEnum(Columns.licName).last());
+        await this.filterByColumn(this.filterButtonByEnum(TableColumn.licName).last());
         await this.checkbox.first().check();
         await searchModal.selectButton.click();
         await Elements.waitForVisible(this.tableRow.first());

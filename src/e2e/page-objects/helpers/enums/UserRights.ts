@@ -25,5 +25,8 @@ export enum UserRights {
 'request.groupReport.add' = 'request.groupReport.add',
 'request.groupReport.edit' = 'request.groupReport.edit',
 'request.history' = 'request.history',
-'request.viewAll' = 'request.viewAll'
+'request.viewAll' = 'request.viewAll',
+'request.sendLimit.edit' = 'request.sendLimit.edit',
+'request.sanctions.edit' = 'request.sanctions.edit',
+'request.docsDeadline.edit' = 'request.docsDeadline.edit'
 }

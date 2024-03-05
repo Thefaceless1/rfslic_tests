@@ -1,6 +1,6 @@
 import {Locator} from "@playwright/test";
-import {FileReader} from "../../page-objects/helpers/file-reader.js";
-import {Elements} from "./elements.js";
+import {FileReader} from "../../page-objects/helpers/FileReader.js";
+import {Elements} from "./Elements.js";
 
 export class Input extends Elements {
     /**

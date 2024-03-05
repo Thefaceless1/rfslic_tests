@@ -1,9 +1,9 @@
 import {test} from "../../page-objects/helpers/fixtures/fixtures.js";
-import {InputData} from "../../page-objects/helpers/input-data.js";
+import {InputData} from "../../page-objects/helpers/InputData.js";
 import Process from "process";
 import config from "../../../../playwright.config.js";
 
-test.describe("Классификатор групп критериев",() => {
+test.describe("Справочник 'Классификатор групп критериев'",() => {
     test(`Дата запуска : ${InputData.currentDate}, Версия модуля: ${Process.env.APP_VERSION}`,
         async ({groupClassifier}) => {
         test.info().annotations.push

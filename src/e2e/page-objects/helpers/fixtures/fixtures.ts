@@ -1,17 +1,20 @@
 import {test as base} from '@playwright/test';
-import {ConstructorNewPage} from "../../pages/constructor/constructor-new.page.js";
-import {Pages} from "../enums/pages.js";
-import {RequestPage} from "../../pages/request/request.page.js";
-import {Columns} from "../enums/columns.js";
-import {RolesPage} from "../../pages/admin/roles.page.js";
-import {AdminOptions} from "../enums/admin-options.js";
-import {UsersPage} from "../../pages/admin/users.page.js";
-import {AuthPage} from "../../pages/auth.page.js";
-import {LicTextPage} from "../../pages/admin/lictext.page.js";
-import {CommissionPage} from "../../pages/commissions/commission.page.js";
-import {CommissionMenuOptions} from "../enums/commission-menu-options.js";
-import {GroupsClassifierPage} from "../../pages/admin/groups-classifier.page.js";
-import {CategoriesClassifierPage} from "../../pages/admin/categories-classifier.page.js";
+import {ConstructorNewPage} from "../../pages/constructor/ConstructorNewPage.js";
+import {Pages} from "../enums/Pages.js";
+import {RequestPage} from "../../pages/request/RequestPage.js";
+import {TableColumn} from "../enums/TableColumn.js";
+import {RolesPage} from "../../pages/admin/RolesPage.js";
+import {AdminOptions} from "../enums/AdminOptions.js";
+import {UsersPage} from "../../pages/admin/UsersPage.js";
+import {AuthPage} from "../../pages/AuthPage.js";
+import {LicTextPage} from "../../pages/admin/LictextPage.js";
+import {CommissionPage} from "../../pages/commissions/CommissionPage.js";
+import {CommissionMenuOptions} from "../enums/CommissionMenuOptions.js";
+import {GroupsClassifierPage} from "../../pages/admin/GropsClassifierPage.js";
+import {CategoriesClassifierPage} from "../../pages/admin/CategoriesClassifierPage.js";
+import {SanctionTypesPage} from "../../pages/admin/SanctionTypesPage.js";
+import {ViolationsPage} from "../../pages/admin/ViolationsPage.js";
+import {SanctionsPage} from "../../pages/admin/SanctionsPage.js";
 
 type Fixtures = {
     setUser: AuthPage,
@@ -24,7 +27,10 @@ type Fixtures = {
     licenseText: LicTextPage,
     commission: CommissionPage,
     groupClassifier: GroupsClassifierPage,
-    categoriesClassifier: CategoriesClassifierPage
+    categoriesClassifier: CategoriesClassifierPage,
+    sanctionTypes: SanctionTypesPage,
+    violations: ViolationsPage,
+    sanctions: SanctionsPage
 }
 export const test = base.extend<Fixtures>({
     constructor: async ({page},use) => {
@@ -34,7 +40,7 @@ export const test = base.extend<Fixtures>({
         await constructor.login();
         await constructor.openConstructor();
         await use(constructor);
-        await constructor.deleteCreatedData();
+        await constructor.deleteCreatedDataFromDatabase();
     },
     licRequests: async ({page},use) => {
         const request = new RequestPage(page);
@@ -44,9 +50,9 @@ export const test = base.extend<Fixtures>({
         await request.createTestProlicense("lic");
         await request.goto(Pages.requestNewPage);
         await request.chooseClub();
-        await request.filterByColumn(request.filterButtonByEnum(Columns.licName));
+        await request.filterByColumn(request.filterButtonByEnum(TableColumn.licName));
         await use(request);
-        await request.deleteCreatedData();
+        await request.deleteCreatedDataFromDatabase();
     },
     finRequests: async ({page},use) => {
         const request = new RequestPage(page);
@@ -56,9 +62,9 @@ export const test = base.extend<Fixtures>({
         await request.createTestProlicense("fin");
         await request.goto(Pages.requestNewPage);
         await request.chooseClub();
-        await request.filterByColumn(request.filterButtonByEnum(Columns.licName));
+        await request.filterByColumn(request.filterButtonByEnum(TableColumn.licName));
         await use(request);
-        await request.deleteCreatedData();
+        await request.deleteCreatedDataFromDatabase();
     },
     certRequests: async ({page},use) => {
         const request = new RequestPage(page);
@@ -68,9 +74,9 @@ export const test = base.extend<Fixtures>({
         await request.createTestProlicense("cert");
         await request.goto(Pages.requestNewPage);
         await request.chooseClub();
-        await request.filterByColumn(request.filterButtonByEnum(Columns.licName));
+        await request.filterByColumn(request.filterButtonByEnum(TableColumn.licName));
         await use(request);
-        await request.deleteCreatedData();
+        await request.deleteCreatedDataFromDatabase();
     },
     roles: async ({page},use) => {
         const roles = new RolesPage(page);
@@ -126,5 +132,33 @@ export const test = base.extend<Fixtures>({
         await categoriesClassifier.login();
         await categoriesClassifier.adminMenuByEnum(AdminOptions.categoriesClassifier).click();
         await use(categoriesClassifier);
+    },
+    sanctionTypes: async ({page},use) => {
+        const sanctionTypes = new SanctionTypesPage(page);
+        await sanctionTypes.deleteUser();
+        await sanctionTypes.createUser();
+        await sanctionTypes.login();
+        await sanctionTypes.adminMenuByEnum(AdminOptions.sanctionConstructor).click();
+        await use(sanctionTypes);
+        await sanctionTypes.deleteSanctionTypeFromDatabase();
+    },
+    violations: async ({page},use) => {
+        const violations = new ViolationsPage(page);
+        await violations.deleteUser();
+        await violations.createUser();
+        await violations.login();
+        await violations.adminMenuByEnum(AdminOptions.sanctionConstructor).click();
+        await use(violations);
+        await violations.deleteViolationsFromDatabase();
+    },
+    sanctions: async ({page},use) => {
+        const sanctions = new SanctionsPage(page);
+        await sanctions.deleteUser();
+        await sanctions.createUser();
+        await sanctions.createViolation();
+        await sanctions.login();
+        await sanctions.adminMenuByEnum(AdminOptions.sanctionConstructor).click();
+        await use(sanctions);
+        await sanctions.deleteViolationAndSanctionFromDatabase();
     }
 })

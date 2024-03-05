@@ -1,4 +1,4 @@
-export enum CriteriaTypes {
+export enum CriteriaType {
     documents = "Документы",
     member = "Участник",
     ofi = "ОФИ"

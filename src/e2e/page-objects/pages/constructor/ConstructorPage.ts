@@ -1,6 +1,6 @@
-import {MainPage} from "../main.page.js";
+import {MainPage} from "../MainPage.js";
 import {Locator, Page} from "@playwright/test";
-import {Elements} from "../../../framework/elements/elements.js";
+import {Elements} from "../../../framework/elements/Elements.js";
 
 export class ConstructorPage extends MainPage {
     constructor(page: Page) {

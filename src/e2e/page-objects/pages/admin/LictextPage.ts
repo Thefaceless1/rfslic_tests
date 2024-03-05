@@ -1,8 +1,8 @@
-import {MainPage} from "../main.page.js";
+import {MainPage} from "../MainPage.js";
 import {expect, Locator, Page} from "@playwright/test";
-import {AdminOptions} from "../../helpers/enums/admin-options.js";
-import {Elements} from "../../../framework/elements/elements.js";
-import {InputData} from "../../helpers/input-data.js";
+import {AdminOptions} from "../../helpers/enums/AdminOptions.js";
+import {Elements} from "../../../framework/elements/Elements.js";
+import {InputData} from "../../helpers/InputData.js";
 
 export class LicTextPage extends MainPage {
     constructor(page: Page) {

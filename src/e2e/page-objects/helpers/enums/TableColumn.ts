@@ -1,4 +1,4 @@
-export enum Columns {
+export enum TableColumn {
     licName = "Название",
     status = "Статус"
 }

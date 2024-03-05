@@ -17,5 +17,7 @@ export enum Notifications {
     prolicenseRemoved = "Пролицензия удалена",
     requestAdded = "Заявка подана",
     sanctionRemoved = "Санкция удалена",
-    subscriptionChanged = "Подписка обновлена"
+    subscriptionChanged = "Подписка обновлена",
+    sanctionSaved = "Санкция сохранена",
+    entryDeleted = "Запись удалена"
 }

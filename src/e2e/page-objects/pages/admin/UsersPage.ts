@@ -1,10 +1,10 @@
-import {MainPage} from "../main.page.js";
+import {MainPage} from "../MainPage.js";
 import {expect, Locator, Page} from "@playwright/test";
-import {Elements} from "../../../framework/elements/elements.js";
-import {SearchModalPage} from "../search-modal.page.js";
+import {Elements} from "../../../framework/elements/Elements.js";
+import {SearchModalPage} from "../SearchModalPage.js";
 import {DbHelper} from "../../../../db/db-helper.js";
-import {UserTabs} from "../../helpers/enums/usertabs.js";
-import {Notifications} from "../../helpers/enums/notifications.js";
+import {UserTabs} from "../../helpers/enums/UserTabs.js";
+import {Notifications} from "../../helpers/enums/Notifications.js";
 
 export class UsersPage extends MainPage {
     private readonly testedUserId : number = 17500821

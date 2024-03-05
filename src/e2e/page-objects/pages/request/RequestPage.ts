@@ -1,20 +1,20 @@
 import {expect, Locator, Page} from "@playwright/test";
-import {RequestSections} from "../../helpers/enums/request-sections.js";
-import {Elements} from "../../../framework/elements/elements.js";
-import {SearchModalPage} from "../search-modal.page.js";
-import {InputData} from "../../helpers/input-data.js";
+import {RequestSections} from "../../helpers/enums/RequestSections.js";
+import {Elements} from "../../../framework/elements/Elements.js";
+import {SearchModalPage} from "../SearchModalPage.js";
+import {InputData} from "../../helpers/InputData.js";
 import {randomInt} from "crypto";
-import {LicStatus} from "../../helpers/enums/licstatus.js";
-import {CriteriaTypes} from "../../helpers/enums/criteriatypes.js";
-import {DocStatus} from "../../helpers/enums/docstatus.js";
-import {ConstructorNewPage} from "../constructor/constructor-new.page.js";
-import {Input} from "../../../framework/elements/input.js";
-import {Notifications} from "../../helpers/enums/notifications.js";
-import {Pages} from "../../helpers/enums/pages.js";
-import {CommissionPage} from "../commissions/commission.page.js";
+import {LicStates} from "../../helpers/enums/LicStates.js";
+import {CriteriaType} from "../../helpers/enums/CriteriaType.js";
+import {DocStatus} from "../../helpers/enums/DocStatus.js";
+import {ConstructorNewPage} from "../constructor/ConstructorNewPage.js";
+import {Input} from "../../../framework/elements/Input.js";
+import {Notifications} from "../../helpers/enums/Notifications.js";
+import {Pages} from "../../helpers/enums/Pages.js";
+import {CommissionPage} from "../commissions/CommissionPage.js";
 import * as Process from "process";
 import {ProlicType} from "../../helpers/types/prolic.type.js";
-import {Date} from "../../../framework/elements/date.js";
+import {Date} from "../../../framework/elements/Dates.js";
 
 export class RequestPage extends CommissionPage {
     private manualSanctionCount: number = 3
@@ -108,7 +108,7 @@ export class RequestPage extends CommissionPage {
     /**
      * Document tooltip
      */
-    private docTooltip: Locator = Elements.getElement(this.page,"//span[contains(@class,'IconInfo')]")
+    private docTooltip: Locator = Elements.getElement(this.page,"//span[contains(@class,'DocumentInfo_itemInfoIcon')]")
     /**
      * Button "Edit Member"
      */
@@ -223,9 +223,17 @@ export class RequestPage extends CommissionPage {
      */
     private saveSanctionButton: Locator = Elements.getElement(this.page,"//*[contains(@class,'RequestSanctions')]//button[text()='Сохранить']")
     /**
+     * Field value "Number of documents sent for verification"
+     */
+    private verificationDocsCount: Locator = Elements.getElement(this.page,"(//*[contains(@class,'GeneralInfo_numChecksWrapper')]//*)[1]")
+    /**
+     * Field for editing the number of documents sent for verification
+     */
+    private verificationDocsCountEditField: Locator = Elements.getElement(this.page,"//input[@name='maxCheck']")
+    /**
      * Get the drop-down list value of the 'License decision' field by enum
      */
-    private selectLicStatusByEnum(statusValue: LicStatus ): Locator {
+    private selectLicStatusByEnum(statusValue: LicStates ): Locator {
         return Elements.getElement(this.page,`//*[contains(@class,'requestState__option') and text()='${statusValue}']`);
     }
     /**
@@ -306,14 +314,14 @@ export class RequestPage extends CommissionPage {
             for (let x = 0; x < criteriaCount; x++) {
                 const critTypeName : string = await this.critTypeValue.nth(x).innerText();
                 switch (critTypeName) {
-                    case CriteriaTypes.documents : {
+                    case CriteriaType.documents : {
                         await this.sendForVerification(currDocNumb,currMaxDocNumb);
                         currDocNumb+=step;
                         currMaxDocNumb+=step;
                         break;
                     }
                     default : {
-                        (critTypeName == CriteriaTypes.member) ? await this.editMemberButton.click() : await this.editOfiButton.click();
+                        (critTypeName == CriteriaType.member) ? await this.editMemberButton.click() : await this.editOfiButton.click();
                         await this.fillSearchModalData();
                         await this.sendForVerification(currDocNumb,currMaxDocNumb);
                         currDocNumb+=step;
@@ -336,7 +344,7 @@ export class RequestPage extends CommissionPage {
     /**
      * Edit license status by enum
      */
-    public async editLicStatus(statusValue: LicStatus): Promise<void> {
+    public async editLicStatus(statusValue: LicStates): Promise<void> {
         await this.page.reload();
         await this.page.waitForLoadState();
         await this.licEditButton.click();
@@ -344,15 +352,15 @@ export class RequestPage extends CommissionPage {
         await Elements.waitForVisible(this.selectLicStatusByEnum(statusValue));
         await this.selectLicStatusByEnum(statusValue).click();
         await this.saveButton.last().click();
-        if(statusValue == LicStatus.inWork) {
+        if(statusValue == LicStates.inWork) {
             await Elements.waitForVisible(this.specifyGroupForRevision);
             await this.checkbox.nth(1).click();
             await this.saveButton.last().click();
         }
         await Elements.waitForHidden(this.changeLicStatusTitle);
-        if(statusValue == LicStatus.waitForCommission) {
+        if(statusValue == LicStates.waitForCommission) {
             const licStatusValue: string = await this.currentLicStatus.innerText();
-            expect(licStatusValue.toLowerCase()).toBe(LicStatus.waitForCommission.toLowerCase());
+            expect(licStatusValue.toLowerCase()).toBe(LicStates.waitForCommission.toLowerCase());
         }
     }
     /**
@@ -389,8 +397,8 @@ export class RequestPage extends CommissionPage {
             for(let c = 0; c<criteriaCount; c++) {
                 await this.criteriaInfo.nth(c).click();
                 const criteriaType : string = await this.critTypeValue.nth(c).innerText();
-                if(criteriaType == CriteriaTypes.member) await this.memberCriteriaInfo.click();
-                else if(criteriaType == CriteriaTypes.ofi) await this.ofiCriteriaInfo.click();
+                if(criteriaType == CriteriaType.member) await this.memberCriteriaInfo.click();
+                else if(criteriaType == CriteriaType.ofi) await this.ofiCriteriaInfo.click();
             }
             docsCount = await this.checkButton.count();
             await this.fillStatusAndComment(docsCount,"criterias");
@@ -401,7 +409,7 @@ export class RequestPage extends CommissionPage {
                 await expect(this.workingMemberReportFile).toBeVisible();
         }
         const licStatusValue: string = await this.currentLicStatus.innerText();
-        expect(licStatusValue.toLowerCase()).toBe(LicStatus.readyForReport.toLowerCase());
+        expect(licStatusValue.toLowerCase()).toBe(LicStates.readyForReport.toLowerCase());
     }
     /**
      * Checking criteria statuses based on child documents
@@ -590,7 +598,7 @@ export class RequestPage extends CommissionPage {
         await Date.fillDateInput(this.dates,InputData.futureDate);
         await this.checkButton.first().click();
         await Elements.waitForHidden(this.dates);
-        await this.page.waitForTimeout(1000);
+        await this.page.reload({waitUntil: "load"});
         expect(await this.submissionDocDateValue.innerText()).toBe(InputData.futureDate);
         expect(await this.reviewDocDateValue.innerText()).toBe(InputData.futureDate);
     }
@@ -634,7 +642,7 @@ export class RequestPage extends CommissionPage {
      * Formation of the sanction “Return of the RFU expert’s report for revision”
      */
     public async formExpertReportSanction(): Promise<void> {
-        await this.editLicStatus(LicStatus.inWork);
+        await this.editLicStatus(LicStates.inWork);
         await this.sectionByEnum(RequestSections.criterias).click();
         await this.createExpertReport.click();
         await Elements.waitForVisible(this.createExpertReport);
@@ -649,5 +657,17 @@ export class RequestPage extends CommissionPage {
         await this.sectionByEnum(RequestSections.commissions).click();
         await Elements.waitForVisible(this.violationName.first());
         expect(await this.violationName.count()).toBe(this.manualSanctionCount);
+    }
+    /**
+     * Change the number of documents sent for verification
+     */
+    public async changeVerificationDocsCount(): Promise<void> {
+        await this.verificationDocsCount.click({clickCount: 2});
+        const newDocsCountValue: string = String(randomInt(1,99));
+        await this.verificationDocsCountEditField.fill(newDocsCountValue);
+        await this.checkButton.first().click();
+        await Elements.waitForVisible(this.verificationDocsCount);
+        await this.page.reload({waitUntil: "load"});
+        expect(await this.verificationDocsCount.innerText()).toBe(newDocsCountValue);
     }
 }

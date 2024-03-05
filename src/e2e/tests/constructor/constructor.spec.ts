@@ -1,5 +1,5 @@
 import {test} from "../../page-objects/helpers/fixtures/fixtures.js";
-import {InputData} from "../../page-objects/helpers/input-data.js";
+import {InputData} from "../../page-objects/helpers/InputData.js";
 import * as Process from "process";
 import config from "../../../../playwright.config.js";
 

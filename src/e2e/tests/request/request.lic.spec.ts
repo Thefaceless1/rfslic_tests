@@ -1,7 +1,7 @@
 import {test} from "../../page-objects/helpers/fixtures/fixtures.js";
-import {LicStatus} from "../../page-objects/helpers/enums/licstatus.js";
+import {LicStates} from "../../page-objects/helpers/enums/LicStates.js";
 import * as Process from "process";
-import {InputData} from "../../page-objects/helpers/input-data.js";
+import {InputData} from "../../page-objects/helpers/InputData.js";
 import config from "../../../../playwright.config.js";
 
 test.describe("Заявки на лицензирование", () => {
@@ -25,6 +25,10 @@ test.describe("Заявки на лицензирование", () => {
         await test.step(
             "Изменение сроков подачи и рассмотрения документации",
             async () => await licRequests.updateDeadlineOfDates("lic")
+        );
+        await test.step(
+            "Изменение количества отправок документов на проверку",
+            async () => await licRequests.changeVerificationDocsCount()
         );
         await test.step(
             "Добавление экспертов и сотрудников для групп критериев",
@@ -56,7 +60,7 @@ test.describe("Заявки на лицензирование", () => {
         );
         await test.step(
             "Проставление статуса 'Ожидает решения комиссии'",
-            async () => await licRequests.editLicStatus(LicStatus.waitForCommission)
+            async () => await licRequests.editLicStatus(LicStates.waitForCommission)
         );
         await test.step(
             "Вынесение решения и утверждение санкций(в т.ч изменение суммы штрафа) комиссией по заявке на лицензирование",

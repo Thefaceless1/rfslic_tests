@@ -1,7 +1,7 @@
 import {test} from "../../page-objects/helpers/fixtures/fixtures.js";
-import {InputData} from "../../page-objects/helpers/input-data.js";
+import {InputData} from "../../page-objects/helpers/InputData.js";
 import Process from "process";
-import {LicStatus} from "../../page-objects/helpers/enums/licstatus.js";
+import {LicStates} from "../../page-objects/helpers/enums/LicStates.js";
 import config from "../../../../playwright.config.js";
 
 test.describe("Заявки на аттестацию",() => {
@@ -26,6 +26,10 @@ test.describe("Заявки на аттестацию",() => {
                 async () => await certRequests.updateDeadlineOfDates("cert")
             );
             await test.step(
+                "Изменение количества отправок документов на проверку",
+                async () => await certRequests.changeVerificationDocsCount()
+            );
+            await test.step(
                 "Добавление экспертов и сотрудников для групп критериев",
                 async () => await certRequests.addExperts()
             );
@@ -43,7 +47,7 @@ test.describe("Заявки на аттестацию",() => {
             );
             await test.step(
                 "Проставление статуса 'Ожидает решения комиссии'",
-                async () => await certRequests.editLicStatus(LicStatus.waitForCommission)
+                async () => await certRequests.editLicStatus(LicStates.waitForCommission)
             );
             await test.step(
                 "Вынесение решения комиссии по заявке на аттестацию",

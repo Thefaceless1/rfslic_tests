@@ -1,6 +1,6 @@
-import {BasePage} from "./base.page.js";
+import {BasePage} from "./BasePage.js";
 import {Locator, Page} from "@playwright/test";
-import {Elements} from "../../framework/elements/elements.js";
+import {Elements} from "../../framework/elements/Elements.js";
 
 export class SearchModalPage extends BasePage {
     constructor(page: Page) {

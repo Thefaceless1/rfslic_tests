@@ -1,6 +1,6 @@
 import {Locator, Page} from "@playwright/test";
-import {BasePage} from "./base.page.js";
-import {Elements} from "../../framework/elements/elements.js";
+import {BasePage} from "./BasePage.js";
+import {Elements} from "../../framework/elements/Elements.js";
 import {DbHelper} from "../../../db/db-helper.js";
 import twoFactor from "node-2fa";
 import * as Process from "process";

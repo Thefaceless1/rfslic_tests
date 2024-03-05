@@ -1,9 +1,9 @@
 import {Locator, Page} from "@playwright/test";
-import {Elements} from "../../framework/elements/elements.js";
-import {MainMenuOptions} from "../helpers/enums/main-menu-options.js";
-import {AdminOptions} from "../helpers/enums/admin-options.js";
-import {AuthPage} from "./auth.page.js";
-import {CommissionMenuOptions} from "../helpers/enums/commission-menu-options";
+import {Elements} from "../../framework/elements/Elements.js";
+import {MainMenuOptions} from "../helpers/enums/MainMenuOptions.js";
+import {AdminOptions} from "../helpers/enums/AdminOptions";
+import {AuthPage} from "./AuthPage.js";
+import {CommissionMenuOptions} from "../helpers/enums/CommissionMenuOptions";
 
 export class MainPage extends AuthPage {
     constructor(page: Page) {

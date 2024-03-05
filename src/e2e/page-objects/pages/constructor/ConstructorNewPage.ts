@@ -1,17 +1,17 @@
 import {expect, Locator, Page} from "@playwright/test";
-import {Elements} from "../../../framework/elements/elements.js";
-import {Date} from "../../../framework/elements/date.js";
-import {Input} from "../../../framework/elements/input.js";
-import {ProlicenseActions} from "../../helpers/enums/prolicense-actions.js";
-import {InputData} from "../../helpers/input-data.js";
+import {Elements} from "../../../framework/elements/Elements.js";
+import {Date} from "../../../framework/elements/Dates.js";
+import {Input} from "../../../framework/elements/Input.js";
+import {ProlicenseActions} from "../../helpers/enums/ProlicenseActions.js";
+import {InputData} from "../../helpers/InputData.js";
 import {randomInt} from "crypto";
-import {NonFilesDoctypes} from "../../helpers/enums/non-files-doctypes.js";
-import {ConstructorPage} from "./constructor.page.js";
-import {MainMenuOptions} from "../../helpers/enums/main-menu-options.js";
-import {Columns} from "../../helpers/enums/columns.js";
-import {CriteriaTypes} from "../../helpers/enums/criteriatypes.js";
-import {Notifications} from "../../helpers/enums/notifications.js";
-import {ProlicStatus} from "../../helpers/enums/prolicstatus.js";
+import {NonFilesDoctypes} from "../../helpers/enums/NonFilesDoctypes.js";
+import {ConstructorPage} from "./ConstructorPage.js";
+import {MainMenuOptions} from "../../helpers/enums/MainMenuOptions.js";
+import {TableColumn} from "../../helpers/enums/TableColumn.js";
+import {CriteriaType} from "../../helpers/enums/CriteriaType.js";
+import {Notifications} from "../../helpers/enums/Notifications.js";
+import {ProlicStatus} from "../../helpers/enums/ProlicStatus.js";
 import {ProlicType} from "../../helpers/types/prolic.type.js";
 import {ScenarioType} from "../../helpers/types/scenario.type.js";
 import {ProlicTypes} from "../../helpers/enums/ProlicTypes.js";
@@ -117,20 +117,10 @@ export class ConstructorNewPage extends ConstructorPage {
      */
     private minAmount: Locator = Elements.getElement(this.page,"//input[@name='minCount']")
     /**
-     * Field 'Prolicense type'
-     */
-    private prolicType: Locator = Elements.getElement(this.page,"//*[contains(@class,'proLicType__control')]")
-    /**
      * Current displayed prolicense status
      */
     private prolicenseStatus(statusValue: string): Locator {
         return Elements.getElement(this.page,`//*[text()='${statusValue}']`);
-    }
-    /**
-     * selected field 'Prolicense type' dropdown value
-     */
-    private prolicTypeValue(selectedType: ProlicTypes): Locator {
-        return Elements.getElement(this.page,`//*[contains(@class,'proLicType__option') and text()='${selectedType}']`);
     }
     /**
      * Open Prolicense constructor
@@ -243,7 +233,7 @@ export class ConstructorNewPage extends ConstructorPage {
      */
     public async publishProlicense(scenario: ScenarioType): Promise<void> {
         if(scenario == "prolic") {
-            await this.filterByColumn(this.filterButtonByEnum(Columns.licName));
+            await this.filterByColumn(this.filterButtonByEnum(TableColumn.licName));
             await this.waitForColumnFilter();
             await this.tableRow.click();
         }
@@ -251,7 +241,7 @@ export class ConstructorNewPage extends ConstructorPage {
         await this.actionsList.filter({hasText: ProlicenseActions.publish}).click();
         await this.publishButton.click();
         if(scenario == "prolic") {
-            await this.filterByColumn(this.filterButtonByEnum(Columns.licName));
+            await this.filterByColumn(this.filterButtonByEnum(TableColumn.licName));
             await this.waitForColumnFilter();
             await this.tableRow.click();
             await expect(this.prolicenseStatus(ProlicStatus.published)).toBeVisible();
@@ -320,7 +310,7 @@ export class ConstructorNewPage extends ConstructorPage {
         await this.description.type(InputData.randomWord)
         await this.criteriaType.click();
         await this.criteriaTypeList.filter({hasText : critType}).click();
-        if (critType == CriteriaTypes.ofi || critType == CriteriaTypes.member) {
+        if (critType == CriteriaType.ofi || critType == CriteriaType.member) {
             await this.multipleCriteria.click();
             await this.minAmount.type(String(randomInt(1,10)));
         }
@@ -358,7 +348,7 @@ export class ConstructorNewPage extends ConstructorPage {
      */
     public async createCriteria(): Promise<void> {
         const groupsCount = await this.createdGroups.count();
-        const criteriaTypes: string[] = [`${CriteriaTypes.documents}`,`${CriteriaTypes.member}`,`${CriteriaTypes.ofi}`];
+        const criteriaTypes: string[] = [`${CriteriaType.documents}`,`${CriteriaType.member}`,`${CriteriaType.ofi}`];
         const docCount = 2;
         let createdCriteriaCount: number = 0;
         for(let i = 0; i < groupsCount; i++) {

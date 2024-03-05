@@ -1,9 +1,10 @@
-import {PlaywrightDevPage} from "../../framework/helpers/playwright-dev-page.js";
+import {PlaywrightDevPage} from "../../framework/helpers/PlaywrightDevPage.js";
 import {expect, Locator, Page} from "@playwright/test";
-import {Elements} from "../../framework/elements/elements.js";
-import {Columns} from "../helpers/enums/columns.js";
-import {Notifications} from "../helpers/enums/notifications.js";
+import {Elements} from "../../framework/elements/Elements.js";
+import {TableColumn} from "../helpers/enums/TableColumn.js";
+import {Notifications} from "../helpers/enums/Notifications.js";
 import {DbHelper} from "../../../db/db-helper.js";
+import {ProlicTypes} from "../helpers/enums/ProlicTypes.js";
 
 export class BasePage extends PlaywrightDevPage{
     protected prolicenseName: string
@@ -68,6 +69,10 @@ export class BasePage extends PlaywrightDevPage{
      */
     protected searchDataButton: Locator = Elements.getElement(this.page,"//button//span[contains(@class,'IconSearch')]")
     /**
+     * Field 'Prolicense type'
+     */
+    protected prolicType: Locator = Elements.getElement(this.page,"//*[contains(@class,'proLicType__control')]")
+    /**
      * Field "License type"
      */
     protected licType: Locator = Elements.getElement(this.page,"//*[contains(@class,'type__control') or contains(@class,'licType__control')]")
@@ -79,6 +84,10 @@ export class BasePage extends PlaywrightDevPage{
      * Fields with date type
      */
     protected dates: Locator = Elements.getElement(this.page,"//*[contains(@class,'datepicker')]//input[not(@disabled)]")
+    /**
+     * Field with the fine amount for editing
+     */
+    protected fineAmountFieldEdition: Locator = Elements.getElement(this.page,"//input[@name='fine']")
     /**
      * License type 'РФС Ж'
      */
@@ -92,6 +101,10 @@ export class BasePage extends PlaywrightDevPage{
      */
     protected tableRow: Locator = Elements.getElement(this.page,"//tr[contains(@class,'ant-table-row')]")
     /**
+     * Button 'Forward'
+     */
+    protected forwardButton: Locator = Elements.getElement(this.page,"//span[text()='Вперёд']")
+    /**
      * Button "Close notification"
      */
     private closeNotifyButton: Locator = Elements.getElement(this.page,"//span[contains(@class,'notice-close-icon')]")
@@ -103,6 +116,12 @@ export class BasePage extends PlaywrightDevPage{
      * Delete icon
      */
     protected deleteIcon: Locator = Elements.getElement(this.page,"//button[not(@disabled)]//span[contains(@class,'IconTrash')]")
+    /**
+     * selected field 'Prolicense type' dropdown value
+     */
+    protected prolicTypeValue(selectedType: ProlicTypes): Locator {
+        return Elements.getElement(this.page,`//*[contains(@class,'proLicType__option') and text()='${selectedType}']`);
+    }
     /**
      * Button "Delete"
      */
@@ -154,7 +173,7 @@ export class BasePage extends PlaywrightDevPage{
     /**
      * Get "Filter" button by table column name
      */
-    public filterButtonByEnum(columnValue: Columns): Locator {
+    public filterButtonByEnum(columnValue: TableColumn): Locator {
         return Elements.getElement(this.page,`//span[contains(text(),'${columnValue}')]//following-sibling::span`);
     }
     /**
@@ -206,7 +225,7 @@ export class BasePage extends PlaywrightDevPage{
     /**
      * Delete created licenses, prolicenses and commissions
      */
-    public async deleteCreatedData(): Promise<void> {
+    public async deleteCreatedDataFromDatabase(): Promise<void> {
         const dbHelper = new DbHelper();
         await dbHelper.deleteLicense();
         await dbHelper.deleteProlicense();

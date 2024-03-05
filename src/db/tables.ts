@@ -21,13 +21,6 @@ export const issuedLicense = {
         storageId : "storage_id"
     }
 }
-export const userRights = {
-    tableName : "rfslic.work_user_rights",
-    columns : {
-        userId : "user_id",
-        rightId : "right_id"
-    }
-}
 export const roles = {
     tableName : "rfslic.work_roles",
     columns : {
@@ -36,27 +29,5 @@ export const roles = {
         isBase : "is_base",
         isClub : "is_club",
         id : "id"
-    }
-}
-export const licenses = {
-    tableName : "rfslic.licenses",
-    columns : {
-        id : "id",
-        stateId : "state_id",
-        prolicId : "prolic_id"
-    }
-}
-export const prolicenses = {
-    tableName : "rfslic.nsi_prolicenses",
-    columns : {
-        id : "id",
-        licName : "licname"
-    }
-}
-export const commissions = {
-    tableName : "rfslic.commissions",
-    columns : {
-        id : "id",
-        name : "name"
     }
 }

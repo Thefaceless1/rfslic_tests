@@ -1,7 +1,7 @@
 import {test} from "../../page-objects/helpers/fixtures/fixtures.js";
-import {InputData} from "../../page-objects/helpers/input-data.js";
+import {InputData} from "../../page-objects/helpers/InputData.js";
 import Process from "process";
-import {LicStatus} from "../../page-objects/helpers/enums/licstatus.js";
+import {LicStates} from "../../page-objects/helpers/enums/LicStates.js";
 import config from "../../../../playwright.config.js";
 
 test.describe("Заявки на фин. контроль",() => {
@@ -26,6 +26,10 @@ test.describe("Заявки на фин. контроль",() => {
                 async () => await finRequests.updateDeadlineOfDates("fin")
             );
             await test.step(
+                "Изменение количества отправок документов на проверку",
+                async () => await finRequests.changeVerificationDocsCount()
+            );
+            await test.step(
                 "Добавление членов рабочей группы и сотрудников для групп критериев",
                 async () => await finRequests.addExperts()
             );
@@ -43,7 +47,7 @@ test.describe("Заявки на фин. контроль",() => {
             );
             await test.step(
                 "Проставление статуса 'Ожидает решения комиссии'",
-                async () => await finRequests.editLicStatus(LicStatus.waitForCommission)
+                async () => await finRequests.editLicStatus(LicStates.waitForCommission)
             );
             await test.step(
                 "Вынесение решения комиссии по заявке на фин. контроль",
