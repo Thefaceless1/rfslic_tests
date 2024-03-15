@@ -153,11 +153,11 @@ export class RequestPage extends CommissionPage {
     /**
      * Value of deadline for submission of documents
      */
-    private submissionDocDateValue: Locator = Elements.getElement(this.page,"//*[contains(text(),'Срок подачи документации:')]//following-sibling::*")
+    private submissionDocDateValue: Locator = Elements.getElement(this.page,"//*[contains(text(),'Срок подачи документов по графику:')]//following-sibling::*")
     /**
      * Value of deadline for review of documents
      */
-    private reviewDocDateValue: Locator = Elements.getElement(this.page,"//*[contains(text(),'Срок рассмотрения документации:')]//following-sibling::*")
+    private reviewDocDateValue: Locator = Elements.getElement(this.page,"//*[contains(text(),'Последний день приема документов:')]//following-sibling::*")
     /**
      * Name of a working group member report file
      */
@@ -355,6 +355,7 @@ export class RequestPage extends CommissionPage {
         if(statusValue == LicStates.inWork) {
             await Elements.waitForVisible(this.specifyGroupForRevision);
             await this.checkbox.nth(1).click();
+            await Elements.waitForVisible(this.dates.first());
             await this.saveButton.last().click();
         }
         await Elements.waitForHidden(this.changeLicStatusTitle);
@@ -628,6 +629,8 @@ export class RequestPage extends CommissionPage {
                 await this.saveSanctionButton.click();
             }
         }
+        await this.page.reload();
+        await Elements.waitForVisible(this.violationName.first());
         expect(await this.violationName.count()).toBe(this.manualSanctionCount);
     }
     /**
