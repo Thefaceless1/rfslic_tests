@@ -4,12 +4,14 @@ import {Elements} from "../../framework/elements/Elements.js";
 import {DbHelper} from "../../../db/db-helper.js";
 import twoFactor from "node-2fa";
 import * as Process from "process";
+import {logger} from "../../../logger/logger.js";
 
 export class AuthPage extends BasePage {
     private readonly prodUserMail: string = "sync-license@rfs.ru"
     private readonly prodUserPassword: string = "RfsTest2023"
     private readonly userId: number = (Process.env.BRANCH == "prod") ? 17513354 : 11309600
     private readonly userName: string = "Агвеуб Нсеадклра"
+    private numberLoginAttempts: number = 2
     constructor(page: Page) {
         super(page)
     }
@@ -53,6 +55,10 @@ export class AuthPage extends BasePage {
      * Message "Verification code entered incorrectly"
      */
     private invalidCodeMessage: Locator = Elements.getElement(this.page,"//p[text()='Неверно введён проверочный код']")
+    /**
+     * Close button for invalid code message
+     */
+    private closeInvalidCodeMessageButton: Locator = Elements.getElement(this.page,"//button[contains(@class,'inline-flex')]")
     /**
      * Create a user with 'Administrator' role
      */
@@ -113,9 +119,25 @@ export class AuthPage extends BasePage {
      * Enter confirmation code
      */
     private async setConfirmationCode(): Promise<void> {
-        await this.confirmationCode.clear();
-        await this.confirmationCode.type(this.get2FaToken);
+        const twoFaToken: string = this.get2FaToken;
+        await this.confirmationCode.fill(twoFaToken);
         await this.confirmButton.click();
-        if (await this.invalidCodeMessage.isVisible({timeout:500})) await this.setConfirmationCode();
+        await this.page.waitForTimeout(1000);
+        if(await this.invalidCodeMessage.isVisible() && this.numberLoginAttempts < 0) {
+            logger.warn("Неверный код подтверждения. Ожидание генерации нового кода...");
+            await this.closeInvalidCodeMessageButton.click();
+            await this.waitForGenerateNewToken(twoFaToken);
+            this.numberLoginAttempts--;
+            logger.info(`Попытка логина №${(this.numberLoginAttempts == 0) ? 2 : 1} c новым кодом подтверждения`);
+            await this.setConfirmationCode();
+        }
+    }
+    /**
+     * Waiting for generation new 2fa token
+     */
+    private async waitForGenerateNewToken(twoFaCode: string): Promise<void> {
+        while (twoFaCode == this.get2FaToken) {
+            await this.page.waitForTimeout(1000);
+        }
     }
 }

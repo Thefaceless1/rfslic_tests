@@ -15,6 +15,7 @@ import {CommissionPage} from "../commissions/CommissionPage.js";
 import * as Process from "process";
 import {ProlicType} from "../../helpers/types/prolic.type.js";
 import {Date} from "../../../framework/elements/Dates.js";
+import {DbHelper} from "../../../../db/db-helper.js";
 
 export class RequestPage extends CommissionPage {
     private manualSanctionCount: number = 3
@@ -199,10 +200,6 @@ export class RequestPage extends CommissionPage {
      */
     private violationName: Locator = Elements.getElement(this.page,"//td[contains(@class,'RequestSanctions_violationName')]")
     /**
-     * Expert Report Sanction
-     */
-    private expertReportSanction: Locator = Elements.getElement(this.page,"//td[contains(@class,'RequestSanctions_violationName') and text()='Возврат отчета эксперта РФС на доработку']")
-    /**
      * Message 'Obligatory field'
      */
     private obligatoryField: Locator = Elements.getElement(this.page,"//*[text()='Обязательное поле']")
@@ -241,6 +238,12 @@ export class RequestPage extends CommissionPage {
      */
     private sectionByEnum(section: RequestSections): Locator {
         return Elements.getElement(this.page,`//button[text()='${section}']`);
+    }
+    /**
+     * Expert Report Sanction
+     */
+    private async expertReportSanction(): Promise<Locator> {
+        return Elements.getElement(this.page,`//td[contains(@class,'RequestSanctions_violationName') and text()='${await this.returnRfuViolationName()}']`);
     }
     /**
      * Fill in experts and club workers for criteria groups
@@ -650,7 +653,7 @@ export class RequestPage extends CommissionPage {
         await this.createExpertReport.click();
         await Elements.waitForVisible(this.createExpertReport);
         await this.sectionByEnum(RequestSections.generalInfo).click();
-        await expect(this.expertReportSanction).toBeVisible();
+        await expect(await this.expertReportSanction()).toBeVisible();
     }
     /**
      * View approved sanctions
@@ -672,5 +675,14 @@ export class RequestPage extends CommissionPage {
         await Elements.waitForVisible(this.verificationDocsCount);
         await this.page.reload({waitUntil: "load"});
         expect(await this.verificationDocsCount.innerText()).toBe(newDocsCountValue);
+    }
+    /**
+     * Getting the name of the violation "Return of the RFU expert's report for revision"
+     */
+    public async returnRfuViolationName(): Promise<string> {
+        const dbHelper = new DbHelper();
+        const returnRfuViolationName: string = await dbHelper.getReturnRfuViolationName();
+        await dbHelper.closeConnect();
+        return returnRfuViolationName;
     }
 }

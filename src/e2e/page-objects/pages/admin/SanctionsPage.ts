@@ -20,10 +20,6 @@ export class SanctionsPage extends MainPage {
      */
     private selectSanctionType: Locator = Elements.getElement(this.page,"//*[contains(@class,'sanctionType__control')]")
     /**
-     * Sanction type with 'autotest'
-     */
-    private fineSanctionType: Locator = Elements.getElement(this.page,"//*[contains(@class,'sanctionType__option') and (text()='Штраф')]")
-    /**
      * Field 'Select violation'
      */
     private selectViolation: Locator = Elements.getElement(this.page,"//*[contains(@class,'violation__control')]")
@@ -44,18 +40,33 @@ export class SanctionsPage extends MainPage {
         return Elements.getElement(this.page,`//td[.//*[contains(text(),'автотест')]]//following-sibling::td[contains(@class,'editWrapperCell')]//*//*[contains(@class,'deleteWrapper')]`);
     }
     /**
+     * Fine sanction type
+     */
+    private async fineSanctionType(): Promise<Locator> {
+        return Elements.getElement(this.page,`//*[contains(@class,'sanctionType__option') and (text()='${await this.fineSanctionTypeName()}')]`);
+    }
+    /**
      * Insert violation in database
      */
     public async createViolation(): Promise<void> {
-        const dbHelper = new DbHelper()
+        const dbHelper = new DbHelper();
         await dbHelper.insertViolation();
         await dbHelper.closeConnect();
+    }
+    /**
+     * Getting name of fine sanction type
+     */
+    private async fineSanctionTypeName(): Promise<string> {
+        const dbHelper = new DbHelper();
+        const fineSanctionTypeName: string = await dbHelper.getFineSanctionTypeName();
+        await dbHelper.closeConnect();
+        return fineSanctionTypeName;
     }
     /**
      * Delete violations, sanction types and sanction from database
      */
     public async deleteViolationAndSanctionFromDatabase(): Promise<void> {
-        const dbHelper = new DbHelper()
+        const dbHelper = new DbHelper();
         await dbHelper.deleteSanctions();
         await dbHelper.deleteViolations();
         await dbHelper.closeConnect();
@@ -76,8 +87,8 @@ export class SanctionsPage extends MainPage {
         await Elements.waitForVisible(this.autotestViolation);
         await this.autotestViolation.click();
         await this.selectSanctionType.click();
-        await Elements.waitForVisible(this.fineSanctionType);
-        await this.fineSanctionType.click();
+        await Elements.waitForVisible(await this.fineSanctionType());
+        await this.fineSanctionType().then(fineSanctionTypeLocator => fineSanctionTypeLocator.click());
         await this.fineAmountFieldEdition.type(String(randomInt(1,10000000)));
         await this.maxFine.type(String(randomInt(1,10000000)));
         await this.saveButton.click();

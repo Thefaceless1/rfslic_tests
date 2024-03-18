@@ -30,7 +30,7 @@ export class DbHelper {
         await this.sql`INSERT INTO rfslic.work_users 
                        (user_id,is_active,role_id)
                         VALUES (${userId},true,${Role.admin})
-                        on conflict do nothing;`
+                        on conflict do nothing;`;
     }
     /**
      * Add rights for a user in table 'user rights'
@@ -69,7 +69,7 @@ export class DbHelper {
                        (${userId},${UserRights["request.sendLimit.edit"]}),
                        (${userId},${UserRights["request.sanctions.edit"]}),
                        (${userId},${UserRights["request.docsDeadline.edit"]})
-                       on conflict do nothing;`
+                       on conflict do nothing;`;
     }
     /**
      * Update state_id column in Licenses table
@@ -104,7 +104,7 @@ export class DbHelper {
      */
     public async deleteProlicense(): Promise<void> {
         await this.sql`DELETE FROM rfslic.nsi_prolicenses
-                       WHERE licname LIKE ('автотест%');`
+                       WHERE licname LIKE ('автотест%');`;
     }
     /**
      * Delete license from 'licenses' table
@@ -123,34 +123,54 @@ export class DbHelper {
      */
     public async deleteCommission(): Promise<void> {
         await this.sql`DELETE FROM rfslic.commissions
-                       WHERE name LIKE ('автотест%');`
+                       WHERE name LIKE ('автотест%');`;
     }
     /**
      * Delete sanction types
      */
     public async deleteSanctionTypes(): Promise<void> {
         await this.sql`DELETE FROM rfslic.nsi_sanction_types
-                       WHERE text LIKE ('автотест%');`
+                       WHERE text LIKE ('автотест%');`;
     }
     /**
      * Delete violations
      */
     public async deleteViolations(): Promise<void> {
         await this.sql`DELETE FROM rfslic.nsi_violations
-                       WHERE name LIKE ('автотест%');`
+                       WHERE name LIKE ('автотест%');`;
     }
     /**
      * Insert a violation
      */
     public async insertViolation(): Promise<void> {
         await this.sql`INSERT INTO rfslic.nsi_violations (name,is_auto,text,event_description)
-                       VALUES (${InputData.randomWord},false,${InputData.randomWord},${InputData.randomWord});`
+                       VALUES (${InputData.randomWord},false,${InputData.randomWord},${InputData.randomWord});`;
     }
     /**
      * Delete sanctions
      */
     public async deleteSanctions(): Promise<void> {
         await this.sql`DELETE from rfslic.nsi_sanctions 
-                       WHERE violation_id IN (SELECT id from rfslic.nsi_violations WHERE name LIKE 'автотест%')`
+                       WHERE violation_id IN (SELECT id from rfslic.nsi_violations WHERE name LIKE 'автотест%');`;
+    }
+    /**
+     * Getting name of fine sanction type
+     */
+    public async getFineSanctionTypeName(): Promise<string> {
+        const fineSanctionTypeId: number = 1;
+        const result: postgres.RowList<postgres.Row[]> = await this.sql`SELECT text FROM rfslic.nsi_sanction_types
+                                                                        WHERE id = ${fineSanctionTypeId};`;
+        if(result.length == 0) throw new Error(`Отсутсвует тип санкции с id ${fineSanctionTypeId}`);
+        return result[0].text;
+    }
+    /**
+     * Getting the name of the violation "Return of the RFU expert's report for revision"
+     */
+    public async getReturnRfuViolationName(): Promise<string> {
+        const returnRfuViolationId: number = 2;
+        const result: postgres.RowList<postgres.Row[]> = await this.sql`SELECT name FROM rfslic.nsi_violations
+                                                                        WHERE id = ${returnRfuViolationId};`;
+        if(result.length == 0) throw new Error(`Отсутсвует нарушение с id ${returnRfuViolationId}`);
+        return result[0].name;
     }
 }
