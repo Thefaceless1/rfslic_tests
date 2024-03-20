@@ -11,7 +11,7 @@ export class AuthPage extends BasePage {
     private readonly prodUserPassword: string = "RfsTest2023"
     private readonly userId: number = (Process.env.BRANCH == "prod") ? 17513354 : 11309600
     private readonly userName: string = "Агвеуб Нсеадклра"
-    private numberLoginAttempts: number = 2
+    private loginAttempts: number = 3
     constructor(page: Page) {
         super(page)
     }
@@ -119,16 +119,17 @@ export class AuthPage extends BasePage {
      * Enter confirmation code
      */
     private async setConfirmationCode(): Promise<void> {
+        if(this.loginAttempts == 0) throw new Error("Не осталось попыток входа в систему");
         const twoFaToken: string = this.get2FaToken;
         await this.confirmationCode.fill(twoFaToken);
         await this.confirmButton.click();
         await this.page.waitForTimeout(1000);
-        if(await this.invalidCodeMessage.isVisible() && this.numberLoginAttempts < 0) {
+        if(await this.invalidCodeMessage.isVisible()) {
             logger.warn("Неверный код подтверждения. Ожидание генерации нового кода...");
             await this.closeInvalidCodeMessageButton.click();
             await this.waitForGenerateNewToken(twoFaToken);
-            this.numberLoginAttempts--;
-            logger.info(`Попытка логина №${(this.numberLoginAttempts == 0) ? 2 : 1} c новым кодом подтверждения`);
+            this.loginAttempts--;
+            if(this.loginAttempts > 0) logger.info(`Вход в систему c новым кодом подтверждения. Осталось попыток: ${this.loginAttempts}`);
             await this.setConfirmationCode();
         }
     }
