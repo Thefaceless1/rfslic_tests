@@ -20,10 +20,6 @@ export class CommissionPage extends MainPage {
      */
     private createMeetingButton: Locator = Elements.getElement(this.page,"//button[text()='Создать заседание']")
     /**
-     * Button "Create"
-     */
-    private createButton: Locator = Elements.getElement(this.page,"//button[text()='Создать']")
-    /**
      * Button "Next"
      */
     private nextButton: Locator = Elements.getElement(this.page,"//button[text()='Далее']")
@@ -46,7 +42,7 @@ export class CommissionPage extends MainPage {
     /**
      * Button "Edit decision"
      */
-    private editDecisionButton: Locator = Elements.getElement(this.page,"//*[contains(@class,'CommissionLicensesTab_endStateWrapper')]//button")
+    private editDecisionButton: Locator = Elements.getElement(this.page,"//*[contains(@class,'CommissionLicensesTab-module_endStateWrapper')]//button")
     /**
      * Field "Select a decision"
      */

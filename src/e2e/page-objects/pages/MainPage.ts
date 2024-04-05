@@ -13,7 +13,7 @@ export class MainPage extends AuthPage {
      * Get main page menu item values by enum
      */
     public menuOptionByEnum (menuOption: MainMenuOptions): Locator {
-        return Elements.getElement(this.page,`//*[contains(@class,'HomePage_title') and text()='${menuOption}']`);
+        return Elements.getElement(this.page,`//*[contains(@class,'HomePage-module') and text()='${menuOption}']`);
     }
     /**
      * Get the values of the menu items of the "Administration" block by enum

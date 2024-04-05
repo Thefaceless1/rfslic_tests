@@ -15,6 +15,7 @@ import {CategoriesClassifierPage} from "../../pages/admin/CategoriesClassifierPa
 import {SanctionTypesPage} from "../../pages/admin/SanctionTypesPage.js";
 import {ViolationsPage} from "../../pages/admin/ViolationsPage.js";
 import {SanctionsPage} from "../../pages/admin/SanctionsPage.js";
+import {RulesClassifierPage} from "../../pages/admin/RulesClassifierPage.js";
 
 type Fixtures = {
     setUser: AuthPage,
@@ -30,7 +31,8 @@ type Fixtures = {
     categoriesClassifier: CategoriesClassifierPage,
     sanctionTypes: SanctionTypesPage,
     violations: ViolationsPage,
-    sanctions: SanctionsPage
+    sanctions: SanctionsPage,
+    rulesClassifier: RulesClassifierPage
 }
 export const test = base.extend<Fixtures>({
     constructor: async ({page},use) => {
@@ -160,5 +162,14 @@ export const test = base.extend<Fixtures>({
         await sanctions.adminMenuByEnum(AdminOptions.sanctionConstructor).click();
         await use(sanctions);
         await sanctions.deleteViolationAndSanctionFromDatabase();
+    },
+    rulesClassifier: async ({page},use) => {
+        const rulesClassifier = new RulesClassifierPage(page);
+        await rulesClassifier.deleteUser();
+        await rulesClassifier.createUser();
+        await rulesClassifier.login();
+        await rulesClassifier.adminMenuByEnum(AdminOptions.rulesClassifier).click();
+        await use(rulesClassifier);
+        await rulesClassifier.deleteRulesFromDatabase();
     }
 })

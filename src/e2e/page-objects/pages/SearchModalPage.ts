@@ -9,7 +9,7 @@ export class SearchModalPage extends BasePage {
     /**
      * Button "Search"
      */
-    public findButton: Locator = Elements.getElement(this.page,"//button[contains(@class,'SearchModal_searchBtn')]")
+    public findButton: Locator = Elements.getElement(this.page,"//button[text()='Найти']")
     /**
      * Button "Select"
      */

@@ -6,4 +6,5 @@ export enum AdminOptions {
     groupsClassifier = "Классификатор групп критериев",
     categoriesClassifier = "Классификатор разрядов критериев",
     sanctionConstructor = "Конструктор санкций",
+    rulesClassifier = "Классификатор Правил"
 }

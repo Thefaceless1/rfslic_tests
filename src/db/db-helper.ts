@@ -173,4 +173,11 @@ export class DbHelper {
         if(result.length == 0) throw new Error(`Отсутсвует нарушение с id ${returnRfuViolationId}`);
         return result[0].name;
     }
+    /**
+     * Delete rules
+     */
+    public async deleteRules(): Promise<void> {
+        await this.sql`DELETE FROM rfslic.nsi_rule_versions
+                       WHERE name LIKE ('автотест%');`;
+    }
 }

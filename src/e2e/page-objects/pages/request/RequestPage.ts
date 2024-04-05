@@ -29,7 +29,7 @@ export class RequestPage extends CommissionPage {
     /**
      * Criteria information field
      */
-    private criteriaInfo: Locator = Elements.getElement(this.page,"//span[contains(@class,'CriteriasInfoItem_collapse_title')]")
+    private criteriaInfo: Locator = Elements.getElement(this.page,"//span[contains(@class,'CriteriasInfoItem-module_collapse_title')]")
     /**
      * Member criteria information field
      */
@@ -109,7 +109,7 @@ export class RequestPage extends CommissionPage {
     /**
      * Document tooltip
      */
-    private docTooltip: Locator = Elements.getElement(this.page,"//span[contains(@class,'DocumentInfo_itemInfoIcon')]")
+    private docTooltip: Locator = Elements.getElement(this.page,"//span[contains(@class,'DocumentInfo-module')]")
     /**
      * Button "Edit Member"
      */
@@ -170,11 +170,15 @@ export class RequestPage extends CommissionPage {
     /**
      * File attached to the document
      */
-    private attachedFile: Locator = Elements.getElement(this.page,"//*[contains(@class,'DocumentInfo_file_wrapper')][1]")
+    private attachedFile: Locator = Elements.getElement(this.page,"//*[contains(@class,'DocumentInfo-module_file_wrapper')][1]")
+    /**
+     * Button "Add" (+)
+     */
+    protected addDocument: Locator = Elements.getElement(this.page,"//button[@data-tooltip-content='Прикрепить документ']")
     /**
      * Title of the modal window "Change ticket status"
      */
-    private changeLicStatusTitle: Locator = Elements.getElement(this.page,"//*[contains(@class,'ChangeRequestStatusModal_modal_titleWrapper')]")
+    private changeLicStatusTitle: Locator = Elements.getElement(this.page,"//*[contains(@class,'ChangeRequestStatusModal-module_modal_titleWrapper')]")
     /**
      * Field 'number of appointed experts'
      */
@@ -198,7 +202,7 @@ export class RequestPage extends CommissionPage {
     /**
      * Violation name
      */
-    private violationName: Locator = Elements.getElement(this.page,"//td[contains(@class,'RequestSanctions_violationName')]")
+    private violationName: Locator = Elements.getElement(this.page,"//td[contains(@class,'RequestSanctions-module_violationName')]")
     /**
      * Message 'Obligatory field'
      */
@@ -214,7 +218,7 @@ export class RequestPage extends CommissionPage {
     /**
      * Icon 'Delete sanction'
      */
-    private deleteSanctionIcon: Locator = Elements.getElement(this.page,"//*[contains(@class,'RequestSanctions_deleteWrapper')]")
+    private deleteSanctionIcon: Locator = Elements.getElement(this.page,"//*[contains(@class,'RequestSanctions-module_deleteWrapper')]")
     /**
      * 'Save sanction' button
      */
@@ -222,7 +226,7 @@ export class RequestPage extends CommissionPage {
     /**
      * Field value "Number of documents sent for verification"
      */
-    private verificationDocsCount: Locator = Elements.getElement(this.page,"(//*[contains(@class,'GeneralInfo_numChecksWrapper')]//*)[1]")
+    private verificationDocsCount: Locator = Elements.getElement(this.page,"(//*[contains(@class,'numChecksWrapper')]//*)[1]")
     /**
      * Field for editing the number of documents sent for verification
      */
@@ -243,7 +247,7 @@ export class RequestPage extends CommissionPage {
      * Expert Report Sanction
      */
     private async expertReportSanction(): Promise<Locator> {
-        return Elements.getElement(this.page,`//td[contains(@class,'RequestSanctions_violationName') and text()='${await this.returnRfuViolationName()}']`);
+        return Elements.getElement(this.page,`//td[contains(@class,'RequestSanctions-module_violationName') and text()='${await this.returnRfuViolationName()}']`);
     }
     /**
      * Fill in experts and club workers for criteria groups
@@ -340,8 +344,8 @@ export class RequestPage extends CommissionPage {
      */
     private async addGeneralDocInfo(): Promise<void> {
         await this.sectionByEnum(RequestSections.generalInfo).click();
-        await Elements.waitForVisible(this.plusButton.last());
-        const docsCount : number = await this.plusButton.count();
+        await Elements.waitForVisible(this.addDocument.last());
+        const docsCount : number = await this.addDocument.count();
         await this.sendForVerification(0,docsCount);
     }
     /**
@@ -491,7 +495,7 @@ export class RequestPage extends CommissionPage {
     private async sendForVerification(currDocNumb: number,currMaxDocNumb: number): Promise<void> {
         for(let c = currDocNumb;c < currMaxDocNumb; c++) {
             await this.docTooltip.nth(c).click();
-            await this.plusButton.first().click();
+            await this.addDocument.nth(c).click();
             await Elements.waitForVisible(this.saveButton);
             await this.fillDocsAndComment();
             await this.checkCommentValue(c);
@@ -566,15 +570,9 @@ export class RequestPage extends CommissionPage {
         await Input.uploadFiles(this.templates.first(),"all");
         await Elements.waitForVisible(this.docIcon);
         await Elements.waitForVisible(this.xlsxIcon);
-        await this.comment.type(InputData.randomWord);
+        await this.comment.fill(InputData.randomWord);
         await this.saveButton.click();
-        try {
-            await Elements.waitForHidden(this.saveButton);
-        }
-        catch (err) {
-            await this.saveButton.click();
-            await Elements.waitForHidden(this.saveButton);
-        }
+        await Elements.waitForHidden(this.saveButton);
         await this.closeNotifications("last");
     }
     /**

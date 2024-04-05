@@ -26,7 +26,7 @@ export class AuthPage extends BasePage {
     /**
      * 'Check user' menu
      */
-    private selectUserMenu: Locator = Elements.getElement(this.page,"//*[contains(@class,'user__control')]")
+    private selectUserMenu: Locator = Elements.getElement(this.page,"//*[contains(@class,'user__indicators')]")
     /**
      * 'Check user' menu dropdown values
      */

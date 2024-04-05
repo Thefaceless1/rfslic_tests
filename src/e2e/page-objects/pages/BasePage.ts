@@ -21,10 +21,6 @@ export class BasePage extends PlaywrightDevPage{
      */
     protected rolesList: Locator = Elements.getElement(this.page,"//*[contains(@class,'role__option')]")
     /**
-     * Button "Add" (+)
-     */
-    protected plusButton: Locator = Elements.getElement(this.page,"//button[contains(@class,'Button_view_secondary')][.//span[contains(@class,'IconAdd')]]")
-    /**
      * Button "Edit"
      */
     protected editButton: Locator = Elements.getElement(this.page,"//button[contains(@class,'Button_view_secondary') and not(contains(@name,'editButton'))][.//span[contains(@class,'IconEdit')]]")
@@ -36,6 +32,14 @@ export class BasePage extends PlaywrightDevPage{
      * Values of the drop-down list of the field "Select experts"
      */
     protected expertsList: Locator = Elements.getElement(this.page,"//*[contains(@class,'experts__option')]")
+    /**
+     * Values of the drop-down list of the "Season" field
+     */
+    protected seasons: Locator = Elements.getElement(this.page,"//*[contains(@class,'season__option')]")
+    /**
+     * Field "Season"
+     */
+    protected season: Locator = Elements.getElement(this.page,"//*[contains(@class,'season__control')]")
     /**
      * Field "Document Templates"
      */
@@ -51,7 +55,7 @@ export class BasePage extends PlaywrightDevPage{
     /**
      * Value input field in the "Prolicense name" field filter
      */
-    protected searchInput: Locator = Elements.getElement(this.page,"//input[contains(@class,'Table_filterElement')]")
+    protected searchInput: Locator = Elements.getElement(this.page,"//input[contains(@class,'Table-module_filterElement')]")
     /**
      * "Find" button in table column filter
      */
@@ -108,6 +112,18 @@ export class BasePage extends PlaywrightDevPage{
      * Button "Close notification"
      */
     private closeNotifyButton: Locator = Elements.getElement(this.page,"//span[contains(@class,'notice-close-icon')]")
+    /**
+     * Button "Publish"
+     */
+    protected publishButton: Locator = Elements.getElement(this.page,"//button[text()='Опубликовать']")
+    /**
+     * Button "Create"
+     */
+    protected createButton: Locator = Elements.getElement(this.page,"//button[text()='Создать']")
+    /**
+     * Button "Unpublish"
+     */
+    protected unpublishButton: Locator = Elements.getElement(this.page,"//button[text()='Снять с публикации']")
     /**
      * column "Number of a license" in Licenses table
      */
@@ -195,7 +211,7 @@ export class BasePage extends PlaywrightDevPage{
      */
     public async filterByColumn(column: Locator): Promise<void> {
         await column.click();
-        await this.searchInput.type(this.prolicenseName);
+        await this.searchInput.fill(this.prolicenseName);
         await this.searchButton.click();
     }
     /**

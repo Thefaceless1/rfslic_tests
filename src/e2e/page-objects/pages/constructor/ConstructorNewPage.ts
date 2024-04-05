@@ -25,10 +25,6 @@ export class ConstructorNewPage extends ConstructorPage {
      */
     public createdProlicName: Locator = Elements.getElement(this.page,"//*[text()='Название пролицензии:']//following-sibling::*")
     /**
-     * Field "Season"
-     */
-    private season: Locator = Elements.getElement(this.page,"//*[contains(@class,'season__control')]")
-    /**
      * Field "Document name"
      */
     private docName: Locator = Elements.getElement(this.page,"//input[@placeholder='Введите название документа']")
@@ -55,11 +51,7 @@ export class ConstructorNewPage extends ConstructorPage {
     /**
      * Action dropdown values
      */
-    private actionsList: Locator = Elements.getElement(this.page,"//*[contains(@class,'ContextMenuLevelCanary-Item')]")
-    /**
-     * Values of the drop-down list of the "Season" field
-     */
-    private seasons: Locator = Elements.getElement(this.page,"//*[contains(@class,'season__option')]")
+    private actionsList: Locator = Elements.getElement(this.page,"//a[contains(@class,'ListItem')]")
     /**
      * Field "Criteria number"
      */
@@ -85,6 +77,10 @@ export class ConstructorNewPage extends ConstructorPage {
      */
     private criteriaTypeList: Locator = Elements.getElement(this.page,"//*[contains(@class,'type__option')]")
     /**
+     * Button "Add" (+)
+     */
+    protected addCriteria: Locator = Elements.getElement(this.page,"//button[contains(@class,'Button_view_secondary')][.//span[contains(@class,'IconAdd')]]")
+    /**
      * Field "Additional data type"
      */
     private additionalDataType: Locator = Elements.getElement(this.page,"//*[contains(@class,'additionalDocType__control')]")
@@ -92,14 +88,6 @@ export class ConstructorNewPage extends ConstructorPage {
      * Values of the drop-down list of the field "Additional data type"
      */
     private additionalDataTypeList: Locator = Elements.getElement(this.page,"//*[contains(@class,'additionalDocType__option')]")
-    /**
-     * Button "Publish"
-     */
-    private publishButton: Locator = Elements.getElement(this.page,"//button[text()='Опубликовать']")
-    /**
-     * Button "Unpublish"
-     */
-    private unpublishButton: Locator = Elements.getElement(this.page,"//button[text()='Снять с публикации']")
     /**
      * Field "Document description"
      */
@@ -302,7 +290,7 @@ export class ConstructorNewPage extends ConstructorPage {
      * Fill in the criteria fields
      */
     private async fillCriteriaInfo(index: number, critType: string): Promise<void> {
-        await this.plusButton.nth(index).click();
+        await this.addCriteria.nth(index).click();
         await this.criteriaNumber.type(InputData.randomWord)
         await this.rankCriteria.click();
         await this.rankList.first().click();
