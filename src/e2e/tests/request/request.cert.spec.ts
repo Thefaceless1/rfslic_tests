@@ -15,11 +15,11 @@ test.describe("Заявки на аттестацию",() => {
             );
             await test.step(
                 "Создание заявки на аттестацию в статусе Черновик",
-                async () => await certRequests.createDraft("cert")
+                async () => await certRequests.createRequestDraft("cert")
             );
             await test.step(
                 "Подача заявки на аттестацию",
-                async () => await certRequests.publishLic()
+                async () => await certRequests.submitLicenseRequest()
             );
             await test.step(
                 "Изменение сроков подачи и рассмотрения документации",

@@ -1,5 +1,3 @@
 export enum UserTabs  {
-    rights = "Права",
-    grpCriterias = "Группы критериев",
-    clubs = "Клубы"
+    grpCriterias = "Группы критериев"
 }

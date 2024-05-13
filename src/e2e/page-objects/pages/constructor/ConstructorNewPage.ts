@@ -4,17 +4,16 @@ import {Date} from "../../../framework/elements/Dates.js";
 import {Input} from "../../../framework/elements/Input.js";
 import {ProlicenseActions} from "../../helpers/enums/ProlicenseActions.js";
 import {InputData} from "../../helpers/InputData.js";
-import {randomInt} from "crypto";
-import {NonFilesDoctypes} from "../../helpers/enums/NonFilesDoctypes.js";
 import {ConstructorPage} from "./ConstructorPage.js";
-import {MainMenuOptions} from "../../helpers/enums/MainMenuOptions.js";
 import {TableColumn} from "../../helpers/enums/TableColumn.js";
-import {CriteriaType} from "../../helpers/enums/CriteriaType.js";
 import {Notifications} from "../../helpers/enums/Notifications.js";
 import {ProlicStatus} from "../../helpers/enums/ProlicStatus.js";
 import {ProlicType} from "../../helpers/types/prolic.type.js";
 import {ScenarioType} from "../../helpers/types/scenario.type.js";
 import {ProlicTypes} from "../../helpers/enums/ProlicTypes.js";
+import {RulesClassifierPage} from "../admin/RulesClassifierPage.js";
+import {MainMenuOptions} from "../../helpers/enums/MainMenuOptions.js";
+import {randomInt} from "crypto";
 
 export class ConstructorNewPage extends ConstructorPage {
     constructor(page: Page) {
@@ -23,87 +22,39 @@ export class ConstructorNewPage extends ConstructorPage {
     /**
      * The name of the created prolicense
      */
-    public createdProlicName: Locator = Elements.getElement(this.page,"//*[text()='Название пролицензии:']//following-sibling::*")
-    /**
-     * Field "Document name"
-     */
-    private docName: Locator = Elements.getElement(this.page,"//input[@placeholder='Введите название документа']")
-    /**
-     * Field "Add document"
-     */
-    private addDocButton: Locator = Elements.getElement(this.page,"//span[text()='Добавить документ']")
+    public prolicName: Locator = Elements.getElement(this.page,"//*[text()='Название пролицензии:']//following-sibling::*")
     /**
      * Action call button for prolicense
      */
-    private  actionButton: Locator = Elements.getElement(this.page,"//button[@name='proLic_btn_details']")
+    private actionButton: Locator = Elements.getElement(this.page,"//button[@name='proLic_btn_details']")
     /**
-     * Field "Criteria group name"
+     * Button 'Select criteria'
      */
-    private grpCrit = Elements.getElement(this.page,"//*[contains(@class,'groupName__placeholder')]")
+    private selectCriteriaButton: Locator = Elements.getElement(this.page,"//button[text()='Выбрать критерии']")
     /**
-     * Values of the drop-down list of the field "Criteria group name"
+     * Selected rule version value in the "Version number" field
      */
-    private grpCritList: Locator = Elements.getElement(this.page,"//*[contains(@class,'groupName__option')]")
-    /**
-     * Created criteria groups
-     */
-    private createdGroups: Locator = Elements.getElement(this.page,"//span[contains(text(),'критерии')]")
+    private selectedRuleVersion: Locator = Elements.getElement(this.page,"//*[contains(@class,'version__single-value')]")
     /**
      * Action dropdown values
      */
     private actionsList: Locator = Elements.getElement(this.page,"//a[contains(@class,'ListItem')]")
     /**
-     * Field "Criteria number"
+     * Field 'Minimum count'
      */
-    private criteriaNumber: Locator = Elements.getElement(this.page,"//input[@placeholder='Введите номер критерия']")
+    private minimumCount: Locator = Elements.getElement(this.page,"//input[@name='minCount']")
     /**
-     * Field "Rank"
+     * Edit button for 'experts' tab
      */
-    private rankCriteria: Locator = Elements.getElement(this.page,"//*[contains(@class,'category__control')]")
+    private expertEditButton: Locator = Elements.getElement(this.page,"//span[text()='Эксперты' or text()='Рабочая группа']//..//following-sibling::*//button")
     /**
-     * Values of the drop-down list of the field "Rank"
+     * Edit button for criteria with warning
      */
-    private rankList: Locator = Elements.getElement(this.page,"//*[contains(@class,'category__option')]")
+    private criteriaWarningEditButton: Locator = Elements.getElement(this.page,"//span[contains(@class,'color-typo-warning')]//..//following-sibling::*//button")
     /**
-     * Field "Criteria name"
+     * Checkboxes for criteria groups
      */
-    private criteriaName: Locator = Elements.getElement(this.page,"//input[@placeholder='Введите название критерия']")
-    /**
-     * Field "Criteria type"
-     */
-    private criteriaType: Locator = Elements.getElement(this.page,"//*[contains(@class,'type__control')]")
-    /**
-     * Values of the drop-down list of the field "Criteria type"
-     */
-    private criteriaTypeList: Locator = Elements.getElement(this.page,"//*[contains(@class,'type__option')]")
-    /**
-     * Button "Add" (+)
-     */
-    protected addCriteria: Locator = Elements.getElement(this.page,"//button[contains(@class,'Button_view_secondary')][.//span[contains(@class,'IconAdd')]]")
-    /**
-     * Field "Additional data type"
-     */
-    private additionalDataType: Locator = Elements.getElement(this.page,"//*[contains(@class,'additionalDocType__control')]")
-    /**
-     * Values of the drop-down list of the field "Additional data type"
-     */
-    private additionalDataTypeList: Locator = Elements.getElement(this.page,"//*[contains(@class,'additionalDocType__option')]")
-    /**
-     * Field "Document description"
-     */
-    private docDescription: Locator = Elements.getElement(this.page,"//textarea[@placeholder='Добавьте описание документа']")
-    /**
-     * Created criteria name
-     */
-    private createdCriteria: Locator = Elements.getElement(this.page,"//*[contains(@class,'CriteriaView')]//div[1]//div[1]//span")
-    /**
-     * Field "Multiple criteria"
-     */
-    private multipleCriteria: Locator = Elements.getElement(this.page,"//input[@name='isMulti']")
-    /**
-     * Field "Minimal amount"
-     */
-    private minAmount: Locator = Elements.getElement(this.page,"//input[@name='minCount']")
+    private criteriaGroupCheckbox: Locator = Elements.getElement(this.page,"//span[not(contains(@class,'checked'))]//input[@type='checkbox']")
     /**
      * Current displayed prolicense status
      */
@@ -111,21 +62,22 @@ export class ConstructorNewPage extends ConstructorPage {
         return Elements.getElement(this.page,`//*[text()='${statusValue}']`);
     }
     /**
-     * Open Prolicense constructor
+     * Table field with Added experts
      */
-    public async openConstructor(): Promise<void> {
-        await Elements.waitForVisible(this.menuOptionByEnum(MainMenuOptions.constructor));
-        await this.menuOptionByEnum(MainMenuOptions.constructor).click();
-        await this.createProlicButton.click();
+    private addedExpert(expertName: string): Locator {
+        return Elements.getElement(this.page,`//td[contains(text(),'${expertName}')]`);
     }
     /**
-     * Get an action for a prolicense by enum
+     * Field value "Minimum count"
      */
-    private async actionByEnum(enumValue: ProlicenseActions) {
-        const actionArray = await this.actionsList.all();
-        for (const action of actionArray) {
-            if (await action.textContent() == enumValue) return action;
-        }
+    private minimumCountValue(addedCountValue: string): Locator {
+        return Elements.getElement(this.page,`//*[text()='Минимальное количество:']//following-sibling::*[text()='${addedCountValue}']`);
+    }
+    /**
+     * Value of the field "Version of the list of criteria and documents"
+     */
+    private ruleVersionValue(ruleVersionNumber: string): Locator {
+        return Elements.getElement(this.page,`//*[text()='Версия списка критериев и документов:']//following-sibling::*//*[text()='${ruleVersionNumber}']`);
     }
     /**
      * Fill in the fields of the block "General information"
@@ -151,7 +103,7 @@ export class ConstructorNewPage extends ConstructorPage {
         }
         await this.name.type(InputData.randomWord);
         await this.season.click();
-        await this.seasons.last().click();
+        await this.seasonValues.last().click();
         await this.licType.click();
         (prolicType != "cert") ? await Elements.waitForVisible(this.rfsWomanLicType) : await Elements.waitForVisible(this.certificateFnlLicType);
         (prolicType != "cert") ? await this.rfsWomanLicType.click() : await this.certificateFnlLicType.click();
@@ -161,33 +113,11 @@ export class ConstructorNewPage extends ConstructorPage {
         }
     }
     /**
-     * Change the values in the fields of the "General information" block
-     */
-    public async changeBasicInfo(): Promise<void> {
-        const oldProlicName: string = await this.createdProlicName.innerText();
-        await this.editButton.first().click();
-        await this.name.clear();
-        await this.name.type(InputData.randomWord);
-        const allDates = await this.dates.all();
-        for (const date of allDates) {
-            await Date.fillDateInput(date,InputData.futureDate);
-        }
-        await this.saveButton.click();
-        expect(this.compareProlicName(oldProlicName)).toBeTruthy();
-    }
-    /**
-     * Comparison of the old and new name of the prolicense
-     */
-    private async compareProlicName(oldProlicName: string): Promise<boolean> {
-        const newProlicName: string = await this.createdProlicName.innerText();
-        return (oldProlicName != newProlicName) ? true : this.compareProlicName(oldProlicName);
-    }
-    /**
      * Fill in the fields of the block "Documents for filing an application"
      */
     private async fillDocs(): Promise<void> {
         const docsCount: number = 2;
-        for(let i = 1 ; i<=docsCount ; i++) {
+        for(let i = 1; i<=docsCount; i++) {
             if (i != 1) await this.addDocButton.click();
             await this.docName.last().type(InputData.randomWord);
             await this.docDescription.last().type(InputData.randomWord);
@@ -200,21 +130,41 @@ export class ConstructorNewPage extends ConstructorPage {
      * Create a prolicense
      */
     public async createProlicense(prolicType: ProlicType): Promise<void> {
-         await this.fillBasicInfo(prolicType);
-         await this.fillDocs();
-         await this.saveButton.click();
-         await expect(this.createdProlicName).toBeVisible();
+        await this.breadCrumbMain.click();
+        await this.menuOptionByEnum(MainMenuOptions.constructor).click();
+        await this.createProlicButton.click();
+        await this.fillBasicInfo(prolicType);
+        await this.fillDocs();
+        await this.saveButton.click();
+        await expect(this.prolicName).toBeVisible();
+        this.prolicenseName = await this.prolicName.innerText();
+    }
+    /**
+     * Add rule version for prolicense
+     */
+    public async addRuleVersionForProlicense(): Promise<void> {
+        await this.selectCriteriaButton.click();
+        await Elements.waitForVisible(this.selectedRuleVersion);
+        const ruleVersionNumber: string = await this.selectedRuleVersion.innerText();
+        await this.nextButton.click();
+        let criteriaGroupsCount: number = 0;
+        while (await this.criteriaGroupCheckbox.first().isVisible()) {
+            await this.criteriaGroupCheckbox.first().click();
+            criteriaGroupsCount++;
+        }
+        await this.selectButton.click();
+        expect(await this.criteriaGroupName.count()).toBe(criteriaGroupsCount);
+        await expect(this.ruleVersionValue(ruleVersionNumber)).toBeVisible();
     }
     /**
      * Copy a prolicense
      */
     public async cloneProlicense(): Promise<void> {
-        const prolicNameBeforeClone: string = await this.createdProlicName.innerText();
         await this.actionButton.click();
         await this.actionsList.filter({hasText: ProlicenseActions.clone}).click();
         await this.name.type(InputData.randomWord);
         await this.saveButton.click();
-        expect(this.compareProlicName(prolicNameBeforeClone)).toBeTruthy();
+        await expect(this.notification(Notifications.prolicenseCloned)).toBeVisible();
     }
     /**
      * Publication of a prolicense
@@ -249,108 +199,9 @@ export class ConstructorNewPage extends ConstructorPage {
      */
     public async deleteProlicense(): Promise<void> {
         await this.actionButton.click();
-        const deleteValue = await this.actionByEnum(ProlicenseActions.delete);
-        if (deleteValue) {
-            await deleteValue.click();
-            await this.deleteButton.click();
-        }
+        await this.actionsList.filter({hasText: ProlicenseActions.delete}).click();
+        await this.deleteButton.click();
         await expect(this.notification(Notifications.prolicenseRemoved)).toBeVisible()
-    }
-    /**
-     * Create criteria groups
-     */
-    public async createGrpCrit(): Promise<void> {
-        const groupsCount: number = 2;
-        for(let i = 0; i <groupsCount; i++) {
-            await Elements.waitForVisible(this.addGrpCritButton);
-            await this.addGrpCritButton.click();
-            await Elements.waitForVisible(this.grpCrit);
-            await this.grpCrit.click();
-            await Elements.waitForVisible(this.grpCritList.first());
-            await this.grpCritList.first().click();
-            await this.experts.click();
-            await Elements.waitForVisible(this.expertsList.first());
-            const expertsCount = await this.expertsList.count();
-            for (let i = 0; i<expertsCount; i++) {
-                await this.expertsList.first().click();
-            }
-            await this.saveButton.click();
-            await expect(this.createdGroups.nth(i)).toBeVisible();
-        }
-        await this.waitForVisibleAllGroups(groupsCount);
-    }
-    /**
-     * Waiting for the visibility of all created criteria groups
-     */
-    private async waitForVisibleAllGroups(groups: number): Promise<void> {
-        const currentGroups: number = await this.createdGroups.count();
-        if(groups != currentGroups) await this.waitForVisibleAllGroups(groups);
-    }
-    /**
-     * Fill in the criteria fields
-     */
-    private async fillCriteriaInfo(index: number, critType: string): Promise<void> {
-        await this.addCriteria.nth(index).click();
-        await this.criteriaNumber.type(InputData.randomWord)
-        await this.rankCriteria.click();
-        await this.rankList.first().click();
-        await this.criteriaName.type(InputData.randomWord)
-        await this.description.type(InputData.randomWord)
-        await this.criteriaType.click();
-        await this.criteriaTypeList.filter({hasText : critType}).click();
-        if (critType == CriteriaType.ofi || critType == CriteriaType.member) {
-            await this.multipleCriteria.click();
-            await this.minAmount.type(String(randomInt(1,10)));
-        }
-    }
-    /**
-     * Fill in the fields of criteria documents
-     */
-    private async fillCriteriaDocs(): Promise<void> {
-        await this.addDocButton.click();
-        await this.docName.last().type(InputData.randomWord);
-        await this.docDescription.last().type(InputData.randomWord);
-        await this.additionalDataType.last().click();
-        await Elements.waitForVisible(this.additionalDataTypeList.last());
-        const dataTypeCount: number = await this.additionalDataTypeList.count();
-        const randomNumb: number = randomInt(0,dataTypeCount);
-        await this.additionalDataTypeList.nth(randomNumb).click();
-        if (this.checkDocType(randomNumb)) {
-            await Input.uploadFiles(this.templates.last(),"all");
-            await Elements.waitForVisible(this.docIcon.last());
-            await Elements.waitForVisible(this.xlsxIcon.last());
-        }
-    }
-    /**
-     * Checking whether to add files to the selected criteria document type
-     */
-    private checkDocType(randomNumb: number): boolean {
-        return (
-            randomNumb != NonFilesDoctypes.participantsList &&
-            randomNumb != NonFilesDoctypes.organization &&
-            randomNumb != NonFilesDoctypes.ofi
-        )
-    }
-    /**
-     * Create criterias
-     */
-    public async createCriteria(): Promise<void> {
-        const groupsCount = await this.createdGroups.count();
-        const criteriaTypes: string[] = [`${CriteriaType.documents}`,`${CriteriaType.member}`,`${CriteriaType.ofi}`];
-        const docCount = 2;
-        let createdCriteriaCount: number = 0;
-        for(let i = 0; i < groupsCount; i++) {
-            for (const type of criteriaTypes) {
-                await this.fillCriteriaInfo(i,type);
-                for(let c = 0; c < docCount; c++) {
-                    await this.fillCriteriaDocs()
-                }
-                await this.saveButton.click();
-                await expect(this.createdCriteria.nth(createdCriteriaCount)).toBeVisible();
-                createdCriteriaCount++;
-            }
-        }
-        this.prolicenseName = await this.createdProlicName.innerText();
     }
     /**
      * waiting for the filtered record to be displayed
@@ -361,21 +212,41 @@ export class ConstructorNewPage extends ConstructorPage {
         return;
     }
     /**
-     * Change criteria for published prolicense
+     * Create a rule for testing scenario with prolicense
      */
-    public async changeCriteria(): Promise<void> {
-        await this.createdGroups.first().click();
-        const criteriaEditButtonNumber = 4;
-        await this.editButton.nth(criteriaEditButtonNumber).click();
-        await this.criteriaName.fill(InputData.randomWord);
-        if(await this.minAmount.isVisible()) {
-            const minAmountValue: number = +(await this.minAmount.getAttribute("value") ?? 0);
-            if(minAmountValue > 1) await this.minAmount.fill(String(minAmountValue - 1));
+    public async createRuleForProlicense(): Promise<void> {
+        const ruleClassifier = new RulesClassifierPage(this.page);
+        await ruleClassifier.addRule();
+        await ruleClassifier.addCriteriaGroups();
+        await ruleClassifier.addCriterias();
+        await ruleClassifier.publishRule();
+    }
+    /**
+     * Add experts for criteria groups
+     */
+    public async addExperts(): Promise<void> {
+        const criteriaGroupCount: number = await this.criteriaGroupName.count();
+        for(let i=0; i<criteriaGroupCount; i++) {
+            await this.criteriaGroupName.nth(i).click();
+            await this.expertEditButton.nth(i).click();
+            await this.experts.click();
+            const expertName: string = await this.expertsValues.first().innerText();
+            await this.expertsValues.first().click();
+            await this.saveButton.click();
+            await expect(this.addedExpert(expertName).nth(i)).toBeVisible();
         }
-        await this.docName.first().fill(InputData.randomWord);
-        await this.deleteIcon.first().click();
-        await this.fillCriteriaDocs();
-        await this.saveButton.click();
-        await expect(this.notification(Notifications.criteriaChanged)).toBeVisible();
+    }
+    /**
+     * adding a value to the 'Minimum count' field
+     */
+    public async addMinimumCount(): Promise<void> {
+        const criteriaWithWarningCount: number = await this.criteriaWarningEditButton.count();
+        for(let i=0; i<criteriaWithWarningCount; i++) {
+            await this.criteriaWarningEditButton.first().click();
+            const randomMinCountValue: string = String(randomInt(1,10000));
+            await this.minimumCount.fill(randomMinCountValue);
+            await this.saveButton.click();
+            await expect(this.minimumCountValue(randomMinCountValue)).toBeVisible();
+        }
     }
 }

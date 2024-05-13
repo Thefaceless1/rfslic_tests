@@ -16,6 +16,8 @@ import * as Process from "process";
 import {ProlicType} from "../../helpers/types/prolic.type.js";
 import {Date} from "../../../framework/elements/Dates.js";
 import {DbHelper} from "../../../../db/db-helper.js";
+import {TableColumn} from "../../helpers/enums/TableColumn.js";
+import {SubmitRequestOptions} from "../../helpers/enums/SubmitRequestOptions.js";
 
 export class RequestPage extends CommissionPage {
     private manualSanctionCount: number = 3
@@ -126,7 +128,7 @@ export class RequestPage extends CommissionPage {
     /**
      * Button "Publish a request"
      */
-    private publishReqButton: Locator = Elements.getElement(this.page,"//button[text()='Подать заявку']")
+    private submitRequestButton: Locator = Elements.getElement(this.page,"//button[text()='Подать заявку']")
     /**
      * Field "Select a club"
      */
@@ -216,6 +218,10 @@ export class RequestPage extends CommissionPage {
      */
     private sanctionValues: Locator = Elements.getElement(this.page,"//*[contains(@class,'sanction__option')]")
     /**
+     * Field 'Submit request options'
+     */
+    private submitRequestOptions: Locator = Elements.getElement(this.page,"//*[contains(@class,'usePrevSeasons__indicators')]")
+    /**
      * Icon 'Delete sanction'
      */
     private deleteSanctionIcon: Locator = Elements.getElement(this.page,"//*[contains(@class,'RequestSanctions-module_deleteWrapper')]")
@@ -242,6 +248,12 @@ export class RequestPage extends CommissionPage {
      */
     private sectionByEnum(section: RequestSections): Locator {
         return Elements.getElement(this.page,`//button[text()='${section}']`);
+    }
+    /**
+     * Dropdown values in the field 'Submit request options'
+     */
+    private submitRequestOptionsValues(optionName: SubmitRequestOptions): Locator {
+        return Elements.getElement(this.page,`//*[contains(@class,'usePrevSeasons__option') and text()='${optionName}']`);
     }
     /**
      * Expert Report Sanction
@@ -276,8 +288,8 @@ export class RequestPage extends CommissionPage {
      */
     private async fillExperts(): Promise<void> {
         await this.experts.click();
-        await Elements.waitForVisible(this.expertsList.first());
-        await this.expertsList.first().click();
+        await Elements.waitForVisible(this.expertsValues.first());
+        await this.expertsValues.first().click();
         await this.saveButton.click();
         await this.closeNotifications("last");
         await Elements.waitForHidden(this.saveButton);
@@ -522,22 +534,26 @@ export class RequestPage extends CommissionPage {
         await this.selectClubList.first().click();
     }
     /**
-     * Create a prolicense with filled criteria groups and criterias
+     * Create a prolicense for testing licenses
      */
     public async createTestProlicense(prolicType: ProlicType): Promise<void> {
         const constructor = new ConstructorNewPage(this.page);
-        await constructor.openConstructor();
+        await constructor.createRuleForProlicense();
         await constructor.createProlicense(prolicType);
-        await constructor.createGrpCrit();
-        await constructor.createCriteria();
-        this.prolicenseName = await constructor.createdProlicName.innerText();
+        await constructor.addRuleVersionForProlicense();
+        await constructor.addExperts();
+        await constructor.addMinimumCount();
+        this.prolicenseName = await constructor.prolicName.innerText();
         await constructor.publishProlicense("lic");
         await Elements.waitForVisible(constructor.createProlicButton);
     }
     /**
      * Create a request in the status "Draft"
      */
-    public async createDraft(prolicType: ProlicType): Promise<void> {
+    public async createRequestDraft(prolicType: ProlicType): Promise<void> {
+        await this.page.goto(Pages.requestNewPage);
+        await this.chooseClub();
+        await this.filterByColumn(this.filterButtonByEnum(TableColumn.licName));
         await this.arrow.click();
         await this.goToRequest.click();
         switch (prolicType) {
@@ -556,11 +572,14 @@ export class RequestPage extends CommissionPage {
         }
     }
     /**
-     * Publish a license
+     * Submit a license request
      */
-    public async publishLic(): Promise<void> {
-        await Elements.waitForVisible(this.publishReqButton);
-        await this.publishReqButton.click();
+    public async submitLicenseRequest(): Promise<void> {
+        await Elements.waitForVisible(this.submitRequestButton);
+        await this.submitRequestButton.click();
+        await this.submitRequestOptions.click();
+        await this.submitRequestOptionsValues(SubmitRequestOptions.submitEmptyRequest).click();
+        await this.nextButton.click();
         await expect(this.notification(Notifications.requestAdded)).toBeVisible();
     }
     /**

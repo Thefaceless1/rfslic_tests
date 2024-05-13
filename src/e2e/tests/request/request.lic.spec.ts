@@ -16,11 +16,11 @@ test.describe("Заявки на лицензирование", () => {
 
         await test.step(
             "Создание заявки на лицензирование в статусе Черновик",
-            async () => await licRequests.createDraft("lic")
+            async () => await licRequests.createRequestDraft("lic")
         );
         await test.step(
             "Подача заявки на лицензирование",
-            async () => await licRequests.publishLic()
+            async () => await licRequests.submitLicenseRequest()
         );
         await test.step(
             "Изменение сроков подачи и рассмотрения документации",

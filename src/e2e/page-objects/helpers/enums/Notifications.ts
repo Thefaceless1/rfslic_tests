@@ -1,12 +1,8 @@
 export enum Notifications {
-    deletedFromTrash = "Удалены из корзины",
-    movedToTrash = "Помещены в корзину",
-    markedAsRead = "Отмечены как прочитанные",
     categoryAdded = "Разряд добавлен",
     categoryChanged = "Разряд изменен",
     groupAdded = "Группа добавлена",
     groupChanged = "Группа изменена",
-    criteriaChanged = "Критерий изменен",
     groupDeleted = "Группа удалена",
     rightsChanged = "Права изменены",
     roleDeleted = "Роль удалена",
@@ -17,7 +13,8 @@ export enum Notifications {
     prolicenseRemoved = "Пролицензия удалена",
     requestAdded = "Заявка подана",
     sanctionRemoved = "Санкция удалена",
-    subscriptionChanged = "Подписка обновлена",
     sanctionSaved = "Санкция сохранена",
-    entryDeleted = "Запись удалена"
+    entryDeleted = "Запись удалена",
+    prolicenseCloned = "Пролицензия создана по образцу",
+    ruleSaved = "Версия списка критериев и документов сохранена"
 }

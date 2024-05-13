@@ -15,11 +15,11 @@ test.describe("Заявки на фин. контроль",() => {
         );
             await test.step(
                 "Создание заявки на фин. контроль в статусе Черновик",
-                async () => await finRequests.createDraft("fin")
+                async () => await finRequests.createRequestDraft("fin")
             );
             await test.step(
                 "Подача заявки на фин. контроль",
-                async () => await finRequests.publishLic()
+                async () => await finRequests.submitLicenseRequest()
             );
             await test.step(
                 "Изменение сроков подачи и рассмотрения документации",

@@ -5,6 +5,7 @@ import {SearchModalPage} from "../SearchModalPage.js";
 import {DbHelper} from "../../../../db/db-helper.js";
 import {UserTabs} from "../../helpers/enums/UserTabs.js";
 import {Notifications} from "../../helpers/enums/Notifications.js";
+import {AdminOptions} from "../../helpers/enums/AdminOptions.js";
 
 export class UsersPage extends MainPage {
     private readonly testedUserId : number = 17500821
@@ -42,6 +43,7 @@ export class UsersPage extends MainPage {
      * Add a user
      */
     public async addUser(): Promise<void> {
+        await this.adminMenuByEnum(AdminOptions.users).click();
         const searchModal = new SearchModalPage(this.page);
         await this.plusAddButton.click();
         await Elements.waitForVisible(this.searchDataButton);

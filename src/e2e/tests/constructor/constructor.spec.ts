@@ -18,16 +18,16 @@ test.describe("Пролицензии", () => {
             async () => await constructor.createProlicense("lic")
         );
         await test.step(
-            "Изменение общей информации пролицензии",
-            async () => await constructor.changeBasicInfo()
+            "Добавление версии правил для пролицензии",
+            async () => await constructor.addRuleVersionForProlicense()
         );
         await test.step(
-            "Добавление групп критериев",
-            async () => await constructor.createGrpCrit()
+            "Добавление экспертов для групп критериев",
+            async () => await constructor.addExperts()
         );
         await test.step(
-            "Добавление критериев и документов",
-            async () => await constructor.createCriteria()
+            "Заполнение поля 'Минимальное количество' критерия",
+            async () => await constructor.addMinimumCount()
         );
         await test.step(
             "Создание пролицензии по образцу",
@@ -40,14 +40,6 @@ test.describe("Пролицензии", () => {
         await test.step(
             "Публикация пролицензии",
             async () => await constructor.publishProlicense("prolic")
-        );
-        await test.step(
-            "Изменение общей информации опубликованной пролицезии",
-            async () => await constructor.changeBasicInfo()
-        );
-        await test.step(
-            "Изменение критерия опубликованной пролицензии",
-            async () => await constructor.changeCriteria()
         );
         await test.step(
             "Снятие с публикации пролицензии",

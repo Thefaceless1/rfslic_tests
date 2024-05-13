@@ -25,25 +25,25 @@ export class BasePage extends PlaywrightDevPage{
      */
     protected editButton: Locator = Elements.getElement(this.page,"//button[contains(@class,'Button_view_secondary') and not(contains(@name,'editButton'))][.//span[contains(@class,'IconEdit')]]")
     /**
-     * Field "Select experts"
+     * Field "Document Templates"
      */
-    protected experts: Locator = Elements.getElement(this.page,"//*[contains(@class,'experts__indicators')]")
-    /**
-     * Values of the drop-down list of the field "Select experts"
-     */
-    protected expertsList: Locator = Elements.getElement(this.page,"//*[contains(@class,'experts__option')]")
+    protected templates: Locator = Elements.getElement(this.page,"//input[@type='file']")
     /**
      * Values of the drop-down list of the "Season" field
      */
-    protected seasons: Locator = Elements.getElement(this.page,"//*[contains(@class,'season__option')]")
+    protected seasonValues: Locator = Elements.getElement(this.page,"//*[contains(@class,'season__option')]")
+    /**
+     * Field 'Experts'
+     */
+    protected experts: Locator = Elements.getElement(this.page,"//*[contains(@class,'experts__value-container')]")
+    /**
+     * dropdown values of field 'Experts'
+     */
+    protected expertsValues: Locator = Elements.getElement(this.page,"//*[contains(@class,'experts__option')]")
     /**
      * Field "Season"
      */
     protected season: Locator = Elements.getElement(this.page,"//*[contains(@class,'season__control')]")
-    /**
-     * Field "Document Templates"
-     */
-    protected templates: Locator = Elements.getElement(this.page,"//input[@type='file']")
     /**
      * Downloaded "doc" file picture
      */
@@ -81,13 +81,21 @@ export class BasePage extends PlaywrightDevPage{
      */
     protected licType: Locator = Elements.getElement(this.page,"//*[contains(@class,'type__control') or contains(@class,'licType__control')]")
     /**
-     * Button "Add criteria groups"
-     */
-    protected addGrpCritButton: Locator = Elements.getElement(this.page,"//*[contains(text(),'Добавить группу')]")
-    /**
      * Fields with date type
      */
     protected dates: Locator = Elements.getElement(this.page,"//*[contains(@class,'datepicker')]//input[not(@disabled)]")
+    /**
+     * Field "Add document"
+     */
+    protected addDocButton: Locator = Elements.getElement(this.page,"//span[text()='Добавить документ']")
+    /**
+     * Field "Document name"
+     */
+    protected docName: Locator = Elements.getElement(this.page,"//input[@placeholder='Введите название документа']")
+    /**
+     * Field "Document description"
+     */
+    protected docDescription: Locator = Elements.getElement(this.page,"//textarea[@placeholder='Добавьте описание документа']")
     /**
      * Field with the fine amount for editing
      */
@@ -117,6 +125,22 @@ export class BasePage extends PlaywrightDevPage{
      */
     protected publishButton: Locator = Elements.getElement(this.page,"//button[text()='Опубликовать']")
     /**
+     * Button "Next"
+     */
+    protected nextButton: Locator = Elements.getElement(this.page,"//button[text()='Далее']")
+    /**
+     * Button "Add criteria groups"
+     */
+    protected addCriteriaGroupButton: Locator = Elements.getElement(this.page,"//*[contains(text(),'Добавить группу')]")
+    /**
+     * Field with criteria group name
+     */
+    protected criteriaGroupName: Locator = Elements.getElement(this.page,"//span[contains(text(),'критерии')]")
+    /**
+     * Button "Select"
+     */
+    public selectButton: Locator = Elements.getElement(this.page,"//button[text()='Выбрать']")
+    /**
      * Button "Create"
      */
     protected createButton: Locator = Elements.getElement(this.page,"//button[text()='Создать']")
@@ -125,13 +149,9 @@ export class BasePage extends PlaywrightDevPage{
      */
     protected unpublishButton: Locator = Elements.getElement(this.page,"//button[text()='Снять с публикации']")
     /**
-     * column "Number of a license" in Licenses table
+     * Bread crumb 'Main'
      */
-    protected numberLicenseColumn: Locator = Elements.getElement(this.page,"//td[@class='ant-table-cell'][2]")
-    /**
-     * Delete icon
-     */
-    protected deleteIcon: Locator = Elements.getElement(this.page,"//button[not(@disabled)]//span[contains(@class,'IconTrash')]")
+    protected breadCrumbMain: Locator = Elements.getElement(this.page,"//span[contains(@class,'breadcrumb')]//a[text()='Главная']")
     /**
      * selected field 'Prolicense type' dropdown value
      */
@@ -246,6 +266,7 @@ export class BasePage extends PlaywrightDevPage{
         await dbHelper.deleteLicense();
         await dbHelper.deleteProlicense();
         await dbHelper.deleteCommission();
+        await dbHelper.deleteRules();
         await dbHelper.closeConnect();
     }
 }

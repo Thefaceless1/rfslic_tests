@@ -3,7 +3,7 @@ import {InputData} from "../../page-objects/helpers/InputData.js";
 import Process from "process";
 import config from "../../../../playwright.config.js";
 
-test.describe("Справочник 'Классификатор правил'",() => {
+test.describe("Классификатор критериев и документов",() => {
     test(`Дата запуска : ${InputData.currentDate}, Версия модуля: ${Process.env.APP_VERSION}`,
         async ({rulesClassifier}) => {
             test.info().annotations.push
@@ -14,27 +14,35 @@ test.describe("Справочник 'Классификатор правил'",(
             );
 
             await test.step(
-                "Добавление правила",
+                "Добавление версии списка критериев и документов",
                 async () => await rulesClassifier.addRule()
             );
             await test.step(
-                "Редактирование правила",
+                "Редактирование версии списка критериев и документов",
                 async () => await rulesClassifier.editRule()
             );
             await test.step(
-                "Публикация версии правил",
+                "Добавление групп критериев",
+                async () => await rulesClassifier.addCriteriaGroups()
+            );
+            await test.step(
+                "Добавление критериев",
+                async () => await rulesClassifier.addCriterias()
+            );
+            await test.step(
+                "Публикация версии списка критериев и документов",
                 async () => await rulesClassifier.publishRule()
             );
             await test.step(
-                "Снятие с публикации версии правил",
+                "Снятие с публикации версии списка критериев и документов",
                 async () => await rulesClassifier.unpublishRule()
             );
             await test.step(
-                "Создание версии правил по образцу",
+                "Создание версии списка критериев и документов по образцу",
                 async () => await rulesClassifier.cloneRule()
             );
             await test.step(
-                "Удаление версии правил",
+                "Удаление версии списка критериев и документов",
                 async () => await rulesClassifier.deleteRule()
             );
         })

@@ -4,6 +4,8 @@ import {Elements} from "../../../framework/elements/Elements.js";
 import {randomInt} from "crypto";
 import {InputData} from "../../helpers/InputData.js";
 import {Notifications} from "../../helpers/enums/Notifications.js";
+import {AdminOptions} from "../../helpers/enums/AdminOptions.js";
+import {DbHelper} from "../../../../db/db-helper.js";
 
 export class CategoriesClassifierPage extends MainPage {
     constructor(page: Page) {
@@ -25,6 +27,7 @@ export class CategoriesClassifierPage extends MainPage {
      * Add a category
      */
     public async addCategory(): Promise<void> {
+        await this.adminMenuByEnum(AdminOptions.categoriesClassifier).click();
         await Elements.waitForVisible(this.codeColumn.first());
         const existingCodes : string[] =await this.codeColumn.allInnerTexts();
         await this.addRankButton.click();
@@ -67,5 +70,13 @@ export class CategoriesClassifierPage extends MainPage {
         await this.deleteTableButton.last().click();
         await this.deleteButton.click();
         await expect(this.notification(pendingNotification)).toBeVisible();
+    }
+    /**
+     * Delete classifiers categories
+     */
+    public async deleteCategoriesClassifiers(): Promise<void> {
+        const dbHelper = new DbHelper();
+        await dbHelper.deleteCategoriesClassifiers();
+        await dbHelper.closeConnect();
     }
 }

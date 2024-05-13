@@ -3,6 +3,7 @@ import {Locator,expect} from "@playwright/test";
 import {Elements} from "../../../framework/elements/Elements.js";
 import {InputData} from "../../helpers/InputData.js";
 import {DbHelper} from "../../../../db/db-helper.js";
+import {AdminOptions} from "../../helpers/enums/AdminOptions.js";
 
 export class SanctionTypesPage extends MainPage {
     private sanctionTypeName: string = InputData.randomWord
@@ -36,6 +37,7 @@ export class SanctionTypesPage extends MainPage {
      * Add a sanction type
      */
     public async addSanctionType(): Promise<void> {
+        await this.adminMenuByEnum(AdminOptions.sanctionConstructor).click();
         await this.sanctionTypesTab.click();
         await this.addButton.click();
         await this.sanctionTypeText.type(this.sanctionTypeName);

@@ -5,8 +5,6 @@ import {Date} from "../../../framework/elements/Dates.js";
 import {InputData} from "../../helpers/InputData.js";
 import {SearchModalPage} from "../SearchModalPage.js";
 import {randomInt} from "crypto";
-import {MainMenuOptions} from "../../helpers/enums/MainMenuOptions.js";
-import {DbHelper} from "../../../../db/db-helper.js";
 import {TableColumn} from "../../helpers/enums/TableColumn.js";
 import {ProlicType} from "../../helpers/types/prolic.type";
 import {CommissionTypes} from "../../helpers/enums/CommissionTypes.js";
@@ -19,10 +17,6 @@ export class CommissionPage extends MainPage {
      * Button "Create a commission"
      */
     private createMeetingButton: Locator = Elements.getElement(this.page,"//button[text()='Создать заседание']")
-    /**
-     * Button "Next"
-     */
-    private nextButton: Locator = Elements.getElement(this.page,"//button[text()='Далее']")
     /**
      * Button "Approve"
      */
@@ -141,22 +135,6 @@ export class CommissionPage extends MainPage {
             await this.saveButton.click();
             await expect(this.acceptedDecision.nth(i)).toBeVisible();
         }
-    }
-    /**
-     * Set status "Wait for a commission solution" for licenses
-     */
-    public async changeLicensesStatus(): Promise<void> {
-        const dbHelper = new DbHelper();
-        const waitForCommissionStatusId: number = 4;
-        await this.menuOptionByEnum(MainMenuOptions.workWithRequest).click();
-        await Elements.waitForVisible(this.numberLicenseColumn.first());
-        let licIds: string[] | number[] = await this.numberLicenseColumn.allTextContents();
-        licIds = licIds.map(licId => Number(licId));
-        for(const licId of licIds) {
-            await dbHelper.updateLicenseStatus(licId,waitForCommissionStatusId);
-        }
-        await dbHelper.closeConnect();
-        await this.page.goBack();
     }
     /**
      * Edit fine amount

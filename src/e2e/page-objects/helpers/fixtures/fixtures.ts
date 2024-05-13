@@ -1,15 +1,10 @@
 import {test as base} from '@playwright/test';
 import {ConstructorNewPage} from "../../pages/constructor/ConstructorNewPage.js";
-import {Pages} from "../enums/Pages.js";
 import {RequestPage} from "../../pages/request/RequestPage.js";
-import {TableColumn} from "../enums/TableColumn.js";
 import {RolesPage} from "../../pages/admin/RolesPage.js";
-import {AdminOptions} from "../enums/AdminOptions.js";
 import {UsersPage} from "../../pages/admin/UsersPage.js";
 import {AuthPage} from "../../pages/AuthPage.js";
 import {LicTextPage} from "../../pages/admin/LictextPage.js";
-import {CommissionPage} from "../../pages/commissions/CommissionPage.js";
-import {CommissionMenuOptions} from "../enums/CommissionMenuOptions.js";
 import {GroupsClassifierPage} from "../../pages/admin/GropsClassifierPage.js";
 import {CategoriesClassifierPage} from "../../pages/admin/CategoriesClassifierPage.js";
 import {SanctionTypesPage} from "../../pages/admin/SanctionTypesPage.js";
@@ -26,7 +21,6 @@ type Fixtures = {
     roles: RolesPage,
     users: UsersPage,
     licenseText: LicTextPage,
-    commission: CommissionPage,
     groupClassifier: GroupsClassifierPage,
     categoriesClassifier: CategoriesClassifierPage,
     sanctionTypes: SanctionTypesPage,
@@ -40,7 +34,7 @@ export const test = base.extend<Fixtures>({
         await constructor.deleteUser();
         await constructor.createUser();
         await constructor.login();
-        await constructor.openConstructor();
+        await constructor.createRuleForProlicense();
         await use(constructor);
         await constructor.deleteCreatedDataFromDatabase();
     },
@@ -50,9 +44,6 @@ export const test = base.extend<Fixtures>({
         await request.createUser();
         await request.login();
         await request.createTestProlicense("lic");
-        await request.goto(Pages.requestNewPage);
-        await request.chooseClub();
-        await request.filterByColumn(request.filterButtonByEnum(TableColumn.licName));
         await use(request);
         await request.deleteCreatedDataFromDatabase();
     },
@@ -62,9 +53,6 @@ export const test = base.extend<Fixtures>({
         await request.createUser();
         await request.login();
         await request.createTestProlicense("fin");
-        await request.goto(Pages.requestNewPage);
-        await request.chooseClub();
-        await request.filterByColumn(request.filterButtonByEnum(TableColumn.licName));
         await use(request);
         await request.deleteCreatedDataFromDatabase();
     },
@@ -74,9 +62,6 @@ export const test = base.extend<Fixtures>({
         await request.createUser();
         await request.login();
         await request.createTestProlicense("cert");
-        await request.goto(Pages.requestNewPage);
-        await request.chooseClub();
-        await request.filterByColumn(request.filterButtonByEnum(TableColumn.licName));
         await use(request);
         await request.deleteCreatedDataFromDatabase();
     },
@@ -85,7 +70,6 @@ export const test = base.extend<Fixtures>({
         await roles.deleteUser();
         await roles.createUser();
         await roles.login();
-        await roles.adminMenuByEnum(AdminOptions.roles).click();
         await use(roles);
     },
     users: async ({page},use) => {
@@ -94,7 +78,6 @@ export const test = base.extend<Fixtures>({
         await users.createUser();
         await users.deleteTestedUser();
         await users.login();
-        await users.adminMenuByEnum(AdminOptions.users).click();
         await use(users);
     },
     setUser: async ({browser},use) => {
@@ -110,37 +93,27 @@ export const test = base.extend<Fixtures>({
         await licenseText.login();
         await use(licenseText);
     },
-    commission: async ({page},use) => {
-        const commission = new CommissionPage(page);
-        await commission.deleteUser();
-        await commission.createUser();
-        await commission.login();
-        await commission.changeLicensesStatus();
-        await commission.commissionMenuByEnum(CommissionMenuOptions.meetings).click();
-        await use(commission);
-    },
     groupClassifier: async ({page},use) => {
         const groupClassifier = new GroupsClassifierPage(page);
         await groupClassifier.deleteUser();
         await groupClassifier.createUser();
         await groupClassifier.login();
-        await groupClassifier.adminMenuByEnum(AdminOptions.groupsClassifier).click();
         await use(groupClassifier);
+        await groupClassifier.deleteCriteriaGroups();
     },
     categoriesClassifier: async ({page},use) => {
         const categoriesClassifier = new CategoriesClassifierPage(page);
         await categoriesClassifier.deleteUser();
         await categoriesClassifier.createUser();
         await categoriesClassifier.login();
-        await categoriesClassifier.adminMenuByEnum(AdminOptions.categoriesClassifier).click();
         await use(categoriesClassifier);
+        await categoriesClassifier.deleteCategoriesClassifiers();
     },
     sanctionTypes: async ({page},use) => {
         const sanctionTypes = new SanctionTypesPage(page);
         await sanctionTypes.deleteUser();
         await sanctionTypes.createUser();
         await sanctionTypes.login();
-        await sanctionTypes.adminMenuByEnum(AdminOptions.sanctionConstructor).click();
         await use(sanctionTypes);
         await sanctionTypes.deleteSanctionTypeFromDatabase();
     },
@@ -149,7 +122,6 @@ export const test = base.extend<Fixtures>({
         await violations.deleteUser();
         await violations.createUser();
         await violations.login();
-        await violations.adminMenuByEnum(AdminOptions.sanctionConstructor).click();
         await use(violations);
         await violations.deleteViolationsFromDatabase();
     },
@@ -159,7 +131,6 @@ export const test = base.extend<Fixtures>({
         await sanctions.createUser();
         await sanctions.createViolation();
         await sanctions.login();
-        await sanctions.adminMenuByEnum(AdminOptions.sanctionConstructor).click();
         await use(sanctions);
         await sanctions.deleteViolationAndSanctionFromDatabase();
     },
@@ -168,7 +139,6 @@ export const test = base.extend<Fixtures>({
         await rulesClassifier.deleteUser();
         await rulesClassifier.createUser();
         await rulesClassifier.login();
-        await rulesClassifier.adminMenuByEnum(AdminOptions.rulesClassifier).click();
         await use(rulesClassifier);
         await rulesClassifier.deleteRulesFromDatabase();
     }

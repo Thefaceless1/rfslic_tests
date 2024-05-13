@@ -3,6 +3,7 @@ import {Locator, expect} from "@playwright/test";
 import {Elements} from "../../../framework/elements/Elements.js";
 import {InputData} from "../../helpers/InputData.js";
 import {DbHelper} from "../../../../db/db-helper.js";
+import {AdminOptions} from "../../helpers/enums/AdminOptions.js";
 
 export class ViolationsPage extends MainPage {
     private violationName: string = InputData.randomWord
@@ -44,6 +45,7 @@ export class ViolationsPage extends MainPage {
      * Add a violation
      */
     public async addViolation(): Promise<void> {
+        await this.adminMenuByEnum(AdminOptions.sanctionConstructor).click();
         await this.violationsTab.click();
         await this.addButton.click();
         await this.enterViolationName.type(this.violationName);

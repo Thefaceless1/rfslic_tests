@@ -3,6 +3,7 @@ import {expect, Locator, Page} from "@playwright/test";
 import {Elements} from "../../../framework/elements/Elements.js";
 import {InputData} from "../../helpers/InputData.js";
 import {Notifications} from "../../helpers/enums/Notifications.js";
+import {AdminOptions} from "../../helpers/enums/AdminOptions.js";
 
 export class RolesPage extends MainPage {
     constructor(page: Page) {
@@ -28,6 +29,7 @@ export class RolesPage extends MainPage {
      * Add a role
      */
     public async addRole(): Promise<void> {
+        await this.adminMenuByEnum(AdminOptions.roles).click();
         const roleName: string = InputData.randomWord;
         await this.selectRole.click();
         await Elements.waitForVisible(this.rolesList.first());

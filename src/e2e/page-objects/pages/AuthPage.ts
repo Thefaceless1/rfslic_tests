@@ -86,6 +86,7 @@ export class AuthPage extends BasePage {
             await this.checkSelectUserButton();
             await this.selectUserButton.click();
             await Elements.waitForVisible(this.selectUserMenu);
+            await this.page.waitForTimeout(1000)
             await this.selectUserMenu.click();
             await Elements.waitForVisible(this.selectedUser);
             await this.selectedUser.click();

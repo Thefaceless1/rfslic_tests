@@ -5,6 +5,7 @@ import {Elements} from "../../../framework/elements/Elements.js";
 import {ProlicTypes} from "../../helpers/enums/ProlicTypes.js";
 import {randomInt} from "crypto";
 import {Notifications} from "../../helpers/enums/Notifications.js";
+import {AdminOptions} from "../../helpers/enums/AdminOptions.js";
 
 export class SanctionsPage extends MainPage {
     /**
@@ -75,6 +76,7 @@ export class SanctionsPage extends MainPage {
      * Add a sanction
      */
     public async addSanction(): Promise<void> {
+        await this.adminMenuByEnum(AdminOptions.sanctionConstructor).click();
         await this.sanctionsTab.click();
         await this.addButton.click();
         await this.prolicType.click();

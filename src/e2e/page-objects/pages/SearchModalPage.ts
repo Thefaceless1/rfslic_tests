@@ -11,10 +11,6 @@ export class SearchModalPage extends BasePage {
      */
     public findButton: Locator = Elements.getElement(this.page,"//button[text()='Найти']")
     /**
-     * Button "Select"
-     */
-    public selectButton: Locator = Elements.getElement(this.page,"//button[text()='Выбрать']")
-    /**
      * Waiting indicator for table records
      */
     public loadIndicator: Locator = Elements.getElement(this.page,"//span[contains(@class,'ant-spin-dot-spin')]")

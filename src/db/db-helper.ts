@@ -10,20 +10,6 @@ export class DbHelper {
        this.sql = postgres(dbConfig)
     }
     /**
-     * Delete data from tables
-     */
-    public async delete(table: string,column: string,data: number | string): Promise<void> {
-       await this.sql`DELETE FROM ${this.sql(table)} 
-                      WHERE ${this.sql(column)} = ${data}`;
-    }
-    /**
-     * Select data from tables
-     */
-    public async select(table: string,column: string,data: number | string | boolean): Promise<postgres.RowList<postgres.Row[]>> {
-        return this.sql`SELECT * FROM ${this.sql(table)} 
-                        WHERE ${this.sql(column)} = ${data}`
-    }
-    /**
      * Create a user in the license module system
      */
     public async insertUser(userId: number): Promise<void> {
@@ -39,45 +25,38 @@ export class DbHelper {
         await this.sql`INSERT INTO rfslic.work_user_rights 
                        (user_id,right_id) 
                        VALUES
-                       (${userId},${UserRights["adm.classificators.manage"]}),
-                       (${userId},${UserRights["adm.critCategory.manage"]}),
-                       (${userId},${UserRights["adm.critGroup.manage"]}),
-                       (${userId},${UserRights["adm.expertWorkload.manage"]}),
-                       (${userId},${UserRights["adm.licText.edit"]}),
-                       (${userId},${UserRights["adm.role.manage"]}),
-                       (${userId},${UserRights["commission.delete"]}),
-                       (${userId},${UserRights["commission.document.edit"]}),
-                       (${userId},${UserRights["commission.edit"]}),
-                       (${userId},${UserRights["commission.members.edit"]}),
-                       (${userId},${UserRights["commission.view"]}),
-                       (${userId},${UserRights["prolic.copy"]}),
-                       (${userId},${UserRights["prolic.delete"]}),
-                       (${userId},${UserRights["prolic.edit"]}),
-                       (${userId},${UserRights["prolic.view"]}),
-                       (${userId},${UserRights["request.add"]}),
-                       (${userId},${UserRights["request.check"]}),
-                       (${userId},${UserRights["request.checkExpert"]}),
-                       (${userId},${UserRights["request.commission.view"]}),
-                       (${userId},${UserRights["request.delete"]}),
-                       (${userId},${UserRights["request.fill"]}),
-                       (${userId},${UserRights["request.fillExpert"]}),
-                       (${userId},${UserRights["request.groupExpert.edit"]}),
-                       (${userId},${UserRights["request.groupReport.add"]}),
-                       (${userId},${UserRights["request.groupReport.edit"]}),
-                       (${userId},${UserRights["request.history"]}),
-                       (${userId},${UserRights["request.viewAll"]}),
-                       (${userId},${UserRights["request.sendLimit.edit"]}),
-                       (${userId},${UserRights["request.sanctions.edit"]}),
-                       (${userId},${UserRights["request.docsDeadline.edit"]})
+                       (${userId},${UserRights.admClassificatorsManage}),
+                       (${userId},${UserRights.admCritCategoryManage}),
+                       (${userId},${UserRights.admCritGroupManage}),
+                       (${userId},${UserRights.admExpertWorkloadManage}),
+                       (${userId},${UserRights.admLicTextEdit}),
+                       (${userId},${UserRights.admRoleManage}),
+                       (${userId},${UserRights.commissionDelete}),
+                       (${userId},${UserRights.commissionDocumentEdit}),
+                       (${userId},${UserRights.commissionEdit}),
+                       (${userId},${UserRights.commissionMembersEdit}),
+                       (${userId},${UserRights.commissionView}),
+                       (${userId},${UserRights.prolicCopy}),
+                       (${userId},${UserRights.prolicDelete}),
+                       (${userId},${UserRights.prolicEdit}),
+                       (${userId},${UserRights.prolicView}),
+                       (${userId},${UserRights.requestAdd}),
+                       (${userId},${UserRights.requestCheck}),
+                       (${userId},${UserRights.requestCheckExpert}),
+                       (${userId},${UserRights.requestCommissionView}),
+                       (${userId},${UserRights.requestDelete}),
+                       (${userId},${UserRights.requestFill}),
+                       (${userId},${UserRights.requestFillExpert}),
+                       (${userId},${UserRights.requestGroupExpertEdit}),
+                       (${userId},${UserRights.requestGroupReportAdd}),
+                       (${userId},${UserRights.requestGroupReportEdit}),
+                       (${userId},${UserRights.requestHistory}),
+                       (${userId},${UserRights.requestViewAll}),
+                       (${userId},${UserRights.requestSendLimitEdit}),
+                       (${userId},${UserRights.requestSanctionsEdit}),
+                       (${userId},${UserRights.requestDocsDeadlineEdit}),
+                       (${userId},${UserRights.admRulesManage})
                        on conflict do nothing;`;
-    }
-    /**
-     * Update state_id column in Licenses table
-     */
-    public async updateLicenseStatus(licIds: number, licStatusId: number): Promise<void> {
-        await this.sql`UPDATE rfslic.licenses
-                       SET state_id = ${licStatusId}
-                       WHERE id = ${licIds}`;
     }
     /**
      * Close connect to databases
@@ -178,6 +157,20 @@ export class DbHelper {
      */
     public async deleteRules(): Promise<void> {
         await this.sql`DELETE FROM rfslic.nsi_rule_versions
+                       WHERE name LIKE ('автотест%');`;
+    }
+    /**
+     * Delete classifiers categories
+     */
+    public async deleteCategoriesClassifiers(): Promise<void> {
+        await this.sql`DELETE FROM rfslic.nsi_criteriacategories
+                       WHERE description LIKE ('автотест%');`;
+    }
+    /**
+     * Delete criteria groups
+     */
+    public async deleteCriteriaGroups(): Promise<void> {
+        await this.sql`DELETE FROM rfslic.nsi_criteriagroups
                        WHERE name LIKE ('автотест%');`;
     }
 }
