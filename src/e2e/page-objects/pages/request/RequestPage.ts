@@ -109,6 +109,10 @@ export class RequestPage extends CommissionPage {
      */
     private editOfiButton: Locator = Elements.getElement(this.page,"//button[@name='editButtonOfi']")
     /**
+     * Button "Perform"
+     */
+    private performButton: Locator = Elements.getElement(this.page,"//button[text()='Подтвердить']")
+    /**
      * Document tooltip
      */
     private docTooltip: Locator = Elements.getElement(this.page,"//span[contains(@class,'DocumentInfo-module')]")
@@ -543,9 +547,9 @@ export class RequestPage extends CommissionPage {
         await constructor.addRuleVersionForProlicense();
         await constructor.addExperts();
         await constructor.addMinimumCount();
-        this.prolicenseName = await constructor.prolicName.innerText();
         await constructor.publishProlicense("lic");
         await Elements.waitForVisible(constructor.createProlicButton);
+        this.prolicName = constructor.prolicName;
     }
     /**
      * Create a request in the status "Draft"
@@ -553,7 +557,7 @@ export class RequestPage extends CommissionPage {
     public async createRequestDraft(prolicType: ProlicType): Promise<void> {
         await this.page.goto(Pages.requestNewPage);
         await this.chooseClub();
-        await this.filterByColumn(this.filterButtonByEnum(TableColumn.licName));
+        await this.filterByColumn(this.filterButtonByEnum(TableColumn.licName),this.prolicName);
         await this.arrow.click();
         await this.goToRequest.click();
         switch (prolicType) {
@@ -580,6 +584,7 @@ export class RequestPage extends CommissionPage {
         await this.submitRequestOptions.click();
         await this.submitRequestOptionsValues(SubmitRequestOptions.submitEmptyRequest).click();
         await this.nextButton.click();
+        await this.performButton.click();
         await expect(this.notification(Notifications.requestAdded)).toBeVisible();
     }
     /**

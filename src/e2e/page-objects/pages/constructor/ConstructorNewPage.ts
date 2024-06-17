@@ -16,13 +16,11 @@ import {MainMenuOptions} from "../../helpers/enums/MainMenuOptions.js";
 import {randomInt} from "crypto";
 
 export class ConstructorNewPage extends ConstructorPage {
+    private readonly clonedProlicName: string = InputData.randomWord;
+    private ruleVersion: number = 0
     constructor(page: Page) {
         super(page);
     }
-    /**
-     * The name of the created prolicense
-     */
-    public prolicName: Locator = Elements.getElement(this.page,"//*[text()='Название пролицензии:']//following-sibling::*")
     /**
      * Action call button for prolicense
      */
@@ -31,10 +29,6 @@ export class ConstructorNewPage extends ConstructorPage {
      * Button 'Select criteria'
      */
     private selectCriteriaButton: Locator = Elements.getElement(this.page,"//button[text()='Выбрать критерии']")
-    /**
-     * Selected rule version value in the "Version number" field
-     */
-    private selectedRuleVersion: Locator = Elements.getElement(this.page,"//*[contains(@class,'version__single-value')]")
     /**
      * Action dropdown values
      */
@@ -80,6 +74,18 @@ export class ConstructorNewPage extends ConstructorPage {
         return Elements.getElement(this.page,`//*[text()='Версия списка критериев и документов:']//following-sibling::*//*[text()='${ruleVersionNumber}']`);
     }
     /**
+     * Selected rule version value in the "Version number" field
+     */
+    private get selectedRuleVersion(): Locator {
+        return Elements.getElement(this.page,`//input[@name='version' and @value='${this.ruleVersion}']`)
+    }
+    /**
+     * Field with name of the created prolicense
+     */
+    public prolicNameField(prolicName: string): Locator {
+        return Elements.getElement(this.page,`//*[text()='Название пролицензии:']//following-sibling::*[text()='${prolicName}']`)
+    }
+    /**
      * Fill in the fields of the block "General information"
      */
     private async fillBasicInfo(prolicType: ProlicType): Promise<void> {
@@ -101,7 +107,7 @@ export class ConstructorNewPage extends ConstructorPage {
                 break;
             }
         }
-        await this.name.type(InputData.randomWord);
+        await this.name.fill(this.prolicName);
         await this.season.click();
         await this.seasonValues.last().click();
         await this.licType.click();
@@ -136,8 +142,7 @@ export class ConstructorNewPage extends ConstructorPage {
         await this.fillBasicInfo(prolicType);
         await this.fillDocs();
         await this.saveButton.click();
-        await expect(this.prolicName).toBeVisible();
-        this.prolicenseName = await this.prolicName.innerText();
+        await expect(this.prolicNameField(this.prolicName)).toBeVisible();
     }
     /**
      * Add rule version for prolicense
@@ -145,7 +150,6 @@ export class ConstructorNewPage extends ConstructorPage {
     public async addRuleVersionForProlicense(): Promise<void> {
         await this.selectCriteriaButton.click();
         await Elements.waitForVisible(this.selectedRuleVersion);
-        const ruleVersionNumber: string = await this.selectedRuleVersion.innerText();
         await this.nextButton.click();
         let criteriaGroupsCount: number = 0;
         while (await this.criteriaGroupCheckbox.first().isVisible()) {
@@ -154,7 +158,7 @@ export class ConstructorNewPage extends ConstructorPage {
         }
         await this.selectButton.click();
         expect(await this.criteriaGroupName.count()).toBe(criteriaGroupsCount);
-        await expect(this.ruleVersionValue(ruleVersionNumber)).toBeVisible();
+        await expect(this.ruleVersionValue(String(this.ruleVersion))).toBeVisible();
     }
     /**
      * Copy a prolicense
@@ -162,16 +166,16 @@ export class ConstructorNewPage extends ConstructorPage {
     public async cloneProlicense(): Promise<void> {
         await this.actionButton.click();
         await this.actionsList.filter({hasText: ProlicenseActions.clone}).click();
-        await this.name.type(InputData.randomWord);
+        await this.name.fill(this.clonedProlicName);
         await this.saveButton.click();
-        await expect(this.notification(Notifications.prolicenseCloned)).toBeVisible();
+        await expect(this.prolicNameField(this.clonedProlicName)).toBeVisible();
     }
     /**
      * Publication of a prolicense
      */
     public async publishProlicense(scenario: ScenarioType): Promise<void> {
         if(scenario == "prolic") {
-            await this.filterByColumn(this.filterButtonByEnum(TableColumn.licName));
+            await this.filterByColumn(this.filterButtonByEnum(TableColumn.licName),this.prolicName);
             await this.waitForColumnFilter();
             await this.tableRow.click();
         }
@@ -179,7 +183,7 @@ export class ConstructorNewPage extends ConstructorPage {
         await this.actionsList.filter({hasText: ProlicenseActions.publish}).click();
         await this.publishButton.click();
         if(scenario == "prolic") {
-            await this.filterByColumn(this.filterButtonByEnum(TableColumn.licName));
+            await this.filterByColumn(this.filterButtonByEnum(TableColumn.licName),this.prolicName);
             await this.waitForColumnFilter();
             await this.tableRow.click();
             await expect(this.prolicenseStatus(ProlicStatus.published)).toBeVisible();
@@ -220,6 +224,7 @@ export class ConstructorNewPage extends ConstructorPage {
         await ruleClassifier.addCriteriaGroups();
         await ruleClassifier.addCriterias();
         await ruleClassifier.publishRule();
+        this.ruleVersion = ruleClassifier.createdRuleVersion;
     }
     /**
      * Add experts for criteria groups

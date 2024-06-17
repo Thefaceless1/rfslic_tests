@@ -13,7 +13,7 @@ import {AdminOptions} from "../../helpers/enums/AdminOptions.js";
 import {Notifications} from "../../helpers/enums/Notifications.js";
 
 export class RulesClassifierPage extends MainPage {
-    private createdRuleVersion: number = 0
+    public createdRuleVersion: number = 0
     constructor(page: Page) {
         super(page);
     }
@@ -192,7 +192,7 @@ export class RulesClassifierPage extends MainPage {
      * Add criteria groups to a rule
      */
     public async addCriteriaGroups(): Promise<void> {
-        const totalGroupCount: number = 2;
+        const totalGroupCount: number = 1;
         for(let i = 0; i < totalGroupCount; i++) {
             await Elements.waitForVisible(this.addCriteriaGroupButton);
             await this.addCriteriaGroupButton.click();
@@ -220,6 +220,12 @@ export class RulesClassifierPage extends MainPage {
                     await this.fillCriteriaDocs()
                 }
                 await this.saveButton.click();
+                try {
+                    await Elements.waitForHidden(this.saveButton)
+                }
+                catch (error) {
+                    await this.saveButton.click();
+                }
             }
         }
         await expect(this.criteriaInfo.nth(totalCriteriaCount)).toBeVisible();

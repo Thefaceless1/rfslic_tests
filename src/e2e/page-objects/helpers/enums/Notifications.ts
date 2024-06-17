@@ -15,6 +15,5 @@ export enum Notifications {
     sanctionRemoved = "Санкция удалена",
     sanctionSaved = "Санкция сохранена",
     entryDeleted = "Запись удалена",
-    prolicenseCloned = "Пролицензия создана по образцу",
     ruleSaved = "Версия списка критериев и документов сохранена"
 }

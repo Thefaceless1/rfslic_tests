@@ -106,7 +106,7 @@ export class CommissionPage extends MainPage {
         await this.addRequestsButton.click();
         const searchModal = new SearchModalPage(this.page);
         await Elements.waitForHidden(searchModal.loadIndicator);
-        await this.filterByColumn(this.filterButtonByEnum(TableColumn.licName).last());
+        await this.filterByColumn(this.filterButtonByEnum(TableColumn.licName).last(),this.prolicName);
         await this.checkbox.first().check();
         await searchModal.selectButton.click();
         await Elements.waitForVisible(this.tableRow.first());

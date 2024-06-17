@@ -11,6 +11,7 @@ import {SanctionTypesPage} from "../../pages/admin/SanctionTypesPage.js";
 import {ViolationsPage} from "../../pages/admin/ViolationsPage.js";
 import {SanctionsPage} from "../../pages/admin/SanctionsPage.js";
 import {RulesClassifierPage} from "../../pages/admin/RulesClassifierPage.js";
+import {FinalDocumentsGroupsPage} from "../../pages/admin/FinalDocumentsGroupsPage.js";
 
 type Fixtures = {
     setUser: AuthPage,
@@ -26,7 +27,8 @@ type Fixtures = {
     sanctionTypes: SanctionTypesPage,
     violations: ViolationsPage,
     sanctions: SanctionsPage,
-    rulesClassifier: RulesClassifierPage
+    rulesClassifier: RulesClassifierPage,
+    finalDocumentsGroups: FinalDocumentsGroupsPage
 }
 export const test = base.extend<Fixtures>({
     constructor: async ({page},use) => {
@@ -141,5 +143,12 @@ export const test = base.extend<Fixtures>({
         await rulesClassifier.login();
         await use(rulesClassifier);
         await rulesClassifier.deleteRulesFromDatabase();
+    },
+    finalDocumentsGroups: async ({page},use)=> {
+        const finalDocumentsGroups = new FinalDocumentsGroupsPage(page);
+        await finalDocumentsGroups.deleteUser();
+        await finalDocumentsGroups.createUser();
+        await finalDocumentsGroups.login();
+        await use(finalDocumentsGroups);
     }
 })

@@ -7,10 +7,8 @@ import {DbHelper} from "../../../db/db-helper.js";
 import {ProlicTypes} from "../helpers/enums/ProlicTypes.js";
 
 export class BasePage extends PlaywrightDevPage{
-    protected prolicenseName: string
     constructor(page: Page) {
         super(page)
-        this.prolicenseName = ''
     }
     /**
      * Field "Select a role"
@@ -80,6 +78,10 @@ export class BasePage extends PlaywrightDevPage{
      * Field "License type"
      */
     protected licType: Locator = Elements.getElement(this.page,"//*[contains(@class,'type__control') or contains(@class,'licType__control')]")
+    /**
+     * Field "License type" values
+     */
+    protected licTypeValues: Locator = Elements.getElement(this.page,"//*[contains(@class,'type__option') or contains(@class,'licType__option')]")
     /**
      * Fields with date type
      */
@@ -229,9 +231,9 @@ export class BasePage extends PlaywrightDevPage{
     /**
      * Set a table filter by a given column
      */
-    public async filterByColumn(column: Locator): Promise<void> {
+    public async filterByColumn(column: Locator, searchText: string): Promise<void> {
         await column.click();
-        await this.searchInput.fill(this.prolicenseName);
+        await this.searchInput.fill(searchText);
         await this.searchButton.click();
     }
     /**
