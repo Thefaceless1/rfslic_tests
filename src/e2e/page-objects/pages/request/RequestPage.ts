@@ -578,13 +578,15 @@ export class RequestPage extends CommissionPage {
     /**
      * Submit a license request
      */
-    public async submitLicenseRequest(): Promise<void> {
+    public async submitLicenseRequest(prolicType: ProlicType): Promise<void> {
         await Elements.waitForVisible(this.submitRequestButton);
         await this.submitRequestButton.click();
-        await this.submitRequestOptions.click();
-        await this.submitRequestOptionsValues(SubmitRequestOptions.submitEmptyRequest).click();
-        await this.nextButton.click();
-        await this.performButton.click();
+        if(prolicType != "fin") {
+            await this.submitRequestOptions.click();
+            await this.submitRequestOptionsValues(SubmitRequestOptions.submitEmptyRequest).click();
+            await this.nextButton.click();
+            await this.performButton.click();
+        }
         await expect(this.notification(Notifications.requestAdded)).toBeVisible();
     }
     /**

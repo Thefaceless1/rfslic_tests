@@ -19,7 +19,7 @@ test.describe("Заявки на фин. контроль",() => {
             );
             await test.step(
                 "Подача заявки на фин. контроль",
-                async () => await finRequests.submitLicenseRequest()
+                async () => await finRequests.submitLicenseRequest("fin")
             );
             await test.step(
                 "Изменение сроков подачи и рассмотрения документации",

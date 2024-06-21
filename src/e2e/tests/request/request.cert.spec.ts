@@ -19,7 +19,7 @@ test.describe("Заявки на аттестацию",() => {
             );
             await test.step(
                 "Подача заявки на аттестацию",
-                async () => await certRequests.submitLicenseRequest()
+                async () => await certRequests.submitLicenseRequest("cert")
             );
             await test.step(
                 "Изменение сроков подачи и рассмотрения документации",

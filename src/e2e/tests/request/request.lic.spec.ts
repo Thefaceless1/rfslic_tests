@@ -20,7 +20,7 @@ test.describe("Заявки на лицензирование", () => {
         );
         await test.step(
             "Подача заявки на лицензирование",
-            async () => await licRequests.submitLicenseRequest()
+            async () => await licRequests.submitLicenseRequest("lic")
         );
         await test.step(
             "Изменение сроков подачи и рассмотрения документации",
