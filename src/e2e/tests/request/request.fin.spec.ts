@@ -35,7 +35,7 @@ test.describe("Заявки на фин. контроль",() => {
             );
             await test.step(
                 "Заполнение документов критериев, сотрудников и офи",
-                async () => await finRequests.addDocInfo()
+                async () => await finRequests.addDocInfo("fin")
             );
             await test.step(
                 "Добавление комментариев и решений по документам членами рабочей группы",

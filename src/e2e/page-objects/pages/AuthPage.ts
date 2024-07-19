@@ -7,10 +7,8 @@ import * as Process from "process";
 import {logger} from "../../../logger/logger.js";
 
 export class AuthPage extends BasePage {
-    private readonly prodUserMail: string = "sync-license@rfs.ru"
-    private readonly prodUserPassword: string = "RfsTest2023"
     private readonly userId: number = (Process.env.BRANCH == "prod") ? 17513354 : 11309600
-    private readonly userName: string = "Агвеуб Нсеадклра"
+    private readonly userName: string = "Угебва Нкерсалда"
     private loginAttempts: number = 3
     constructor(page: Page) {
         super(page)
@@ -75,8 +73,8 @@ export class AuthPage extends BasePage {
         await this.page.goto("");
         if (Process.env.BRANCH == "prod") {
             await Elements.waitForVisible(this.email);
-            await this.email.type(this.prodUserMail);
-            await this.password.type(this.prodUserPassword);
+            await this.email.fill(process.env.USER_LOGIN + "@rfs.ru");
+            await this.password.fill(process.env.USER_PASS!);
             await this.enterButton.click();
             await Elements.waitForVisible(this.confirmationCode);
             await this.setConfirmationCode();

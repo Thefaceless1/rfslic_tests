@@ -18,6 +18,7 @@ import {Date} from "../../../framework/elements/Dates.js";
 import {DbHelper} from "../../../../db/db-helper.js";
 import {TableColumn} from "../../helpers/enums/TableColumn.js";
 import {SubmitRequestOptions} from "../../helpers/enums/SubmitRequestOptions.js";
+import {ValidityTypes} from "../../helpers/enums/ValidityTypes.js";
 
 export class RequestPage extends CommissionPage {
     private manualSanctionCount: number = 3
@@ -150,6 +151,10 @@ export class RequestPage extends CommissionPage {
      */
     private requestFinTitle: Locator = Elements.getElement(this.page,"//*[text()='Заявка на финансовый контроль']")
     /**
+     * Field 'contains actual information'
+     */
+    private containsActualInformation: Locator = Elements.getElement(this.page,"//*[text()='Содержит актуальные сведения']")
+    /**
      * Request certification title
      */
     private requestCertificationTitle: Locator = Elements.getElement(this.page,"//*[text()='Заявка на аттестацию клуба']")
@@ -193,6 +198,14 @@ export class RequestPage extends CommissionPage {
      * Criteria status value
      */
     private criteriaStatus: Locator = Elements.getElement(this.page,"//div[contains(@class,'CriteriasInfoItem_badgeWrapper')]")
+    /**
+     * Field 'validity type'
+     */
+    private validityType: Locator = Elements.getElement(this.page,"//*[contains(@class,'validType__dropdown-indicator')]")
+    /**
+     * Field 'Calendar'
+     */
+    private calendar: Locator = Elements.getElement(this.page,"//input[@name='validDate']")
     /**
      * Title 'Specify groups for revision'
      */
@@ -246,6 +259,12 @@ export class RequestPage extends CommissionPage {
      */
     private selectLicStatusByEnum(statusValue: LicStates ): Locator {
         return Elements.getElement(this.page,`//*[contains(@class,'requestState__option') and text()='${statusValue}']`);
+    }
+    /**
+     * Field 'validity type' selected dropdown value
+     */
+    private validityTypeValue(validityType: ValidityTypes): Locator {
+        return Elements.getElement(this.page,`//*[contains(@class,'validType__option') and text()='${validityType}']`);
     }
     /**
      * Get tabs by enum
@@ -321,10 +340,11 @@ export class RequestPage extends CommissionPage {
     /**
      * Add ofi and participants to criterias and fill criteria documents
      */
-    public async addDocInfo(): Promise<void> {
-        const groupsCount = await this.criteriaGroups.count();
+    public async addDocInfo(prolicType: ProlicType): Promise<void> {
+        const groupsCount: number = await this.criteriaGroups.count();
         for(let i = groupsCount-1; i >= 0; i--) {
             await this.criteriaGroups.nth(i).click();
+            const currentCriteriaGroupName: string = await this.criteriaGroups.nth(i).innerText();
             await Elements.waitForVisible(this.criteriaInfo.first())
             const criteriaCount: number = await this.criteriaInfo.count();
             for(let m = 0; m < criteriaCount;m++) {
@@ -338,7 +358,7 @@ export class RequestPage extends CommissionPage {
                 const critTypeName : string = await this.critTypeValue.nth(x).innerText();
                 switch (critTypeName) {
                     case CriteriaType.documents : {
-                        await this.sendForVerification(currDocNumb,currMaxDocNumb);
+                        await this.sendForVerification(currDocNumb,currMaxDocNumb,prolicType,currentCriteriaGroupName);
                         currDocNumb+=step;
                         currMaxDocNumb+=step;
                         break;
@@ -346,23 +366,23 @@ export class RequestPage extends CommissionPage {
                     default : {
                         (critTypeName == CriteriaType.member) ? await this.editMemberButton.click() : await this.editOfiButton.click();
                         await this.fillSearchModalData();
-                        await this.sendForVerification(currDocNumb,currMaxDocNumb);
+                        await this.sendForVerification(currDocNumb,currMaxDocNumb,prolicType,currentCriteriaGroupName);
                         currDocNumb+=step;
                         currMaxDocNumb+=step;
                     }
                 }
             }
         }
-        await this.addGeneralDocInfo();
+        await this.addGeneralDocInfo(prolicType);
     }
     /**
      * Fill criteria documents in general info
      */
-    private async addGeneralDocInfo(): Promise<void> {
+    private async addGeneralDocInfo(prolicType: ProlicType): Promise<void> {
         await this.sectionByEnum(RequestSections.generalInfo).click();
         await Elements.waitForVisible(this.addDocument.last());
         const docsCount : number = await this.addDocument.count();
-        await this.sendForVerification(0,docsCount);
+        await this.sendForVerification(0,docsCount,prolicType);
     }
     /**
      * Edit license status by enum
@@ -508,12 +528,12 @@ export class RequestPage extends CommissionPage {
     /**
      * Send documents for verification
      */
-    private async sendForVerification(currDocNumb: number,currMaxDocNumb: number): Promise<void> {
+    private async sendForVerification(currDocNumb: number,currMaxDocNumb: number, prolicType: ProlicType, criGroupName?: string): Promise<void> {
         for(let c = currDocNumb;c < currMaxDocNumb; c++) {
             await this.docTooltip.nth(c).click();
             await this.addDocument.nth(c).click();
             await Elements.waitForVisible(this.saveButton);
-            await this.fillDocsAndComment();
+            await this.fillDocsAndComment(prolicType,criGroupName);
             await this.checkCommentValue(c);
             await expect(this.attachedFile.nth(c)).toBeVisible();
             await this.submitReviewButton.nth(c).click();
@@ -592,7 +612,15 @@ export class RequestPage extends CommissionPage {
     /**
      * Add files and comments for license documents
      */
-    protected async fillDocsAndComment(): Promise<void> {
+    protected async fillDocsAndComment(prolicType: ProlicType, criGroupName?: string): Promise<void> {
+        const criGroupWithoutExpirationDate: string = "Финансовые критерии";
+        if(prolicType != "fin" && criGroupName != criGroupWithoutExpirationDate) {
+            const validityTypesValues: ValidityTypes[] = Object.values(ValidityTypes)
+            const randomValidityType: ValidityTypes = validityTypesValues[randomInt(0,validityTypesValues.length)];
+            await this.validityType.click();
+            await this.validityTypeValue(randomValidityType).click();
+            if(randomValidityType == ValidityTypes.untilSpecificDate) await Date.fillDateInput(this.calendar,InputData.currentDate);
+        }
         await Input.uploadFiles(this.templates.first(),"all");
         await Elements.waitForVisible(this.docIcon);
         await Elements.waitForVisible(this.xlsxIcon);
@@ -708,5 +736,12 @@ export class RequestPage extends CommissionPage {
         const returnRfuViolationName: string = await dbHelper.getReturnRfuViolationName();
         await dbHelper.closeConnect();
         return returnRfuViolationName;
+    }
+    /**
+     * Checking for the presence of the "contains actual information" attribute
+     */
+    public async checkActualInformationAttribute(prolicType: ProlicType): Promise<void> {
+        if(prolicType == "cert") await this.acceptedDecision.click();
+        await expect(this.containsActualInformation).toBeVisible();
     }
 }

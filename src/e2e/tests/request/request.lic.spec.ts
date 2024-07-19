@@ -36,7 +36,7 @@ test.describe("Заявки на лицензирование", () => {
         );
         await test.step(
             "Заполнение документов критериев, сотрудников и офи",
-            async () => await licRequests.addDocInfo()
+            async () => await licRequests.addDocInfo("lic")
         );
         await test.step(
             "Добавление комментариев и решений по документам экспертов групп критериев",
@@ -69,6 +69,10 @@ test.describe("Заявки на лицензирование", () => {
         await test.step(
             "Просмотр утвержденных санкций на табе 'Комиссии' в заявке",
             async () => await licRequests.viewApprovedSanctions()
+        );
+        await test.step(
+            "Получение заявкой признака 'Содержит актуальные сведения'",
+            async () => await licRequests.checkActualInformationAttribute("lic")
         );
     })
 })

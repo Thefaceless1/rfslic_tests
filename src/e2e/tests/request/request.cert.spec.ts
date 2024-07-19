@@ -35,7 +35,7 @@ test.describe("Заявки на аттестацию",() => {
             );
             await test.step(
                 "Заполнение документов критериев, сотрудников и офи",
-                async () => await certRequests.addDocInfo()
+                async () => await certRequests.addDocInfo("cert")
             );
             await test.step(
                 "Добавление комментариев и решений по документам экспертами групп критериев",
@@ -52,6 +52,10 @@ test.describe("Заявки на аттестацию",() => {
             await test.step(
                 "Вынесение решения комиссии по заявке на аттестацию",
                 async () => await certRequests.addCommissionDecision("cert")
+            );
+            await test.step(
+                "Получение заявкой признака 'Содержит актуальные сведения'",
+                async () => await certRequests.checkActualInformationAttribute("cert")
             );
         })
 })
