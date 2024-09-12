@@ -8,8 +8,8 @@ import {ConstructorPage} from "./ConstructorPage.js";
 import {TableColumn} from "../../helpers/enums/TableColumn.js";
 import {Notifications} from "../../helpers/enums/Notifications.js";
 import {ProlicStatus} from "../../helpers/enums/ProlicStatus.js";
-import {ProlicType} from "../../helpers/types/prolic.type.js";
-import {ScenarioType} from "../../helpers/types/scenario.type.js";
+import {ProlicType} from "../../helpers/types/ProlicType";
+import {ScenarioType} from "../../helpers/types/ScenarioType";
 import {ProlicTypes} from "../../helpers/enums/ProlicTypes.js";
 import {RulesClassifierPage} from "../admin/RulesClassifierPage.js";
 import {MainMenuOptions} from "../../helpers/enums/MainMenuOptions.js";
@@ -177,7 +177,7 @@ export class ConstructorNewPage extends ConstructorPage {
         if(scenario == "prolic") {
             await this.filterByColumn(this.filterButtonByEnum(TableColumn.licName),this.prolicName);
             await this.waitForColumnFilter();
-            await this.tableRow.click();
+            await this.tableRow.click({clickCount: 2,delay: 500});
         }
         await this.actionButton.click();
         await this.actionsList.filter({hasText: ProlicenseActions.publish}).click();
@@ -185,7 +185,7 @@ export class ConstructorNewPage extends ConstructorPage {
         if(scenario == "prolic") {
             await this.filterByColumn(this.filterButtonByEnum(TableColumn.licName),this.prolicName);
             await this.waitForColumnFilter();
-            await this.tableRow.click();
+            await this.tableRow.click({clickCount: 2,delay: 500});
             await expect(this.prolicenseStatus(ProlicStatus.published)).toBeVisible();
         }
     }

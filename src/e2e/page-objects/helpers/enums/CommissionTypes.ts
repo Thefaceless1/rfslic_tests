@@ -1,5 +1,6 @@
 export enum CommissionTypes {
     certification = "Аттестация",
     finControl = "Фин. контроль",
-    licensing = "Лицензирование"
+    licensing = "Лицензирование",
+    change = "Изменение"
 }

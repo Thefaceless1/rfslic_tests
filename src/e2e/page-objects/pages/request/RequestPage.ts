@@ -13,7 +13,7 @@ import {Notifications} from "../../helpers/enums/Notifications.js";
 import {Pages} from "../../helpers/enums/Pages.js";
 import {CommissionPage} from "../commissions/CommissionPage.js";
 import * as Process from "process";
-import {ProlicType} from "../../helpers/types/prolic.type.js";
+import {ProlicType} from "../../helpers/types/ProlicType";
 import {Date} from "../../../framework/elements/Dates.js";
 import {DbHelper} from "../../../../db/db-helper.js";
 import {TableColumn} from "../../helpers/enums/TableColumn.js";
@@ -32,15 +32,15 @@ export class RequestPage extends CommissionPage {
     /**
      * Criteria information field
      */
-    private criteriaInfo: Locator = Elements.getElement(this.page,"//span[contains(@class,'CriteriasInfoItem-module_collapse_title')]")
+    private criteriaInfo: Locator = Elements.getElement(this.page,`//div[@class='Collapse-LabelText']//span[contains(text(),'${InputData.testName("criteria")}')]`)
     /**
      * Member criteria information field
      */
-    private memberCriteriaInfo: Locator = Elements.getElement(this.page,"//*[text()='ФИО Участника:']")
+    private memberCriteriaInfo: Locator = Elements.getElement(this.page,"//a//preceding-sibling::span[text()='ФИО Участника:']")
     /**
      * OFI criteria information field
      */
-    private ofiCriteriaInfo: Locator = Elements.getElement(this.page,"//*[text()='Наименование ОФИ:']")
+    private ofiCriteriaInfo: Locator = Elements.getElement(this.page,"//a//preceding-sibling::span[text()='Наименование ОФИ:']")
     /**
      * Document status confirmation button
      */
@@ -54,17 +54,17 @@ export class RequestPage extends CommissionPage {
      */
     private docStatesList: Locator = Elements.getElement(this.page,"//*[contains(@class,'docState__option')]")
     /**
-     * Selected status near the document name
+     * Selected status near document name or missing member/ofi
      */
-    private statusNearDoc: Locator = Elements.getElement(this.page,"//*[contains(@class,'DocumentInfo')]//*[contains(@class,'Badge_view')]")
-    /**
-     * Selected status in the "Document Decision" field
-     */
-    private selectedStatus: Locator = Elements.getElement(this.page,"//*[contains(@class,'docState__single-value') or contains(@class,'docState__placeholder')]")
+    private entityState: Locator = Elements.getElement(this.page,"//div[contains(@class,'missing') or contains(@class,'DocumentInfo') or contains(@class,'CriteriaExternal-module_isDeleted')]//div[contains(@class,'Badge_status')]")
     /**
      * Expert comment
      */
     private reviewComment: Locator = Elements.getElement(this.page,"//textarea[@name='reviewComment']")
+    /**
+     * Selected status near document name
+     */
+    private documentState: Locator = Elements.getElement(this.page,"//div[contains(@class,'DocumentInfo')]//div[contains(@class,'Badge_status')]")
     /**
      * Field "License decision"
      */
@@ -100,15 +100,27 @@ export class RequestPage extends CommissionPage {
     /**
      * Field "Club worker comment"
      */
-    private clubWorkerComment: Locator = Elements.getElement(this.page,"//*[contains(@class,'DocumentInfo') and contains(@class,'hyphens')]")
+    private clubWorkerComment: Locator = Elements.getElement(this.page,"//div[text()='Комментарий представителя футбольного клуба:']/following-sibling::div[1][not(contains(text(),'-'))]")
     /**
-     * Button "submit a document for review"
+     * Button "Send a document for review"
      */
-    private submitReviewButton: Locator = Elements.getElement(this.page,"//span[contains(@class,'IconSendMessage')]")
+    private sendReviewButton: Locator = Elements.getElement(this.page,"//div[contains(@class,'DocumentInfo')]//button//span[text()='Отправить']")
+    /**
+     * Button "Send a document for review for missing member or ofi"
+     */
+    private sendMissingEntityReviewButton: Locator = Elements.getElement(this.page,"//*[@class='mr-1']//button[not(@disabled)]//span[text()='Отправить']")
     /**
      * Button "Edit OFI"
      */
-    private editOfiButton: Locator = Elements.getElement(this.page,"//button[@name='editButtonOfi']")
+    private editOfiButton: Locator = Elements.getElement(this.page,"//button[@name='editButtonOfi' and not(@disabled)]")
+    /**
+     * Button "Add Member"
+     */
+    private addMember: Locator = Elements.getElement(this.page,"//span[text()='Добавить Участника']")
+    /**
+     * Button "Add Ofi"
+     */
+    private addOfi: Locator = Elements.getElement(this.page,"//span[text()='Добавить ОФИ']")
     /**
      * Button "Perform"
      */
@@ -120,16 +132,23 @@ export class RequestPage extends CommissionPage {
     /**
      * Button "Edit Member"
      */
-    private editMemberButton: Locator = Elements.getElement(this.page,"//button[@name='editButtonMember']")
+    private editMemberButton: Locator = Elements.getElement(this.page,"//button[@name='editButtonMember' and not(@disabled)]")
     /**
      * Button "->" in the left corner of the table
      */
     private arrow: Locator = Elements.getElement(this.page,"(//td[contains(@class,'fix-left')]/button)[1]")
-
+    /**
+     * Checkbox for documents on the screen form for selecting replacement documents
+     */
+    private documentCheckbox: Locator = Elements.getElement(this.page,"//td//label//span//input[@type='checkbox']")
     /**
      * Button "Go to request"
      */
     private goToRequest: Locator = Elements.getElement(this.page,"//span[text()='Перейти к заявке']")
+    /**
+     * Checkbox "Member or Ofi is missing"
+     */
+    private isMissingCheckbox: Locator = Elements.getElement(this.page,"//input[@name='isMissing']")
     /**
      * Button "Publish a request"
      */
@@ -139,6 +158,10 @@ export class RequestPage extends CommissionPage {
      */
     private selectClub: Locator = Elements.getElement(this.page,"//*[contains(@class,'club__control')]")
     /**
+     * Field "Comment on absence"
+     */
+    private absenceComment: Locator = Elements.getElement(this.page,"//textarea[@name='missingComment']")
+    /**
      * Values of the drop-down list of the field "Select a club"
      */
     private selectClubList: Locator = Elements.getElement(this.page,"//*[contains(@class,'club__option')]")
@@ -147,17 +170,53 @@ export class RequestPage extends CommissionPage {
      */
     private requestLicTitle: Locator = Elements.getElement(this.page,"//*[text()='Заявка на лицензирование клуба']")
     /**
+     * Criteria group expansion icon
+     */
+    private criteriaGroupExpansionIcon: Locator = Elements.getElement(this.page,"//span[contains(text(),'критерии')]//..//preceding-sibling::span")
+    /**
      * Request finance control title
      */
     private requestFinTitle: Locator = Elements.getElement(this.page,"//*[text()='Заявка на финансовый контроль']")
+    /**
+     * Change comment from football club
+     */
+    private clubChangeComment: Locator = Elements.getElement(this.page,"//div[text()='Комментарий-основание замены от представителя футбольного клуба:']/following-sibling::div[1][not(contains(text(),'-'))]")
     /**
      * Field 'contains actual information'
      */
     private containsActualInformation: Locator = Elements.getElement(this.page,"//*[text()='Содержит актуальные сведения']")
     /**
+     * Change document from football club field title
+     */
+    private clubChangeDocumentTitle: Locator = Elements.getElement(this.page,"//div[text()='Документ-основание замены']")
+    /**
+     * Change document from football club
+     */
+    private clubChangeDocument: Locator = Elements.getElement(this.page,"//div[text()='Документ-основание замены']/following-sibling::div[1][contains(@class,'DocumentInfo-module_file_wrapper')]")
+    /**
+     * Title 'Request for change'
+     */
+    private requestForChangeTitle: Locator = Elements.getElement(this.page,"//div[text()='Заявка на изменение']")
+    /**
+     * Button 'Delete a member'
+     */
+    private deleteMemberButton: Locator = Elements.getElement(this.page,"//button[@data-tooltip-content='Удалить Участника']")
+    /**
      * Request certification title
      */
     private requestCertificationTitle: Locator = Elements.getElement(this.page,"//*[text()='Заявка на аттестацию клуба']")
+    /**
+     * Field 'Comment for replacement'
+     */
+    private replacementComment: Locator = Elements.getElement(this.page,"//textarea[@name='changeComment']")
+    /**
+     * Field 'Documents for replacement'
+     */
+    private replacementDocument: Locator = Elements.getElement(this.page,"//button[@name='changeDocFiles']//..//preceding-sibling::input[@type='file']")
+    /**
+     * Orange frame of the remote member/ofi
+     */
+    private removedEntityFrame: Locator = Elements.getElement(this.page,"//div[contains(@class,'CriteriaExternal-module_isDeleted')]")
     /**
      * Name of an expert report file
      */
@@ -175,13 +234,21 @@ export class RequestPage extends CommissionPage {
      */
     private workingMemberReportFile: Locator = Elements.getElement(this.page,"//span[contains(text(),'Отчет члена рабочей группы')]")
     /**
+     * Checkbox for member or ofi criterias on the screen form for selecting replacement documents
+     */
+    private memberOrOfiCriteriaCheckbox: Locator = Elements.getElement(this.page,"//span[contains(@class,'IconAdd')]//..//following-sibling::div//label//span//input[@type='checkbox']")
+    /**
+     * Checkbox for member or ofi on the screen form for selecting replacement documents
+     */
+    private memberOrOfiCheckbox: Locator = Elements.getElement(this.page,"//span[contains(@class,'IconTrash')]//..//following-sibling::div//label//span//input[@type='checkbox']")
+    /**
      * Currently displayed license status
      */
     private currentLicStatus: Locator = Elements.getElement(this.page,"//*[contains(@class,'requestStateBadgeWrapper')]//*[contains(@class,'Badge_view_filled')]")
     /**
-     * File attached to the document
+     * Club document
      */
-    private attachedFile: Locator = Elements.getElement(this.page,"//*[contains(@class,'DocumentInfo-module_file_wrapper')][1]")
+    private clubDocument: Locator = Elements.getElement(this.page,"//div[text()='Прикрепленные документы:']/following-sibling::div[1][contains(@class,'DocumentInfo-module_file_wrapper')]")
     /**
      * Button "Add" (+)
      */
@@ -203,6 +270,10 @@ export class RequestPage extends CommissionPage {
      */
     private validityType: Locator = Elements.getElement(this.page,"//*[contains(@class,'validType__dropdown-indicator')]")
     /**
+     * Button 'Add request for change'
+     */
+    private addRequestForChangeButton: Locator = Elements.getElement(this.page,"//button[text()='Подать заявку на изменение']")
+    /**
      * Field 'Calendar'
      */
     private calendar: Locator = Elements.getElement(this.page,"//input[@name='validDate']")
@@ -210,6 +281,10 @@ export class RequestPage extends CommissionPage {
      * Title 'Specify groups for revision'
      */
     private specifyGroupForRevision: Locator = Elements.getElement(this.page,"//*[text()='Укажите группы для доработки']")
+    /**
+     * Imported sanction text
+     */
+    private importedSanctionText: Locator = Elements.getElement(this.page,"//td[contains(text(),'Импортировано из заявки')]")
     /**
      * Field 'Select violation'
      */
@@ -219,9 +294,9 @@ export class RequestPage extends CommissionPage {
      */
     private violationValues: Locator = Elements.getElement(this.page,"//*[contains(@class,'violation__option')]")
     /**
-     * Violation name
+     * Added sanction
      */
-    private violationName: Locator = Elements.getElement(this.page,"//td[contains(@class,'RequestSanctions-module_violationName')]")
+    private addedSanction: Locator = Elements.getElement(this.page,"//td[contains(@class,'RequestSanctions-module_violationName')]/following-sibling::td[3][not(contains(text(),'Импортировано из заявки'))]")
     /**
      * Message 'Obligatory field'
      */
@@ -273,6 +348,14 @@ export class RequestPage extends CommissionPage {
         return Elements.getElement(this.page,`//button[text()='${section}']`);
     }
     /**
+     * Display absence of Ofi or member for criteria
+     */
+    private missingEntity(entity: CriteriaType): Locator {
+        return (entity == CriteriaType.member) ?
+            Elements.getElement(this.page,`//*[text()='Участник отсутствует']`) :
+            Elements.getElement(this.page,`//*[text()='ОФИ отсутствует']`);
+    }
+    /**
      * Dropdown values in the field 'Submit request options'
      */
     private submitRequestOptionsValues(optionName: SubmitRequestOptions): Locator {
@@ -320,12 +403,17 @@ export class RequestPage extends CommissionPage {
     /**
      * Add data from the modal search window for club workers, organizations, ofi
      */
-    private async fillSearchModalData(): Promise<void> {
+    private async addMemberOrOfi(entityType: CriteriaType,isChangeRequest?: boolean): Promise<void> {
+        (entityType == CriteriaType.member) ?
+            await this.editMemberButton.nth(1).click() :
+            (isChangeRequest) ?
+                await this.editOfiButton.click() :
+                await this.editOfiButton.nth(1).click();
         const searchModal = new SearchModalPage(this.page);
         await this.searchDataButton.click();
         await searchModal.findButton.click();
         await Elements.waitForHidden(searchModal.loadIndicator);
-        await searchModal.radio.first().click();
+        (isChangeRequest) ? await searchModal.radio.last().click() : await searchModal.radio.first().click();
         await searchModal.selectButton.click();
         await this.saveButton.click();
         await this.closeNotifications("last");
@@ -340,7 +428,8 @@ export class RequestPage extends CommissionPage {
     /**
      * Add ofi and participants to criterias and fill criteria documents
      */
-    public async addDocInfo(prolicType: ProlicType): Promise<void> {
+    public async fillRequestEntities(prolicType: ProlicType, isChangeRequest: boolean): Promise<void> {
+        if(isChangeRequest) await this.sectionByEnum(RequestSections.criterias).click();
         const groupsCount: number = await this.criteriaGroups.count();
         for(let i = groupsCount-1; i >= 0; i--) {
             await this.criteriaGroups.nth(i).click();
@@ -350,30 +439,54 @@ export class RequestPage extends CommissionPage {
             for(let m = 0; m < criteriaCount;m++) {
                 await this.criteriaInfo.nth(m).click();
                 await Elements.waitForVisible(this.critTypeValue.nth(m));
-            }
-            let currMaxDocNumb: number = await this.submitReviewButton.count()/criteriaCount;
-            const step: number = currMaxDocNumb;
-            let currDocNumb: number = 0;
-            for (let x = 0; x < criteriaCount; x++) {
-                const critTypeName : string = await this.critTypeValue.nth(x).innerText();
-                switch (critTypeName) {
-                    case CriteriaType.documents : {
-                        await this.sendForVerification(currDocNumb,currMaxDocNumb,prolicType,currentCriteriaGroupName);
-                        currDocNumb+=step;
-                        currMaxDocNumb+=step;
+                const criteriaType: string = await this.critTypeValue.nth(m).innerText();
+                switch (criteriaType) {
+                    case CriteriaType.member:
+                        if(isChangeRequest) {
+                            await this.deleteMemberButton.click();
+                            await this.deleteButton.click();
+                            await Elements.waitForVisible(this.removedEntityFrame);
+                            await this.sendMissingEntityReviewButton.click();
+                            await this.performButton.click();
+                        }
+                        else {
+                            await this.addMissingMemberOrOfi(CriteriaType.member);
+                            await this.addMemberOrOfi(CriteriaType.member);
+                        }
                         break;
-                    }
-                    default : {
-                        (critTypeName == CriteriaType.member) ? await this.editMemberButton.click() : await this.editOfiButton.click();
-                        await this.fillSearchModalData();
-                        await this.sendForVerification(currDocNumb,currMaxDocNumb,prolicType,currentCriteriaGroupName);
-                        currDocNumb+=step;
-                        currMaxDocNumb+=step;
-                    }
+                    case CriteriaType.ofi:
+                        if(isChangeRequest) await this.addMemberOrOfi(CriteriaType.ofi,true);
+                        else {
+                            await this.addMissingMemberOrOfi(CriteriaType.ofi);
+                            await this.addMemberOrOfi(CriteriaType.ofi);
+                        }
+                }
+            }
+            const docsCount: number = await this.addDocument.count();
+            for (let m = 0; m < docsCount; m++) {
+                await this.sendForVerification(m,prolicType,isChangeRequest,currentCriteriaGroupName);
+            }
+            if(!isChangeRequest) {
+                const missingEntitiesCount: number = await this.sendMissingEntityReviewButton.count();
+                for (let m = 0; m < missingEntitiesCount; m++) {
+                    await this.sendForVerificationMessingEntity(m);
                 }
             }
         }
-        await this.addGeneralDocInfo(prolicType);
+        if(!isChangeRequest) await this.addGeneralDocInfo(prolicType);
+    }
+    /**
+     * Add missing member or ofi
+     */
+    private async addMissingMemberOrOfi(entity: CriteriaType): Promise<void> {
+        (entity == CriteriaType.member) ? await this.addMember.click() : await this.addOfi.click();
+        (entity == CriteriaType.member) ? await this.editMemberButton.click() : await this.editOfiButton.click();
+        await this.isMissingCheckbox.click();
+        await this.absenceComment.fill(InputData.randomWord);
+        await this.saveButton.click();
+        (entity == CriteriaType.member) ?
+            await expect(this.missingEntity(CriteriaType.member)).toBeVisible() :
+            await expect(this.missingEntity(CriteriaType.ofi)).toBeVisible();
     }
     /**
      * Fill criteria documents in general info
@@ -382,7 +495,9 @@ export class RequestPage extends CommissionPage {
         await this.sectionByEnum(RequestSections.generalInfo).click();
         await Elements.waitForVisible(this.addDocument.last());
         const docsCount : number = await this.addDocument.count();
-        await this.sendForVerification(0,docsCount,prolicType);
+        for (let i = 0; i < docsCount; i++) {
+            await this.sendForVerification(i,prolicType,false);
+        }
     }
     /**
      * Edit license status by enum
@@ -416,35 +531,41 @@ export class RequestPage extends CommissionPage {
             await this.reviewComment.nth(i).type(InputData.randomWord);
             await this.docStates.nth(i).click();
             await Elements.waitForVisible(this.docStatesList.last());
-            const randomStateNumb = randomInt(0,await this.docStatesList.count());
+            const randomStateNumb: number = randomInt(0,await this.docStatesList.count());
             const selectedState: string = await this.docStatesList.nth(randomStateNumb).innerText();
             await this.docStatesList.nth(randomStateNumb).click();
             (reason == "generalInfo") ?
                 await this.checkButton.nth(currentIndex).click() :
                 await this.checkButton.nth(i).click();
+            await expect(this.entityState.nth(i)).toHaveText(selectedState);
             await this.closeNotifications("last");
-            await this.waitForDisplayStatus(i);
             if(selectedState == DocStatus.notAccepted) currentIndex++;
         }
     }
     /**
      * Add comments and statuses for documents
      */
-    public async addExpertInfo(prolicType: ProlicType): Promise<void> {
-        let docsCount: number = await this.checkButton.count();
-        await this.fillStatusAndComment(docsCount,"generalInfo");
-        await this.sectionByEnum(RequestSections.criterias).click();
+    public async addExpertSolution(prolicType: ProlicType, isChangeRequest: boolean): Promise<void> {
+        if(!isChangeRequest) {
+            const docsCount: number = await this.checkButton.count();
+            await this.fillStatusAndComment(docsCount,"generalInfo");
+            await this.sectionByEnum(RequestSections.criterias).click();
+        }
         const groupsCount: number = await this.criteriaGroups.count();
         for(let i = 0; i<groupsCount; i++) {
             await this.criteriaGroups.nth(i).click();
             const criteriaCount: number = await this.criteriaInfo.count();
-            for(let c = 0; c<criteriaCount; c++) {
-                await this.criteriaInfo.nth(c).click();
-                const criteriaType : string = await this.critTypeValue.nth(c).innerText();
-                if(criteriaType == CriteriaType.member) await this.memberCriteriaInfo.click();
-                else if(criteriaType == CriteriaType.ofi) await this.ofiCriteriaInfo.click();
+            if(!isChangeRequest) {
+                for(let c = 0; c<criteriaCount; c++) {
+                    await this.criteriaInfo.nth(c).click();
+                    const criteriaType : string = await this.critTypeValue.nth(c).innerText();
+                    if(criteriaType == CriteriaType.member) await this.memberCriteriaInfo.click();
+                    else if(criteriaType == CriteriaType.ofi) await this.ofiCriteriaInfo.click();
+                }
             }
-            docsCount = await this.checkButton.count();
+            // Added to avoid error "This group of criteria contains documents for which the RFU Expert's decision is not indicated."
+            await this.page.waitForTimeout(1000)
+            const docsCount: number = await this.checkButton.count();
             await this.fillStatusAndComment(docsCount,"criterias");
             await this.checkCriteriaStates(docsCount,criteriaCount);
             await this.fillExpertSolution(prolicType);
@@ -459,26 +580,26 @@ export class RequestPage extends CommissionPage {
      * Checking criteria statuses based on child documents
      */
     private async checkCriteriaStates(docsCount: number, criteriaCount: number): Promise<void> {
-        const criteriaStatuses: string[] = await this.criteriaStatus.allInnerTexts();
-        const docsStatuses: string[] = await this.docStates.allInnerTexts();
+        const criteriaStates: string[] = await this.criteriaStatus.allInnerTexts();
+        const docsStates: string[] = await this.docStates.allInnerTexts();
         const docsCountPerCriteria: number = docsCount/criteriaCount;
         let startIndexForDocsArray: number = 0;
-        criteriaStatuses.forEach(criteriaStatus => {
-            const docsArrayForCurrentCriteria: string[] = docsStatuses.slice(startIndexForDocsArray, docsCountPerCriteria + startIndexForDocsArray);
+        criteriaStates.forEach(criteriaState => {
+            const docsArrayForCurrentCriteria: string[] = docsStates.slice(startIndexForDocsArray, docsCountPerCriteria + startIndexForDocsArray);
             if(docsArrayForCurrentCriteria.includes(DocStatus.form)) {
-                expect(criteriaStatus.toLowerCase()).toBe(DocStatus.form.toLowerCase());
+                expect(criteriaState.toLowerCase()).toBe(DocStatus.form.toLowerCase());
             }
             else if(docsArrayForCurrentCriteria.includes(DocStatus.notAccepted)) {
-                expect(criteriaStatus.toLowerCase()).toBe(DocStatus.notAccepted.toLowerCase());
+                expect(criteriaState.toLowerCase()).toBe(DocStatus.notAccepted.toLowerCase());
             }
             else if(docsArrayForCurrentCriteria.includes(DocStatus.underReview)) {
-                expect(criteriaStatus.toLowerCase()).toBe(DocStatus.underReview.toLowerCase());
+                expect(criteriaState.toLowerCase()).toBe(DocStatus.underReview.toLowerCase());
             }
             else if(docsArrayForCurrentCriteria.includes(DocStatus.acceptedWithCondition)) {
-                expect(criteriaStatus.toLowerCase()).toBe(DocStatus.acceptedWithCondition.toLowerCase());
+                expect(criteriaState.toLowerCase()).toBe(DocStatus.acceptedWithCondition.toLowerCase());
             }
             else {
-                expect(criteriaStatus.toLowerCase()).toBe(DocStatus.accepted.toLowerCase());
+                expect(criteriaState.toLowerCase()).toBe(DocStatus.accepted.toLowerCase());
             }
             startIndexForDocsArray += docsCountPerCriteria;
         })
@@ -501,17 +622,6 @@ export class RequestPage extends CommissionPage {
         else expect(conclusionText).not.toBeNull();
     }
     /**
-     * Waiting for a status update near the document name in accordance with the selected status
-     */
-    private async waitForDisplayStatus(statusNumb: number): Promise<void> {
-        const selectedStatusText: string = await this.selectedStatus.nth(statusNumb).innerText();
-        const nearDocStatusText: string = await this.statusNearDoc.nth(statusNumb).innerText();
-        if ((selectedStatusText == DocStatus.selectSolution && nearDocStatusText.toLowerCase() != DocStatus.underReview.toLowerCase()) ||
-            (selectedStatusText.toLowerCase() != nearDocStatusText.toLowerCase() && selectedStatusText != DocStatus.selectSolution)) {
-            await this.waitForDisplayStatus(statusNumb);
-        }
-    }
-    /**
      * Add an expert report
      */
     private async fillExpertSolution(prolicType: ProlicType): Promise<void> {
@@ -526,27 +636,41 @@ export class RequestPage extends CommissionPage {
         }
     }
     /**
-     * Send documents for verification
+     * Filling and sending documents and missing members/ofi for verification
      */
-    private async sendForVerification(currDocNumb: number,currMaxDocNumb: number, prolicType: ProlicType, criGroupName?: string): Promise<void> {
-        for(let c = currDocNumb;c < currMaxDocNumb; c++) {
-            await this.docTooltip.nth(c).click();
-            await this.addDocument.nth(c).click();
-            await Elements.waitForVisible(this.saveButton);
-            await this.fillDocsAndComment(prolicType,criGroupName);
-            await this.checkCommentValue(c);
-            await expect(this.attachedFile.nth(c)).toBeVisible();
-            await this.submitReviewButton.nth(c).click();
-            await this.closeNotifications("last");
-            await this.waitForDisplayStatus(c);
+    private async sendForVerification(currentDocIndex: number,prolicType: ProlicType,isChangeRequest: boolean, critGroupName?: string): Promise<void> {
+        (isChangeRequest) ? await this.expandChangeRequestEntity(currentDocIndex) : await this.docTooltip.nth(currentDocIndex).click();
+        await this.addDocument.nth(currentDocIndex).click();
+        await Elements.waitForVisible(this.saveButton);
+        await this.fillDocsAndComment(prolicType,isChangeRequest,critGroupName);
+        if(isChangeRequest) {
+            await expect(this.clubChangeComment.nth(currentDocIndex)).toBeVisible();
+            await expect(this.clubChangeDocument.nth(currentDocIndex)).toBeVisible();
         }
+        else {
+            await expect(this.clubWorkerComment.nth(currentDocIndex)).toBeVisible();
+            await expect(this.clubDocument.nth(currentDocIndex)).toBeVisible();
+        }
+        await this.sendReviewButton.nth(currentDocIndex).click();
+        await this.closeNotifications("last");
     }
     /**
-     * Check entered comment value
+     * Send missing member or ofi for verification
      */
-    private async checkCommentValue(commentNumber: number): Promise<void> {
-        const currentComment: string = await this.clubWorkerComment.nth(commentNumber).innerText();
-        if(currentComment == "-") await this.checkCommentValue(commentNumber);
+    private async sendForVerificationMessingEntity(missingEntityCurrentIndex: number): Promise<void> {
+        await this.sendMissingEntityReviewButton.nth(missingEntityCurrentIndex).click();
+        await this.submitButton.click();
+    }
+    /**
+     * Expand entity in request for change
+     */
+    private async expandChangeRequestEntity(docIndex: number): Promise<void> {
+        const currentDocumentState: string = await this.documentState.nth(docIndex).innerText();
+        if(currentDocumentState.toLowerCase() == DocStatus.form.toLowerCase()) {
+            (docIndex == 0) ? await this.reviewComment.nth(docIndex).click() : await this.reviewComment.nth(docIndex+1).click()
+            await this.page.waitForTimeout(500);
+            if(!await this.clubChangeDocumentTitle.nth(docIndex).isVisible()) await this.expandChangeRequestEntity(docIndex);
+        }
     }
     /**
      * Select a club from the dropdown list of values
@@ -612,9 +736,9 @@ export class RequestPage extends CommissionPage {
     /**
      * Add files and comments for license documents
      */
-    protected async fillDocsAndComment(prolicType: ProlicType, criGroupName?: string): Promise<void> {
+    protected async fillDocsAndComment(prolicType: ProlicType,isChangeRequest: boolean, critGroupName?: string): Promise<void> {
         const criGroupWithoutExpirationDate: string = "Финансовые критерии";
-        if(prolicType != "fin" && criGroupName != criGroupWithoutExpirationDate) {
+        if(prolicType != "fin" && critGroupName && critGroupName != criGroupWithoutExpirationDate) {
             const validityTypesValues: ValidityTypes[] = Object.values(ValidityTypes)
             const randomValidityType: ValidityTypes = validityTypesValues[randomInt(0,validityTypesValues.length)];
             await this.validityType.click();
@@ -625,6 +749,10 @@ export class RequestPage extends CommissionPage {
         await Elements.waitForVisible(this.docIcon);
         await Elements.waitForVisible(this.xlsxIcon);
         await this.comment.fill(InputData.randomWord);
+        if(isChangeRequest) {
+            await Input.uploadFiles(this.replacementDocument.first(),"all");
+            await this.replacementComment.fill(InputData.randomWord);
+        }
         await this.saveButton.click();
         await Elements.waitForHidden(this.saveButton);
         await this.closeNotifications("last");
@@ -632,9 +760,9 @@ export class RequestPage extends CommissionPage {
     /**
      * Add commission decision for created license
      */
-    public async addCommissionDecision(prolicType: ProlicType): Promise<void> {
+    public async addCommissionDecision(prolicType: ProlicType,isChangeRequest: boolean): Promise<void> {
         await this.page.goto(Pages.commissionPage);
-        await this.createMeeting(prolicType);
+        await this.createMeeting(prolicType,isChangeRequest);
         await this.addRequestToMeeting();
         await this.addRequestDecision(prolicType);
     }
@@ -685,8 +813,8 @@ export class RequestPage extends CommissionPage {
             }
         }
         await this.page.reload();
-        await Elements.waitForVisible(this.violationName.first());
-        expect(await this.violationName.count()).toBe(this.manualSanctionCount);
+        await Elements.waitForVisible(this.addedSanction.first());
+        expect(await this.addedSanction.count()).toBe(this.manualSanctionCount);
     }
     /**
      * Remove a sanction
@@ -710,11 +838,13 @@ export class RequestPage extends CommissionPage {
     /**
      * View approved sanctions
      */
-    public async viewApprovedSanctions(): Promise<void> {
-        await this.acceptedDecision.click();
+    public async viewApprovedSanctions(isAfterAcceptChangeRequest: boolean): Promise<void> {
+        await this.acceptedDecision.click({clickCount: 2});
         await this.sectionByEnum(RequestSections.commissions).click();
-        await Elements.waitForVisible(this.violationName.first());
-        expect(await this.violationName.count()).toBe(this.manualSanctionCount);
+        await Elements.waitForVisible(this.addedSanction.first());
+        (isAfterAcceptChangeRequest) ?
+            expect(await this.addedSanction.count()).toBe(this.manualSanctionCount*2) :
+            expect(await this.addedSanction.count()).toBe(this.manualSanctionCount);
     }
     /**
      * Change the number of documents sent for verification
@@ -738,10 +868,57 @@ export class RequestPage extends CommissionPage {
         return returnRfuViolationName;
     }
     /**
-     * Checking for the presence of the "contains actual information" attribute
+     * Adding a request for change
      */
-    public async checkActualInformationAttribute(prolicType: ProlicType): Promise<void> {
-        if(prolicType == "cert") await this.acceptedDecision.click();
+    public async addRequestForChange(): Promise<void> {
+        await this.sectionByEnum(RequestSections.generalInfo).click();
+        await this.addRequestForChangeButton.click();
+        await this.criteriaGroupExpansionIcon.click();
+        const criteriaCount: number = await this.criteriaInfo.count();
+        const docsCount: number = await this.documentCheckbox.count();
+        const docsInOneCriteria: number = docsCount/criteriaCount;
+        let currentDocIndex: number = 0;
+        let isOfiOrMemberCriteriaPassed: boolean = false;
+        for(let i = 0; i < criteriaCount; i++) {
+            await this.criteriaInfo.nth(i).click();
+            const criteriaType: string = await this.critTypeValue.nth(i).innerText();
+            switch (criteriaType) {
+                case CriteriaType.ofi:
+                    (isOfiOrMemberCriteriaPassed) ?
+                        await this.memberOrOfiCriteriaCheckbox.last().click() :
+                        await this.memberOrOfiCriteriaCheckbox.first().click();
+                    break;
+                case CriteriaType.documents:
+                    await this.documentCheckbox.nth(currentDocIndex).click();
+                    break;
+                default:
+                    (isOfiOrMemberCriteriaPassed) ?
+                        await this.memberOrOfiCheckbox.last().click() :
+                        await this.memberOrOfiCheckbox.nth(1).click();
+
+            }
+            currentDocIndex+=docsInOneCriteria;
+            if(criteriaType == CriteriaType.ofi || criteriaType == CriteriaType.member) isOfiOrMemberCriteriaPassed = true;
+        }
+        await this.addRequestForChangeButton.last().click();
+        await this.submitButton.click();
+        await expect(this.requestForChangeTitle).toBeVisible();
+    }
+    /**
+     * Check imported sanctions
+     */
+    public async checkImportedSanctions(): Promise<void> {
+        await Elements.waitForVisible(this.importedSanctionText.first());
+        expect(await this.importedSanctionText.count()).toBe(this.manualSanctionCount);
+        await this.sectionByEnum(RequestSections.commissions).click();
+        await Elements.waitForVisible(this.importedSanctionText.first());
+        expect(await this.importedSanctionText.count()).toBe(this.manualSanctionCount);
+    }
+    /**
+     * Checking attributes of request
+     */
+    public async checkRequestAttributes(isAfterAcceptChangeRequest: boolean): Promise<void> {
         await expect(this.containsActualInformation).toBeVisible();
+        if(isAfterAcceptChangeRequest) await expect(this.requestForChangeTitle).not.toBeVisible();
     }
 }

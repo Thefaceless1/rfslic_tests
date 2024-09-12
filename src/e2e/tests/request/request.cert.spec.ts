@@ -34,12 +34,12 @@ test.describe("Заявки на аттестацию",() => {
                 async () => await certRequests.addExperts()
             );
             await test.step(
-                "Заполнение документов критериев, сотрудников и офи",
-                async () => await certRequests.addDocInfo("cert")
+                "Заполнение и отправка на проверку документов критериев, добавление сотрудников и офи(в т.ч отсутствующих)",
+                async () => await certRequests.fillRequestEntities("cert",false)
             );
             await test.step(
-                "Добавление комментариев и решений по документам экспертами групп критериев",
-                async () => await certRequests.addExpertInfo("cert")
+                "Добавление комментариев, решений по документам, формирование отчета для экспертов групп критериев",
+                async () => await certRequests.addExpertSolution("cert",false)
             );
             await test.step(
                 "Добавление решения по заявке на аттестацию",
@@ -50,12 +50,36 @@ test.describe("Заявки на аттестацию",() => {
                 async () => await certRequests.editLicStatus(LicStates.waitForCommission)
             );
             await test.step(
-                "Вынесение решения комиссии по заявке на аттестацию",
-                async () => await certRequests.addCommissionDecision("cert")
+                "Вынесение решения комиссией по заявке на аттестацию",
+                async () => await certRequests.addCommissionDecision("cert",false)
             );
             await test.step(
                 "Получение заявкой признака 'Содержит актуальные сведения'",
-                async () => await certRequests.checkActualInformationAttribute("cert")
+                async () => await certRequests.checkRequestAttributes(false)
+            );
+            await test.step(
+                "Подача заявки на изменение",
+                    async () => await certRequests.addRequestForChange()
+            );
+            await test.step(
+                "Заполнение и отправка на проверку изменяемых документов, удаленных и добавленных участников, в заявке на изменение",
+                async () => await certRequests.fillRequestEntities("cert", true)
+            );
+            await test.step(
+                "Добавление решений по документам, добаляемым отсутствующим удаляемым участникам/офи, формирование отчета эксперта",
+                async () => await certRequests.addExpertSolution("cert",true)
+            );
+            await test.step(
+                "Проставление статуса 'Ожидает решения комиссии' для заявки на изменение",
+                async () => await certRequests.editLicStatus(LicStates.waitForCommission)
+            );
+            await test.step(
+             "Вынесение решения комиссией по заявке на изменение",
+                async () => await certRequests.addCommissionDecision("cert",true)
+            );
+            await test.step(
+                "Потеря заявкой атрибута 'заявка на изменение' и приобретение атрибута 'содержит актуальные сведения'",
+                async () => await certRequests.checkRequestAttributes(true)
             );
         })
 })

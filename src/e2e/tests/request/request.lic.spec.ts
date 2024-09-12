@@ -35,12 +35,12 @@ test.describe("Заявки на лицензирование", () => {
             async () => await licRequests.addExperts()
         );
         await test.step(
-            "Заполнение документов критериев, сотрудников и офи",
-            async () => await licRequests.addDocInfo("lic")
+            "Заполнение и отправка на проверку документов критериев, добавление сотрудников и офи(в т.ч отсутствующих)",
+            async () => await licRequests.fillRequestEntities("lic",false)
         );
         await test.step(
-            "Добавление комментариев и решений по документам экспертов групп критериев",
-            async () => await licRequests.addExpertInfo("lic")
+            "Добавление решений по документам, добаляемым отсутствующим участникам/офи, формирование отчета эксперта",
+            async () => await licRequests.addExpertSolution("lic",false)
         );
         await test.step(
             "Ручное добавление санкции к заявке",
@@ -64,15 +64,51 @@ test.describe("Заявки на лицензирование", () => {
         );
         await test.step(
             "Вынесение решения и утверждение санкций(в т.ч изменение суммы штрафа) комиссией по заявке на лицензирование",
-            async () => await licRequests.addCommissionDecision("lic")
+            async () => await licRequests.addCommissionDecision("lic",false)
         );
         await test.step(
             "Просмотр утвержденных санкций на табе 'Комиссии' в заявке",
-            async () => await licRequests.viewApprovedSanctions()
+            async () => await licRequests.viewApprovedSanctions(false)
         );
         await test.step(
             "Получение заявкой признака 'Содержит актуальные сведения'",
-            async () => await licRequests.checkActualInformationAttribute("lic")
+            async () => await licRequests.checkRequestAttributes(false)
+        );
+        await test.step(
+            "Подача заявки на изменение",
+            async () => await licRequests.addRequestForChange()
+        );
+        await test.step(
+            "Наличие импортированных рекомендаций по санкциям и утвержденных санкций из исходной заявки",
+            async () => await licRequests.checkImportedSanctions()
+        );
+        await test.step(
+            "Заполнение и отправка на проверку изменяемых документов, удаленных и добавленных участников, в заявке на изменение",
+            async () => await licRequests.fillRequestEntities("lic", true)
+        );
+        await test.step(
+            "Добавление решений по документам, добаляемым отсутствующим удаляемым участникам/офи, формирование отчета эксперта",
+            async () => await licRequests.addExpertSolution("lic",true)
+        );
+        await test.step(
+            "Ручное добавление санкции к заявке",
+            async () => await licRequests.addSanction()
+        );
+        await test.step(
+            "Проставление статуса 'Ожидает решения комиссии' для заявки на изменение",
+            async () => await licRequests.editLicStatus(LicStates.waitForCommission)
+        );
+        await test.step(
+            "Вынесение решения и утверждение санкций(в т.ч изменение суммы штрафа) комиссией по заявке на изменение",
+            async () => await licRequests.addCommissionDecision("lic",true)
+        );
+        await test.step(
+            "Просмотр утвержденных санкций на табе 'Комиссии' в заявке",
+            async () => await licRequests.viewApprovedSanctions(true)
+        );
+        await test.step(
+            "Потеря заявкой атрибута 'заявка на изменение' и приобретение атрибута 'содержит актуальные сведения'",
+            async () => await licRequests.checkRequestAttributes(true)
         );
     })
 })

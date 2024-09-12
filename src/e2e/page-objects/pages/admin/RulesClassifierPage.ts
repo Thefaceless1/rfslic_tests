@@ -215,7 +215,8 @@ export class RulesClassifierPage extends MainPage {
         const totalCriteriaCount: number = groupsCount * criteriaTypes.length - 1;
         for(let i = 0; i < groupsCount; i++) {
             for (const type of criteriaTypes) {
-                await this.fillCriteriaInfo(i,type);
+                const currentCriteriaIndex: number = criteriaTypes.indexOf(type);
+                await this.fillCriteriaInfo(i,type,currentCriteriaIndex);
                 for(let c = 0; c < docsCountForCriteria; c++) {
                     await this.fillCriteriaDocs()
                 }
@@ -234,19 +235,19 @@ export class RulesClassifierPage extends MainPage {
     /**
      * Fill in the criteria fields
      */
-    private async fillCriteriaInfo(index: number, critType: string): Promise<void> {
+    private async fillCriteriaInfo(index: number, critType: string, criteriaIndex: number): Promise<void> {
         await this.addCriteria.nth(index).click();
         try {
-            await this.criteriaNumber.fill(InputData.randomWord);
+            await this.criteriaNumber.fill(String(criteriaIndex+1));
         }
         catch (error) {
             await this.addCriteria.nth(index).click();
-            await this.criteriaNumber.fill(InputData.randomWord)
+            await this.criteriaNumber.fill(String(criteriaIndex+1))
         }
         await this.rankCriteria.click();
         await this.rankList.first().click();
-        await this.criteriaName.fill(InputData.randomWord)
-        await this.description.type(InputData.randomWord)
+        await this.criteriaName.fill(InputData.testName("criteria",critType));
+        await this.description.type(InputData.randomWord);
         await this.criteriaType.click();
         await this.criteriaTypeValues.filter({hasText: critType}).click();
         if (critType == CriteriaType.ofi || critType == CriteriaType.member) {

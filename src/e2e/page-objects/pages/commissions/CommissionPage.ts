@@ -6,7 +6,7 @@ import {InputData} from "../../helpers/InputData.js";
 import {SearchModalPage} from "../SearchModalPage.js";
 import {randomInt} from "crypto";
 import {TableColumn} from "../../helpers/enums/TableColumn.js";
-import {ProlicType} from "../../helpers/types/prolic.type";
+import {ProlicType} from "../../helpers/types/ProlicType.js";
 import {CommissionTypes} from "../../helpers/enums/CommissionTypes.js";
 
 export class CommissionPage extends MainPage {
@@ -74,24 +74,29 @@ export class CommissionPage extends MainPage {
     /**
      * Create a meeting
      */
-    public async createMeeting(prolicType: ProlicType): Promise<void> {
+    public async createMeeting(prolicType: ProlicType,isChangeRequest: boolean): Promise<void> {
         await this.createMeetingButton.click();
         await this.commissionType.click();
-        switch (prolicType) {
-            case "lic": {
-                await Elements.waitForVisible(this.commissionTypeValue(CommissionTypes.licensing));
-                await this.commissionTypeValue(CommissionTypes.licensing).click();
-                break;
-            }
-            case "fin": {
-                await Elements.waitForVisible(this.commissionTypeValue(CommissionTypes.finControl));
-                await this.commissionTypeValue(CommissionTypes.finControl).click();
-                break;
-            }
-            case "cert": {
-                await Elements.waitForVisible(this.commissionTypeValue(CommissionTypes.certification));
-                await this.commissionTypeValue(CommissionTypes.certification).click();
-                break;
+        if(isChangeRequest) {
+            await Elements.waitForVisible(this.commissionTypeValue(CommissionTypes.change));
+            await this.commissionTypeValue(CommissionTypes.change).click();
+        }
+        else {
+            switch (prolicType) {
+                case "lic": {
+                    await Elements.waitForVisible(this.commissionTypeValue(CommissionTypes.licensing));
+                    await this.commissionTypeValue(CommissionTypes.licensing).click();
+                    break;
+                }
+                case "fin": {
+                    await Elements.waitForVisible(this.commissionTypeValue(CommissionTypes.finControl));
+                    await this.commissionTypeValue(CommissionTypes.finControl).click();
+                    break;
+                }
+                case "cert": {
+                    await Elements.waitForVisible(this.commissionTypeValue(CommissionTypes.certification));
+                    await this.commissionTypeValue(CommissionTypes.certification).click();
+                }
             }
         }
         await Date.fillDateInput(this.dates,InputData.currentDate);
@@ -134,6 +139,7 @@ export class CommissionPage extends MainPage {
             await this.approveButton.click();
             await this.saveButton.click();
             await expect(this.acceptedDecision.nth(i)).toBeVisible();
+            if(prolicType == "cert") await this.acceptedDecision.click({clickCount: 2});
         }
     }
     /**

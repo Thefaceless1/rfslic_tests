@@ -67,6 +67,10 @@ export class BasePage extends PlaywrightDevPage{
      */
     protected editTableButton: Locator = Elements.getElement(this.page,"//span[contains(@class,'IconEdit')]")
     /**
+     * Button "Submit"
+     */
+    protected submitButton: Locator = Elements.getElement(this.page,"//button[text()='Подтвердить']")
+    /**
      * Search button to call a modal window for club workers, organizations, ofi
      */
     protected searchDataButton: Locator = Elements.getElement(this.page,"//button//span[contains(@class,'IconSearch')]")

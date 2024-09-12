@@ -34,12 +34,12 @@ test.describe("Заявки на фин. контроль",() => {
                 async () => await finRequests.addExperts()
             );
             await test.step(
-                "Заполнение документов критериев, сотрудников и офи",
-                async () => await finRequests.addDocInfo("fin")
+                "Заполнение и отправка на проверку документов критериев, добавление сотрудников и офи(в т.ч отсутствующих)",
+                async () => await finRequests.fillRequestEntities("fin",false)
             );
             await test.step(
-                "Добавление комментариев и решений по документам членами рабочей группы",
-                async () => await finRequests.addExpertInfo("fin")
+                "Добавление комментариев, решений по документам, формирование отчета для члена рабочей группы",
+                async () => await finRequests.addExpertSolution("fin",false)
             );
             await test.step(
                 "Добавление решения по заявке на фин. контроль",
@@ -51,7 +51,7 @@ test.describe("Заявки на фин. контроль",() => {
             );
             await test.step(
                 "Вынесение решения комиссии по заявке на фин. контроль",
-                async () => await finRequests.addCommissionDecision("fin")
+                async () => await finRequests.addCommissionDecision("fin",false)
             );
     })
 })
