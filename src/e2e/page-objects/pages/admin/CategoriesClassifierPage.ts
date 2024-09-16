@@ -72,7 +72,7 @@ export class CategoriesClassifierPage extends MainPage {
         await expect(this.notification(pendingNotification)).toBeVisible();
     }
     /**
-     * Delete classifiers categories
+     * Delete classifiers categories from database
      */
     public async deleteCategoriesClassifiers(): Promise<void> {
         const dbHelper = new DbHelper();

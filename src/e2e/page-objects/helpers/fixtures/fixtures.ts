@@ -38,7 +38,7 @@ export const test = base.extend<Fixtures>({
         await constructor.login();
         await constructor.createRuleForProlicense();
         await use(constructor);
-        await constructor.deleteCreatedDataFromDatabase();
+        await constructor.deleteCreatedData();
     },
     licRequests: async ({page},use) => {
         const request = new RequestPage(page);
@@ -47,7 +47,7 @@ export const test = base.extend<Fixtures>({
         await request.login();
         await request.createTestProlicense("lic");
         await use(request);
-        await request.deleteCreatedDataFromDatabase();
+        await request.deleteCreatedData();
     },
     finRequests: async ({page},use) => {
         const request = new RequestPage(page);
@@ -56,7 +56,7 @@ export const test = base.extend<Fixtures>({
         await request.login();
         await request.createTestProlicense("fin");
         await use(request);
-        await request.deleteCreatedDataFromDatabase();
+        await request.deleteCreatedData();
     },
     certRequests: async ({page},use) => {
         const request = new RequestPage(page);
@@ -65,7 +65,7 @@ export const test = base.extend<Fixtures>({
         await request.login();
         await request.createTestProlicense("cert");
         await use(request);
-        await request.deleteCreatedDataFromDatabase();
+        await request.deleteCreatedData();
     },
     roles: async ({page},use) => {
         const roles = new RolesPage(page);
@@ -117,7 +117,7 @@ export const test = base.extend<Fixtures>({
         await sanctionTypes.createUser();
         await sanctionTypes.login();
         await use(sanctionTypes);
-        await sanctionTypes.deleteSanctionTypeFromDatabase();
+        await sanctionTypes.deleteSanctionTypes();
     },
     violations: async ({page},use) => {
         const violations = new ViolationsPage(page);
@@ -125,16 +125,17 @@ export const test = base.extend<Fixtures>({
         await violations.createUser();
         await violations.login();
         await use(violations);
-        await violations.deleteViolationsFromDatabase();
+        await violations.deleteViolations();
     },
     sanctions: async ({page},use) => {
         const sanctions = new SanctionsPage(page);
         await sanctions.deleteUser();
         await sanctions.createUser();
+        await sanctions.deleteViolationAndSanction();
         await sanctions.createViolation();
         await sanctions.login();
         await use(sanctions);
-        await sanctions.deleteViolationAndSanctionFromDatabase();
+        await sanctions.deleteViolationAndSanction();
     },
     rulesClassifier: async ({page},use) => {
         const rulesClassifier = new RulesClassifierPage(page);
@@ -142,7 +143,7 @@ export const test = base.extend<Fixtures>({
         await rulesClassifier.createUser();
         await rulesClassifier.login();
         await use(rulesClassifier);
-        await rulesClassifier.deleteRulesFromDatabase();
+        await rulesClassifier.deleteRules();
     },
     finalDocumentsGroups: async ({page},use)=> {
         const finalDocumentsGroups = new FinalDocumentsGroupsPage(page);

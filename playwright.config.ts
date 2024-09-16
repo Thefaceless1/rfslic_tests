@@ -35,6 +35,9 @@ const config: PlaywrightTestConfig = {
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     screenshot : "only-on-failure",
+    video: {
+      mode: "retain-on-failure",
+    },
     headless : true,
     viewport: null,
     /* Maximum time each action such as `click()` can take. Defaults to 0 (no limit). */

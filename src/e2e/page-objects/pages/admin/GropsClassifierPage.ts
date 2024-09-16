@@ -45,7 +45,7 @@ export class GroupsClassifierPage extends MainPage {
         await expect(this.notification(Notifications.groupDeleted)).toBeVisible();
     }
     /**
-     * Delete criteria groups
+     * Delete criteria groups from database
      */
     public async deleteCriteriaGroups(): Promise<void> {
         const dbHelper = new DbHelper();

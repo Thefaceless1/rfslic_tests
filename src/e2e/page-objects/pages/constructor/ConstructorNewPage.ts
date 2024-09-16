@@ -248,6 +248,12 @@ export class ConstructorNewPage extends ConstructorPage {
         const criteriaWithWarningCount: number = await this.criteriaWarningEditButton.count();
         for(let i=0; i<criteriaWithWarningCount; i++) {
             await this.criteriaWarningEditButton.first().click();
+            try {
+                await Elements.waitForVisible(this.minimumCount);
+            }
+            catch (error) {
+                await this.criteriaWarningEditButton.first().click();
+            }
             const randomMinCountValue: string = String(randomInt(1,10000));
             await this.minimumCount.fill(randomMinCountValue);
             await this.saveButton.click();

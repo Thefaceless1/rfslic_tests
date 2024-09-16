@@ -1,1 +1,1 @@
-export type EntitiesType = "criteria"
+export type EntitiesType = "criteria" | "document";

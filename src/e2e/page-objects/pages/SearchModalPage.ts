@@ -22,4 +22,8 @@ export class SearchModalPage extends BasePage {
      * Field "Enter name, last name or rfs id"
      */
     public search: Locator = Elements.getElement(this.page,"//input[@name='searchText']")
+    /**
+     * Table cell with ofi name or member last name
+     */
+    public entityNameTableCell: Locator = Elements.getElement(this.page,"//td[contains(@class,'selection-column')]//following-sibling::td[1]")
 }

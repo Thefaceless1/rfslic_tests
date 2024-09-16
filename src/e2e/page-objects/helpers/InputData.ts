@@ -41,6 +41,9 @@ export class InputData {
         switch (entity) {
             case "criteria":
                 (text) ? finalName+="критерий" + "|" + text : finalName+="критерий";
+                break;
+            case "document":
+                (text) ? finalName+="документ" + "|" + text : finalName+="документ";
         }
         return finalName;
     }

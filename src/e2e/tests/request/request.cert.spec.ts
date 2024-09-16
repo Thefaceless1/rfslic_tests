@@ -81,5 +81,13 @@ test.describe("Заявки на аттестацию",() => {
                 "Потеря заявкой атрибута 'заявка на изменение' и приобретение атрибута 'содержит актуальные сведения'",
                 async () => await certRequests.checkRequestAttributes(true)
             );
+            await test.step(
+                "Наличие в итоговой заявке добавленного ОФИ и отсутствие удаленного участника",
+                async () => await certRequests.checkRemovedAndAddedEntities()
+            );
+            await test.step(
+                "Наличие в итоговой заявки документов, ОФИ и Участников, импортированных из актуальной заявки",
+                async () => await certRequests.checkImportedEntities()
+            );
         })
 })

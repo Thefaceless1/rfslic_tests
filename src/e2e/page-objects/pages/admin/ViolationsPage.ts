@@ -76,7 +76,7 @@ export class ViolationsPage extends MainPage {
     /**
      * Delete violations from database
      */
-    public async deleteViolationsFromDatabase(): Promise<void> {
+    public async deleteViolations(): Promise<void> {
         const dbHelper = new DbHelper();
         await dbHelper.deleteViolations();
         await dbHelper.closeConnect();

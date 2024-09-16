@@ -66,7 +66,7 @@ export class SanctionsPage extends MainPage {
     /**
      * Delete violations, sanction types and sanction from database
      */
-    public async deleteViolationAndSanctionFromDatabase(): Promise<void> {
+    public async deleteViolationAndSanction(): Promise<void> {
         const dbHelper = new DbHelper();
         await dbHelper.deleteSanctions();
         await dbHelper.deleteViolations();

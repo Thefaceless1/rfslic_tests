@@ -8,6 +8,7 @@ import {randomInt} from "crypto";
 import {TableColumn} from "../../helpers/enums/TableColumn.js";
 import {ProlicType} from "../../helpers/types/ProlicType.js";
 import {CommissionTypes} from "../../helpers/enums/CommissionTypes.js";
+import {LicStates} from "../../helpers/enums/LicStates.js";
 
 export class CommissionPage extends MainPage {
     constructor(page: Page) {
@@ -42,21 +43,9 @@ export class CommissionPage extends MainPage {
      */
     private selectDecision: Locator = Elements.getElement(this.page,"//*[contains(@class,'newLicState__control')]")
     /**
-     * Value of the drop-down list for selecting solutions for the application "license issued"
-     */
-    private licenseIssuedDecision: Locator = Elements.getElement(this.page,"//*[contains(@class,'newLicState__option') and text()='Выдана']")
-    /**
-     * Value of the drop-down list for selecting solutions for the application "passed"
-     */
-    private passedDecision: Locator = Elements.getElement(this.page,"//*[contains(@class,'newLicState__option') and text()='Пройден']")
-    /**
      * Field "Commission name"
      */
     private commissionName: Locator = Elements.getElement(this.page,"//*[contains(@class,'Text_weight_semibold') and contains(text(),'Заседание')]")
-    /**
-     * Accepted decision in the table
-     */
-    protected acceptedDecision: Locator = Elements.getElement(this.page,"//td[7]//*[contains(@class,'Badge_view_filled')]")
     /**
      * Field 'Commission type'
      */
@@ -70,6 +59,18 @@ export class CommissionPage extends MainPage {
      */
     private commissionTypeValue(selectedValue: CommissionTypes): Locator {
         return Elements.getElement(this.page,`//*[contains(@class,'type__option') and text()='${selectedValue}']`);
+    }
+    /**
+     * Get accepted decision locator in the table by name
+     */
+    protected acceptedDecisionByName(name: LicStates): Locator {
+        return Elements.getElement(this.page,`//td[7]//*[contains(@class,'Badge_view_filled') and text()='${name}']`)
+    }
+    /**
+     * Get value of the drop-down list for selecting solutions for the application by name
+     */
+    private decisionByName(name: LicStates): Locator {
+        return Elements.getElement(this.page,`//*[contains(@class,'newLicState__option') and text()='${name}']`)
     }
     /**
      * Create a meeting
@@ -120,27 +121,18 @@ export class CommissionPage extends MainPage {
      * Add decision on requests
      */
     public async addRequestDecision(prolicType: ProlicType): Promise<void> {
-        await Elements.waitForVisible(this.editDecisionButton.first());
-        const requestCount: number = await this.editDecisionButton.count();
-        for(let i = 0; i < requestCount; i++) {
-            await this.editDecisionButton.nth(i).click();
-            await this.selectDecision.click();
-            if(prolicType == "fin") {
-                await Elements.waitForVisible(this.passedDecision);
-                await this.passedDecision.click();
-            }
-            else {
-                await Elements.waitForVisible(this.licenseIssuedDecision);
-                await this.licenseIssuedDecision.click();
-            }
-            await this.comment.type(InputData.randomWord);
-            await this.approvalSanctionButton.click();
-            await this.editFineAmount();
-            await this.approveButton.click();
-            await this.saveButton.click();
-            await expect(this.acceptedDecision.nth(i)).toBeVisible();
-            if(prolicType == "cert") await this.acceptedDecision.click({clickCount: 2});
-        }
+        await this.editDecisionButton.click();
+        await this.selectDecision.click();
+        if(prolicType == "fin") await this.decisionByName(LicStates.passed).click();
+        else await this.decisionByName(LicStates.issued).click();
+        await this.comment.type(InputData.randomWord);
+        await this.approvalSanctionButton.click();
+        await this.editFineAmount();
+        await this.approveButton.click();
+        await this.saveButton.click();
+        if(prolicType == "fin") await expect(this.acceptedDecisionByName(LicStates.passed)).toBeVisible();
+        else await expect(this.acceptedDecisionByName(LicStates.issued)).toBeVisible();
+        if(prolicType == "cert") await this.acceptedDecisionByName(LicStates.issued).click({clickCount: 2});
     }
     /**
      * Edit fine amount

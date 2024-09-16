@@ -22,6 +22,11 @@ import {ValidityTypes} from "../../helpers/enums/ValidityTypes.js";
 
 export class RequestPage extends CommissionPage {
     private manualSanctionCount: number = 3
+    private deletedMemberFio: string
+    private addedOfiName: string
+    private parentLicOfiCount: number
+    private parentLicMemberCount: number
+    private parentLicDocsCount: number
     constructor(page : Page) {
         super(page);
     }
@@ -98,6 +103,14 @@ export class RequestPage extends CommissionPage {
      */
     private critTypeValue: Locator = Elements.getElement(this.page,"//*[text()='Тип критерия:']//following-sibling::*")
     /**
+     * Member fio
+     */
+    private memberFio: Locator = Elements.getElement(this.page,"//span[text()='ФИО Участника:']//following-sibling::a//div")
+    /**
+     * Ofi name
+     */
+    private ofiName: Locator = Elements.getElement(this.page,"//span[text()='Наименование ОФИ:']//following-sibling::a//div")
+    /**
      * Field "Club worker comment"
      */
     private clubWorkerComment: Locator = Elements.getElement(this.page,"//div[text()='Комментарий представителя футбольного клуба:']/following-sibling::div[1][not(contains(text(),'-'))]")
@@ -165,6 +178,10 @@ export class RequestPage extends CommissionPage {
      * Values of the drop-down list of the field "Select a club"
      */
     private selectClubList: Locator = Elements.getElement(this.page,"//*[contains(@class,'club__option')]")
+    /**
+     * Documents of criteria with type "Documents"
+     */
+    private documentsCriteriaTypeDocs: Locator = Elements.getElement(this.page,"//div[text()='Документы']//..//..//following-sibling::*[contains(@class,'DocumentInfo')]")
     /**
      * Request license title
      */
@@ -362,6 +379,14 @@ export class RequestPage extends CommissionPage {
         return Elements.getElement(this.page,`//*[contains(@class,'usePrevSeasons__option') and text()='${optionName}']`);
     }
     /**
+     * Get member or ofi by his name
+     */
+    private getEntityByName(entityType: CriteriaType,name: string): Locator {
+        return (entityType == CriteriaType.member) ?
+            Elements.getElement(this.page,`//span[text()='ФИО Участника:']//following-sibling::a//div[contains(text(),'${name}')]`) :
+            Elements.getElement(this.page,`//span[text()='Наименование ОФИ:']//following-sibling::a//div[contains(text(),'${name}')]`);
+    }
+    /**
      * Expert Report Sanction
      */
     private async expertReportSanction(): Promise<Locator> {
@@ -414,15 +439,18 @@ export class RequestPage extends CommissionPage {
         await searchModal.findButton.click();
         await Elements.waitForHidden(searchModal.loadIndicator);
         (isChangeRequest) ? await searchModal.radio.last().click() : await searchModal.radio.first().click();
+        const addedEntityName: string = (isChangeRequest) ?
+            await searchModal.entityNameTableCell.last().innerText() :
+            await searchModal.entityNameTableCell.first().innerText();
         await searchModal.selectButton.click();
         await this.saveButton.click();
         await this.closeNotifications("last");
         try {
-            await Elements.waitForHidden(this.saveButton);
+            await expect(this.getEntityByName(entityType,addedEntityName)).toBeVisible();
         }
         catch (err) {
             await this.saveButton.click();
-            await Elements.waitForHidden(this.saveButton);
+            await expect(this.getEntityByName(entityType,addedEntityName)).toBeVisible();
         }
     }
     /**
@@ -434,7 +462,7 @@ export class RequestPage extends CommissionPage {
         for(let i = groupsCount-1; i >= 0; i--) {
             await this.criteriaGroups.nth(i).click();
             const currentCriteriaGroupName: string = await this.criteriaGroups.nth(i).innerText();
-            await Elements.waitForVisible(this.criteriaInfo.first())
+            await Elements.waitForVisible(this.criteriaInfo.first());
             const criteriaCount: number = await this.criteriaInfo.count();
             for(let m = 0; m < criteriaCount;m++) {
                 await this.criteriaInfo.nth(m).click();
@@ -448,6 +476,7 @@ export class RequestPage extends CommissionPage {
                             await Elements.waitForVisible(this.removedEntityFrame);
                             await this.sendMissingEntityReviewButton.click();
                             await this.performButton.click();
+                            this.deletedMemberFio = await this.memberFio.innerText();
                         }
                         else {
                             await this.addMissingMemberOrOfi(CriteriaType.member);
@@ -455,13 +484,17 @@ export class RequestPage extends CommissionPage {
                         }
                         break;
                     case CriteriaType.ofi:
-                        if(isChangeRequest) await this.addMemberOrOfi(CriteriaType.ofi,true);
+                        if(isChangeRequest) {
+                            await this.addMemberOrOfi(CriteriaType.ofi,true);
+                            this.addedOfiName = await this.ofiName.last().innerText();
+                        }
                         else {
                             await this.addMissingMemberOrOfi(CriteriaType.ofi);
                             await this.addMemberOrOfi(CriteriaType.ofi);
                         }
                 }
             }
+            if(!isChangeRequest) await this.calculateParentLicEntities();
             const docsCount: number = await this.addDocument.count();
             for (let m = 0; m < docsCount; m++) {
                 await this.sendForVerification(m,prolicType,isChangeRequest,currentCriteriaGroupName);
@@ -474,6 +507,14 @@ export class RequestPage extends CommissionPage {
             }
         }
         if(!isChangeRequest) await this.addGeneralDocInfo(prolicType);
+    }
+    /**
+     * Calculation docs count, ofi count and members count in parent license
+     */
+    private async calculateParentLicEntities(): Promise<void> {
+        this.parentLicMemberCount = await this.memberCriteriaInfo.count() + await this.missingEntity(CriteriaType.member).count();
+        this.parentLicOfiCount = await this.ofiCriteriaInfo.count() + await this.missingEntity(CriteriaType.ofi).count();
+        this.parentLicDocsCount = await this.documentsCriteriaTypeDocs.count();
     }
     /**
      * Add missing member or ofi
@@ -563,7 +604,7 @@ export class RequestPage extends CommissionPage {
                     else if(criteriaType == CriteriaType.ofi) await this.ofiCriteriaInfo.click();
                 }
             }
-            // Added to avoid error "This group of criteria contains documents for which the RFU Expert's decision is not indicated."
+            // Temporary added to avoid error "This group of criteria contains documents for which the RFU Expert's decision is not indicated."
             await this.page.waitForTimeout(1000)
             const docsCount: number = await this.checkButton.count();
             await this.fillStatusAndComment(docsCount,"criterias");
@@ -839,7 +880,7 @@ export class RequestPage extends CommissionPage {
      * View approved sanctions
      */
     public async viewApprovedSanctions(isAfterAcceptChangeRequest: boolean): Promise<void> {
-        await this.acceptedDecision.click({clickCount: 2});
+        await this.acceptedDecisionByName(LicStates.issued).click({clickCount: 2});
         await this.sectionByEnum(RequestSections.commissions).click();
         await Elements.waitForVisible(this.addedSanction.first());
         (isAfterAcceptChangeRequest) ?
@@ -920,5 +961,30 @@ export class RequestPage extends CommissionPage {
     public async checkRequestAttributes(isAfterAcceptChangeRequest: boolean): Promise<void> {
         await expect(this.containsActualInformation).toBeVisible();
         if(isAfterAcceptChangeRequest) await expect(this.requestForChangeTitle).not.toBeVisible();
+    }
+    /**
+     * Check for the presence of an added OFI and the absence of a removed member
+     */
+    public async checkRemovedAndAddedEntities(): Promise<void> {
+        await this.sectionByEnum(RequestSections.criterias).click();
+        await Elements.waitForVisible(this.criteriaInfo.first());
+        const criteriaCount: number = await this.criteriaInfo.count();
+        for(let i = 0; i < criteriaCount;i++) {
+            await this.criteriaInfo.nth(i).click();
+            await Elements.waitForVisible(this.critTypeValue.nth(i));
+        }
+        await expect(this.getEntityByName(CriteriaType.ofi, this.addedOfiName)).toBeVisible();
+        await expect(this.getEntityByName(CriteriaType.member, this.deletedMemberFio)).not.toBeVisible();
+    }
+    /**
+     * Checking for the presence of imported entities from the actual request
+     */
+    public async checkImportedEntities(): Promise<void> {
+        const documentsCriteriaTypeDocsCount: number = await this.documentsCriteriaTypeDocs.count();
+        const membersCount: number = await this.memberCriteriaInfo.count() + await this.missingEntity(CriteriaType.member).count();
+        const ofiCount: number = await this.ofiCriteriaInfo.count() + await this.missingEntity(CriteriaType.ofi).count();
+        expect(documentsCriteriaTypeDocsCount).toBe(this.parentLicDocsCount);
+        expect(membersCount).toBe(this.parentLicMemberCount-1);
+        expect(ofiCount).toBe(this.parentLicOfiCount+1);
     }
 }

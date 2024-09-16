@@ -6,9 +6,7 @@ import {RuleActions} from "../../helpers/enums/RuleActions.js";
 import {RuleStates} from "../../helpers/enums/RuleStates.js";
 import {DbHelper} from "../../../../db/db-helper.js";
 import {CriteriaType} from "../../helpers/enums/CriteriaType.js";
-import {randomInt} from "crypto";
 import {Input} from "../../../framework/elements/Input.js";
-import {NonFilesDoctypes} from "../../helpers/enums/NonFilesDoctypes.js";
 import {AdminOptions} from "../../helpers/enums/AdminOptions.js";
 import {Notifications} from "../../helpers/enums/Notifications.js";
 
@@ -183,7 +181,7 @@ export class RulesClassifierPage extends MainPage {
     /**
      * Delete rules from database
      */
-    public async deleteRulesFromDatabase(): Promise<void> {
+    public async deleteRules(): Promise<void> {
         const dbHelper = new DbHelper();
         await dbHelper.deleteRules();
         await dbHelper.closeConnect();
@@ -209,7 +207,7 @@ export class RulesClassifierPage extends MainPage {
      */
     public async addCriterias(): Promise<void> {
         const groupsCount: number = await this.criteriaGroupName.count();
-        const criteriaTypes: string[] = [`${CriteriaType.documents}`,`${CriteriaType.member}`,`${CriteriaType.ofi}`];
+        const criteriaTypes: string[] = Object.values(CriteriaType);
         const docsCountForCriteria: number = 2;
         const totalDocsCount: number = groupsCount * criteriaTypes.length * docsCountForCriteria - 1;
         const totalCriteriaCount: number = groupsCount * criteriaTypes.length - 1;
@@ -218,7 +216,7 @@ export class RulesClassifierPage extends MainPage {
                 const currentCriteriaIndex: number = criteriaTypes.indexOf(type);
                 await this.fillCriteriaInfo(i,type,currentCriteriaIndex);
                 for(let c = 0; c < docsCountForCriteria; c++) {
-                    await this.fillCriteriaDocs()
+                    await this.fillCriteriaDocs(c)
                 }
                 await this.saveButton.click();
                 try {
@@ -257,29 +255,14 @@ export class RulesClassifierPage extends MainPage {
     /**
      * Fill in the fields of criteria documents
      */
-    private async fillCriteriaDocs(): Promise<void> {
+    private async fillCriteriaDocs(docNumber: number): Promise<void> {
         await this.addDocButton.click();
-        await this.docName.last().type(InputData.randomWord);
+        await this.docName.last().type(InputData.testName("document",String(docNumber+1)));
         await this.docDescription.last().type(InputData.randomWord);
         await this.additionalDataType.last().click();
-        await Elements.waitForVisible(this.additionalDataTypeValues.last());
-        const dataTypeCount: number = await this.additionalDataTypeValues.count();
-        const randomNumb: number = randomInt(0,dataTypeCount);
-        await this.additionalDataTypeValues.nth(randomNumb).click();
-        if (this.checkDocType(randomNumb)) {
-            await Input.uploadFiles(this.templates.last(),"all");
-            await Elements.waitForVisible(this.docIcon.last());
-            await Elements.waitForVisible(this.xlsxIcon.last());
-        }
-    }
-    /**
-     * Checking whether to add files to the selected criteria document type
-     */
-    private checkDocType(randomNumb: number): boolean {
-        return (
-            randomNumb != NonFilesDoctypes.participantsList &&
-            randomNumb != NonFilesDoctypes.organization &&
-            randomNumb != NonFilesDoctypes.ofi
-        )
+        await this.additionalDataTypeValues.click();
+        await Input.uploadFiles(this.templates.last(),"all");
+        await Elements.waitForVisible(this.docIcon.last());
+        await Elements.waitForVisible(this.xlsxIcon.last());
     }
 }

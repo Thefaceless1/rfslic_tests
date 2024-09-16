@@ -110,5 +110,13 @@ test.describe("Заявки на лицензирование", () => {
             "Потеря заявкой атрибута 'заявка на изменение' и приобретение атрибута 'содержит актуальные сведения'",
             async () => await licRequests.checkRequestAttributes(true)
         );
+        await test.step(
+            "Наличие в итоговой заявке добавленного ОФИ и отсутствие удаленного участника",
+            async () => await licRequests.checkRemovedAndAddedEntities()
+        );
+        await test.step(
+            "Наличие в итоговой заявки документов, ОФИ и Участников, импортированных из актуальной заявки",
+            async () => await licRequests.checkImportedEntities()
+        );
     })
 })

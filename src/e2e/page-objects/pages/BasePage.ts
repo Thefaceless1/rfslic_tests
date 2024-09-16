@@ -267,7 +267,7 @@ export class BasePage extends PlaywrightDevPage{
     /**
      * Delete created licenses, prolicenses and commissions
      */
-    public async deleteCreatedDataFromDatabase(): Promise<void> {
+    public async deleteCreatedData(): Promise<void> {
         const dbHelper = new DbHelper();
         await dbHelper.deleteLicense();
         await dbHelper.deleteProlicense();

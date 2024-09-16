@@ -66,7 +66,7 @@ export class SanctionTypesPage extends MainPage {
     /**
      * Delete sanction types from database
      */
-    public async deleteSanctionTypeFromDatabase(): Promise<void> {
+    public async deleteSanctionTypes(): Promise<void> {
         const dbHelper = new DbHelper();
         await dbHelper.deleteSanctionTypes();
         await dbHelper.closeConnect();
