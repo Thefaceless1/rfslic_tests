@@ -203,6 +203,10 @@ export class RequestPage extends CommissionPage {
      */
     private containsActualInformation: Locator = Elements.getElement(this.page,"//*[text()='Содержит актуальные сведения']")
     /**
+     * Checkbox 'Show only documents with expiring dates'
+     */
+    private isOnlyExpiringDatesCheckbox: Locator = Elements.getElement(this.page,"//input[@name='isOnlyExpiringDates']//..")
+    /**
      * Change document from football club field title
      */
     private clubChangeDocumentTitle: Locator = Elements.getElement(this.page,"//div[text()='Документ-основание замены']")
@@ -302,6 +306,10 @@ export class RequestPage extends CommissionPage {
      * Imported sanction text
      */
     private importedSanctionText: Locator = Elements.getElement(this.page,"//td[contains(text(),'Импортировано из заявки')]")
+    /**
+     * Missing entity state
+     */
+    private missingEntityState: Locator = Elements.getElement(this.page,"//div[text()='Участник отсутствует' or text()='ОФИ отсутствует']//..//following-sibling::div[contains(@class,'missing')]//div")
     /**
      * Field 'Select violation'
      */
@@ -595,7 +603,10 @@ export class RequestPage extends CommissionPage {
         const groupsCount: number = await this.criteriaGroups.count();
         for(let i = 0; i<groupsCount; i++) {
             await this.criteriaGroups.nth(i).click();
-            const criteriaCount: number = await this.criteriaInfo.count();
+            let criteriaCount: number;
+            do {
+               criteriaCount = await this.criteriaInfo.count();
+            } while (criteriaCount < Object.keys(CriteriaType).length)
             if(!isChangeRequest) {
                 for(let c = 0; c<criteriaCount; c++) {
                     await this.criteriaInfo.nth(c).click();
@@ -604,8 +615,6 @@ export class RequestPage extends CommissionPage {
                     else if(criteriaType == CriteriaType.ofi) await this.ofiCriteriaInfo.click();
                 }
             }
-            // Temporary added to avoid error "This group of criteria contains documents for which the RFU Expert's decision is not indicated."
-            await this.page.waitForTimeout(1000)
             const docsCount: number = await this.checkButton.count();
             await this.fillStatusAndComment(docsCount,"criterias");
             await this.checkCriteriaStates(docsCount,criteriaCount);
@@ -699,8 +708,13 @@ export class RequestPage extends CommissionPage {
      * Send missing member or ofi for verification
      */
     private async sendForVerificationMessingEntity(missingEntityCurrentIndex: number): Promise<void> {
-        await this.sendMissingEntityReviewButton.nth(missingEntityCurrentIndex).click();
+        await this.sendMissingEntityReviewButton.first().click();
         await this.submitButton.click();
+        let missingEntityState: string;
+        do {
+            missingEntityState = await this.missingEntityState.nth(missingEntityCurrentIndex).innerText().then(text => text.toLowerCase());
+        }
+        while (missingEntityState != DocStatus.underReview.toLowerCase())
     }
     /**
      * Expand entity in request for change
@@ -805,7 +819,7 @@ export class RequestPage extends CommissionPage {
         await this.page.goto(Pages.commissionPage);
         await this.createMeeting(prolicType,isChangeRequest);
         await this.addRequestToMeeting();
-        await this.addRequestDecision(prolicType);
+        await this.addRequestDecision(prolicType,isChangeRequest);
     }
     /**
      * Change the deadlines for submission and review of documentation
@@ -880,7 +894,9 @@ export class RequestPage extends CommissionPage {
      * View approved sanctions
      */
     public async viewApprovedSanctions(isAfterAcceptChangeRequest: boolean): Promise<void> {
-        await this.acceptedDecisionByName(LicStates.issued).click({clickCount: 2});
+        (isAfterAcceptChangeRequest) ?
+            await this.acceptedDecisionByName(LicStates.accepted).click({clickCount: 2}) :
+            await this.acceptedDecisionByName(LicStates.issued).click({clickCount: 2});
         await this.sectionByEnum(RequestSections.commissions).click();
         await Elements.waitForVisible(this.addedSanction.first());
         (isAfterAcceptChangeRequest) ?
@@ -914,6 +930,7 @@ export class RequestPage extends CommissionPage {
     public async addRequestForChange(): Promise<void> {
         await this.sectionByEnum(RequestSections.generalInfo).click();
         await this.addRequestForChangeButton.click();
+        await this.isOnlyExpiringDatesCheckbox.click();
         await this.criteriaGroupExpansionIcon.click();
         const criteriaCount: number = await this.criteriaInfo.count();
         const docsCount: number = await this.documentCheckbox.count();

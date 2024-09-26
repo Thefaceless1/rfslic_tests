@@ -7,8 +7,8 @@ import * as Process from "process";
 import {logger} from "../../../logger/logger.js";
 
 export class AuthPage extends BasePage {
-    private readonly userId: number = (Process.env.BRANCH == "prod") ? 17513354 : 11309600
-    private readonly userName: string = "Угебва Нкерсалда"
+    private readonly userId: number = (Process.env.BRANCH == "prod") ? 17513354 : 11310620
+    private readonly userName: string = "Авклоноке Гевиенй"
     private loginAttempts: number = 3
     constructor(page: Page) {
         super(page)

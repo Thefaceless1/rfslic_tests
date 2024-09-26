@@ -6,5 +6,8 @@ export enum LicStates {
     waitForCommission = "Ожидает решения комиссии",
     inWork = "В работе",
     passed = "Пройден",
-    notPassed = "Не пройден"
+    notPassed = "Не пройден",
+    accepted = "Принята",
+    acceptedWithCondition = "Принята с условиями",
+    notAccepted = "Не принята"
 }

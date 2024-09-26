@@ -120,10 +120,11 @@ export class CommissionPage extends MainPage {
     /**
      * Add decision on requests
      */
-    public async addRequestDecision(prolicType: ProlicType): Promise<void> {
+    public async addRequestDecision(prolicType: ProlicType, isChangeRequest: boolean): Promise<void> {
         await this.editDecisionButton.click();
         await this.selectDecision.click();
         if(prolicType == "fin") await this.decisionByName(LicStates.passed).click();
+        else if(isChangeRequest) await this.decisionByName(LicStates.accepted).click();
         else await this.decisionByName(LicStates.issued).click();
         await this.comment.type(InputData.randomWord);
         await this.approvalSanctionButton.click();
@@ -131,8 +132,12 @@ export class CommissionPage extends MainPage {
         await this.approveButton.click();
         await this.saveButton.click();
         if(prolicType == "fin") await expect(this.acceptedDecisionByName(LicStates.passed)).toBeVisible();
+        else if(isChangeRequest) await expect(this.acceptedDecisionByName(LicStates.accepted)).toBeVisible();
         else await expect(this.acceptedDecisionByName(LicStates.issued)).toBeVisible();
-        if(prolicType == "cert") await this.acceptedDecisionByName(LicStates.issued).click({clickCount: 2});
+        if(prolicType == "cert")
+            (isChangeRequest) ?
+            await this.acceptedDecisionByName(LicStates.accepted).click({clickCount: 2}) :
+            await this.acceptedDecisionByName(LicStates.issued).click({clickCount: 2});
     }
     /**
      * Edit fine amount
