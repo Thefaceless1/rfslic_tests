@@ -32,6 +32,23 @@ function getAttachments(): Mail.Attachment[] {
     const logPath: string = path.resolve("src","e2e","artifacts","logs");
     const logFolder: string[] = fs.readdirSync(logPath);
     if(logFolder.length > 0) attachments.push(getLogFile());
+    const screenshotsPath: string = path.resolve("src","e2e","artifacts","screenshots");
+    const screenshotsFolder: string[] = fs.readdirSync(screenshotsPath);
+    if(screenshotsFolder.length > 0) {
+        screenshotsFolder.forEach(subFolder => {
+            const subFolderPath: string = screenshotsPath + "/" + subFolder;
+            const filesArray: string[] = fs.readdirSync(subFolderPath);
+            if(filesArray.length > 0) {
+                filesArray.forEach(file => {
+                    const filePath: string = subFolderPath + "/" + file;
+                    attachments.push({
+                        filename: file,
+                        path: path.resolve(filePath)
+                    })
+                })
+            }
+        })
+    }
     return attachments;
 }
 

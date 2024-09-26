@@ -8,5 +8,6 @@
 /src/api/report/*.html
 /src/e2e/artifacts/screenshots/*/
 /src/e2e/artifacts/report/
+/src/e2e/artifacts/logs/rfslic.log
 test.db.config.json
 .env

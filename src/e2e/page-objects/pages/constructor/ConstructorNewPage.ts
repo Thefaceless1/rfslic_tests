@@ -157,6 +157,7 @@ export class ConstructorNewPage extends ConstructorPage {
             criteriaGroupsCount++;
         }
         await this.selectButton.click();
+        await Elements.waitForVisible(this.criteriaGroupName.first());
         expect(await this.criteriaGroupName.count()).toBe(criteriaGroupsCount);
         await expect(this.ruleVersionValue(String(this.ruleVersion))).toBeVisible();
     }
