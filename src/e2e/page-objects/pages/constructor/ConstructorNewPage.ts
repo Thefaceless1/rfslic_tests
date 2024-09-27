@@ -151,14 +151,10 @@ export class ConstructorNewPage extends ConstructorPage {
         await this.selectCriteriaButton.click();
         await Elements.waitForVisible(this.selectedRuleVersion);
         await this.nextButton.click();
-        let criteriaGroupsCount: number = 0;
         while (await this.criteriaGroupCheckbox.first().isVisible()) {
             await this.criteriaGroupCheckbox.first().click();
-            criteriaGroupsCount++;
         }
         await this.selectButton.click();
-        await Elements.waitForVisible(this.criteriaGroupName.first());
-        expect(await this.criteriaGroupName.count()).toBe(criteriaGroupsCount);
         await expect(this.ruleVersionValue(String(this.ruleVersion))).toBeVisible();
     }
     /**

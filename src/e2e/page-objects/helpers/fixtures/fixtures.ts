@@ -139,6 +139,7 @@ export const test = base.extend<Fixtures>({
     },
     rulesClassifier: async ({page},use) => {
         const rulesClassifier = new RulesClassifierPage(page);
+        await rulesClassifier.deleteCreatedData();
         await rulesClassifier.deleteUser();
         await rulesClassifier.createUser();
         await rulesClassifier.login();
