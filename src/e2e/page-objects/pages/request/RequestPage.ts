@@ -39,6 +39,10 @@ export class RequestPage extends CommissionPage {
      */
     private criteriaInfo: Locator = Elements.getElement(this.page,`//div[@class='Collapse-LabelText']//span[contains(text(),'${InputData.testName("criteria")}')]`)
     /**
+     * Document name field
+     */
+    private docNameField: Locator = Elements.getElement(this.page,`//span[contains(text(),'${InputData.testName("document")}')]`)
+    /**
      * Member criteria information field
      */
     private memberCriteriaInfo: Locator = Elements.getElement(this.page,"//a//preceding-sibling::span[text()='ФИО Участника:']")
@@ -820,6 +824,21 @@ export class RequestPage extends CommissionPage {
         await this.createMeeting(prolicType,isChangeRequest);
         await this.addRequestToMeeting();
         await this.addRequestDecision(prolicType,isChangeRequest);
+        if(prolicType == "lic") {
+            (isChangeRequest) ?
+                await this.viewApprovedSanctions(true) :
+                await this.viewApprovedSanctions(false);
+        }
+        if(prolicType != "fin") {
+            (isChangeRequest) ?
+                await this.checkRequestAttributes(true) :
+                await this.checkRequestAttributes(false);
+        }
+        if(isChangeRequest) {
+            await this.checkRemovedAndAddedEntities();
+            await this.checkImportedEntities();
+            await this.checkChangedEntitiesColors();
+        }
     }
     /**
      * Change the deadlines for submission and review of documentation
@@ -893,7 +912,7 @@ export class RequestPage extends CommissionPage {
     /**
      * View approved sanctions
      */
-    public async viewApprovedSanctions(isAfterAcceptChangeRequest: boolean): Promise<void> {
+    private async viewApprovedSanctions(isAfterAcceptChangeRequest: boolean): Promise<void> {
         (isAfterAcceptChangeRequest) ?
             await this.acceptedDecisionByName(LicStates.accepted).click({clickCount: 2}) :
             await this.acceptedDecisionByName(LicStates.issued).click({clickCount: 2});
@@ -975,14 +994,14 @@ export class RequestPage extends CommissionPage {
     /**
      * Checking attributes of request
      */
-    public async checkRequestAttributes(isAfterAcceptChangeRequest: boolean): Promise<void> {
+    private async checkRequestAttributes(isAfterAcceptChangeRequest: boolean): Promise<void> {
         await expect(this.containsActualInformation).toBeVisible();
         if(isAfterAcceptChangeRequest) await expect(this.requestForChangeTitle).not.toBeVisible();
     }
     /**
      * Check for the presence of an added OFI and the absence of a removed member
      */
-    public async checkRemovedAndAddedEntities(): Promise<void> {
+    private async checkRemovedAndAddedEntities(): Promise<void> {
         await this.sectionByEnum(RequestSections.criterias).click();
         await Elements.waitForVisible(this.criteriaInfo.first());
         const criteriaCount: number = await this.criteriaInfo.count();
@@ -996,12 +1015,27 @@ export class RequestPage extends CommissionPage {
     /**
      * Checking for the presence of imported entities from the actual request
      */
-    public async checkImportedEntities(): Promise<void> {
+    private async checkImportedEntities(): Promise<void> {
         const documentsCriteriaTypeDocsCount: number = await this.documentsCriteriaTypeDocs.count();
         const membersCount: number = await this.memberCriteriaInfo.count() + await this.missingEntity(CriteriaType.member).count();
         const ofiCount: number = await this.ofiCriteriaInfo.count() + await this.missingEntity(CriteriaType.ofi).count();
         expect(documentsCriteriaTypeDocsCount).toBe(this.parentLicDocsCount);
         expect(membersCount).toBe(this.parentLicMemberCount-1);
         expect(ofiCount).toBe(this.parentLicOfiCount+1);
+    }
+    /**
+     * Checking colors of added ofi and changed documents
+     */
+    private async checkChangedEntitiesColors(): Promise<void> {
+        const blueRgbColor: string = "0, 120, 210";
+        const rgbValueRegExp: RegExp = /(?<=\().+(?=\))/;
+        const critGroupColorStyle: string = await this.criteriaGroups.getAttribute('style');
+        const addedOfiColorStyle: string = await this.ofiName.last().evaluate((element) => window.getComputedStyle(element).color);
+        const changedDocColorStyle: string = await this.docNameField.first().evaluate((element) => window.getComputedStyle(element).color);
+        const criteriaGroupRgbColor: string = rgbValueRegExp.exec(critGroupColorStyle)[0];
+        const ofiRgbColor: string = rgbValueRegExp.exec(addedOfiColorStyle)[0];
+        const docRgbColor: string = rgbValueRegExp.exec(changedDocColorStyle)[0];
+        expect(ofiRgbColor, docRgbColor).toBe(blueRgbColor);
+        expect(criteriaGroupRgbColor).toBe(blueRgbColor);
     }
 }

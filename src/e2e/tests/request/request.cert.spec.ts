@@ -54,10 +54,6 @@ test.describe("Заявки на аттестацию",() => {
                 async () => await certRequests.addCommissionDecision("cert",false)
             );
             await test.step(
-                "Получение заявкой признака 'Содержит актуальные сведения'",
-                async () => await certRequests.checkRequestAttributes(false)
-            );
-            await test.step(
                 "Подача заявки на изменение",
                     async () => await certRequests.addRequestForChange()
             );
@@ -76,18 +72,6 @@ test.describe("Заявки на аттестацию",() => {
             await test.step(
              "Вынесение решения комиссией по заявке на изменение",
                 async () => await certRequests.addCommissionDecision("cert",true)
-            );
-            await test.step(
-                "Потеря заявкой атрибута 'заявка на изменение' и приобретение атрибута 'содержит актуальные сведения'",
-                async () => await certRequests.checkRequestAttributes(true)
-            );
-            await test.step(
-                "Наличие в итоговой заявке добавленного ОФИ и отсутствие удаленного участника",
-                async () => await certRequests.checkRemovedAndAddedEntities()
-            );
-            await test.step(
-                "Наличие в итоговой заявки документов, ОФИ и Участников, импортированных из актуальной заявки",
-                async () => await certRequests.checkImportedEntities()
             );
         })
 })

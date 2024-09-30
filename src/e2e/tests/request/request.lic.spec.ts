@@ -63,16 +63,8 @@ test.describe("Заявки на лицензирование", () => {
             async () => await licRequests.editLicStatus(LicStates.waitForCommission)
         );
         await test.step(
-            "Вынесение решения и утверждение санкций(в т.ч изменение суммы штрафа) комиссией по заявке на лицензирование",
+            "Вынесение решения и утверждение санкций комиссией по заявке на лицензирование",
             async () => await licRequests.addCommissionDecision("lic",false)
-        );
-        await test.step(
-            "Просмотр утвержденных санкций на табе 'Комиссии' в заявке",
-            async () => await licRequests.viewApprovedSanctions(false)
-        );
-        await test.step(
-            "Получение заявкой признака 'Содержит актуальные сведения'",
-            async () => await licRequests.checkRequestAttributes(false)
         );
         await test.step(
             "Подача заявки на изменение",
@@ -99,24 +91,8 @@ test.describe("Заявки на лицензирование", () => {
             async () => await licRequests.editLicStatus(LicStates.waitForCommission)
         );
         await test.step(
-            "Вынесение решения и утверждение санкций(в т.ч изменение суммы штрафа) комиссией по заявке на изменение",
+            "Вынесение решения и утверждение санкций комиссией по заявке на изменение",
             async () => await licRequests.addCommissionDecision("lic",true)
-        );
-        await test.step(
-            "Просмотр утвержденных санкций на табе 'Комиссии' в заявке",
-            async () => await licRequests.viewApprovedSanctions(true)
-        );
-        await test.step(
-            "Потеря заявкой атрибута 'заявка на изменение' и приобретение атрибута 'содержит актуальные сведения'",
-            async () => await licRequests.checkRequestAttributes(true)
-        );
-        await test.step(
-            "Наличие в итоговой заявке добавленного ОФИ и отсутствие удаленного участника",
-            async () => await licRequests.checkRemovedAndAddedEntities()
-        );
-        await test.step(
-            "Наличие в итоговой заявки документов, ОФИ и Участников, импортированных из актуальной заявки",
-            async () => await licRequests.checkImportedEntities()
         );
     })
 })
