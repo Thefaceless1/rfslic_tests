@@ -11,7 +11,7 @@ import {AdminOptions} from "../../helpers/enums/AdminOptions.js";
 import {Notifications} from "../../helpers/enums/Notifications.js";
 
 export class RulesClassifierPage extends MainPage {
-    public createdRuleVersion: number = 0
+    public createdRuleVersion: number
     constructor(page: Page) {
         super(page);
     }
@@ -78,7 +78,7 @@ export class RulesClassifierPage extends MainPage {
     /**
      * Field with criteria name, rank and description
      */
-    private criteriaInfo: Locator = Elements.getElement(this.page,"//div[@class='Collapse-LabelText']//span[contains(text(),'автотест')]")
+    protected criteriaInfo: Locator = Elements.getElement(this.page,`//div[@class='Collapse-LabelText']//span[contains(text(),'${InputData.testName("criteria")}')]`)
     /**
      * Values of the drop-down list of the field "Criteria group name"
      */
@@ -86,7 +86,7 @@ export class RulesClassifierPage extends MainPage {
     /**
      * Field "Criteria group name"
      */
-    private criteriaGroups = Elements.getElement(this.page,"//*[contains(@class,'groupName__indicators') or contains(@class,'group__indicators')]")
+    private criteriaGroups: Locator = Elements.getElement(this.page,"//*[contains(@class,'groupName__indicators') or contains(@class,'group__indicators')]")
     /**
      * Action dropdown values
      */

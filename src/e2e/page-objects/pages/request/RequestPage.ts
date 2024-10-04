@@ -7,7 +7,6 @@ import {randomInt} from "crypto";
 import {LicStates} from "../../helpers/enums/LicStates.js";
 import {CriteriaType} from "../../helpers/enums/CriteriaType.js";
 import {DocStatus} from "../../helpers/enums/DocStatus.js";
-import {ConstructorNewPage} from "../constructor/ConstructorNewPage.js";
 import {Input} from "../../../framework/elements/Input.js";
 import {Notifications} from "../../helpers/enums/Notifications.js";
 import {Pages} from "../../helpers/enums/Pages.js";
@@ -33,11 +32,7 @@ export class RequestPage extends CommissionPage {
     /**
      * Tabs with criteria groups
      */
-    private criteriaGroups: Locator = Elements.getElement(this.page,"//button[contains(text(),'критерии')]")
-    /**
-     * Criteria information field
-     */
-    private criteriaInfo: Locator = Elements.getElement(this.page,`//div[@class='Collapse-LabelText']//span[contains(text(),'${InputData.testName("criteria")}')]`)
+    private criteriaGroupsTab: Locator = Elements.getElement(this.page,"//button[contains(text(),'критерии')]")
     /**
      * Document name field
      */
@@ -410,9 +405,9 @@ export class RequestPage extends CommissionPage {
     public async addExperts(): Promise<void> {
         await Elements.waitForVisible(this.sectionByEnum(RequestSections.criterias));
         await this.sectionByEnum(RequestSections.criterias).click();
-        const groupsCount = await this.criteriaGroups.count();
+        const groupsCount = await this.criteriaGroupsTab.count();
         for(let i = 0; i<groupsCount; i++) {
-            if(i != 0) await this.criteriaGroups.nth(i).click();
+            if(i != 0) await this.criteriaGroupsTab.nth(i).click();
             await Elements.waitForVisible(this.editButton.last());
             const editCount = (Process.env.BRANCH == "prod") ? 1 : await this.editButton.count();
             for(let c = 0;c<editCount; c++) {
@@ -470,10 +465,10 @@ export class RequestPage extends CommissionPage {
      */
     public async fillRequestEntities(prolicType: ProlicType, isChangeRequest: boolean): Promise<void> {
         if(isChangeRequest) await this.sectionByEnum(RequestSections.criterias).click();
-        const groupsCount: number = await this.criteriaGroups.count();
+        const groupsCount: number = await this.criteriaGroupsTab.count();
         for(let i = groupsCount-1; i >= 0; i--) {
-            await this.criteriaGroups.nth(i).click();
-            const currentCriteriaGroupName: string = await this.criteriaGroups.nth(i).innerText();
+            await this.criteriaGroupsTab.nth(i).click();
+            const currentCriteriaGroupName: string = await this.criteriaGroupsTab.nth(i).innerText();
             await Elements.waitForVisible(this.criteriaInfo.first());
             const criteriaCount: number = await this.criteriaInfo.count();
             for(let m = 0; m < criteriaCount;m++) {
@@ -604,9 +599,9 @@ export class RequestPage extends CommissionPage {
             await this.fillStatusAndComment(docsCount,"generalInfo");
             await this.sectionByEnum(RequestSections.criterias).click();
         }
-        const groupsCount: number = await this.criteriaGroups.count();
+        const groupsCount: number = await this.criteriaGroupsTab.count();
         for(let i = 0; i<groupsCount; i++) {
-            await this.criteriaGroups.nth(i).click();
+            await this.criteriaGroupsTab.nth(i).click();
             let criteriaCount: number;
             do {
                criteriaCount = await this.criteriaInfo.count();
@@ -744,15 +739,13 @@ export class RequestPage extends CommissionPage {
      * Create a prolicense for testing licenses
      */
     public async createTestProlicense(prolicType: ProlicType): Promise<void> {
-        const constructor = new ConstructorNewPage(this.page);
-        await constructor.createRuleForProlicense();
-        await constructor.createProlicense(prolicType);
-        await constructor.addRuleVersionForProlicense();
-        await constructor.addExperts();
-        await constructor.addMinimumCount();
-        await constructor.publishProlicense("lic");
-        await Elements.waitForVisible(constructor.createProlicButton);
-        this.prolicName = constructor.prolicName;
+        await this.createRuleForProlicense();
+        await this.createProlicense(prolicType);
+        await this.addRuleVersionForProlicense();
+        await this.addExpertsInProlicense();
+        await this.addMinimumCount();
+        await this.publishProlicense("lic");
+        await Elements.waitForVisible(this.createProlicButton);
     }
     /**
      * Create a request in the status "Draft"
@@ -1016,12 +1009,17 @@ export class RequestPage extends CommissionPage {
      * Checking for the presence of imported entities from the actual request
      */
     private async checkImportedEntities(): Promise<void> {
+        const ofiCountInChangeRequest: number = 3;
         const documentsCriteriaTypeDocsCount: number = await this.documentsCriteriaTypeDocs.count();
         const membersCount: number = await this.memberCriteriaInfo.count() + await this.missingEntity(CriteriaType.member).count();
         const ofiCount: number = await this.ofiCriteriaInfo.count() + await this.missingEntity(CriteriaType.ofi).count();
         expect(documentsCriteriaTypeDocsCount).toBe(this.parentLicDocsCount);
         expect(membersCount).toBe(this.parentLicMemberCount-1);
-        expect(ofiCount).toBe(this.parentLicOfiCount+1);
+        if(this.minCountValue < ofiCountInChangeRequest) {
+            expect(ofiCount).toBe(this.parentLicOfiCount);
+            await expect(this.missingEntity(CriteriaType.ofi)).not.toBeVisible();
+        }
+        else expect(ofiCount).toBe(this.parentLicOfiCount+1);
     }
     /**
      * Checking colors of added ofi and changed documents
@@ -1029,7 +1027,7 @@ export class RequestPage extends CommissionPage {
     private async checkChangedEntitiesColors(): Promise<void> {
         const blueRgbColor: string = "0, 120, 210";
         const rgbValueRegExp: RegExp = /(?<=\().+(?=\))/;
-        const critGroupColorStyle: string = await this.criteriaGroups.getAttribute('style');
+        const critGroupColorStyle: string = await this.criteriaGroupsTab.getAttribute('style');
         const addedOfiColorStyle: string = await this.ofiName.last().evaluate((element) => window.getComputedStyle(element).color);
         const changedDocColorStyle: string = await this.docNameField.first().evaluate((element) => window.getComputedStyle(element).color);
         const criteriaGroupRgbColor: string = rgbValueRegExp.exec(critGroupColorStyle)[0];

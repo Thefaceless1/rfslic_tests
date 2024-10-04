@@ -6,7 +6,6 @@ import {AuthPage} from "./AuthPage.js";
 import {InputData} from "../helpers/InputData.js";
 
 export class MainPage extends AuthPage {
-    public prolicName: string = InputData.randomWord;
     constructor(page: Page) {
         super(page);
     }

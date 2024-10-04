@@ -11,20 +11,20 @@ import {ProlicStatus} from "../../helpers/enums/ProlicStatus.js";
 import {ProlicType} from "../../helpers/types/ProlicType";
 import {ScenarioType} from "../../helpers/types/ScenarioType";
 import {ProlicTypes} from "../../helpers/enums/ProlicTypes.js";
-import {RulesClassifierPage} from "../admin/RulesClassifierPage.js";
 import {MainMenuOptions} from "../../helpers/enums/MainMenuOptions.js";
 import {randomInt} from "crypto";
 
 export class ConstructorNewPage extends ConstructorPage {
+    public prolicName: string = InputData.randomWord
     private readonly clonedProlicName: string = InputData.randomWord;
-    private ruleVersion: number = 0
+    protected readonly minCountValue: number = randomInt(1,5)
     constructor(page: Page) {
         super(page);
     }
     /**
      * Action call button for prolicense
      */
-    private actionButton: Locator = Elements.getElement(this.page,"//button[@name='proLic_btn_details']")
+    private prolicenseActionButton: Locator = Elements.getElement(this.page,"//button[@name='proLic_btn_details']")
     /**
      * Button 'Select criteria'
      */
@@ -32,7 +32,7 @@ export class ConstructorNewPage extends ConstructorPage {
     /**
      * Action dropdown values
      */
-    private actionsList: Locator = Elements.getElement(this.page,"//a[contains(@class,'ListItem')]")
+    private prolicenseActionsList: Locator = Elements.getElement(this.page,"//a[contains(@class,'ListItem')]")
     /**
      * Field 'Minimum count'
      */
@@ -77,7 +77,7 @@ export class ConstructorNewPage extends ConstructorPage {
      * Selected rule version value in the "Version number" field
      */
     private get selectedRuleVersion(): Locator {
-        return Elements.getElement(this.page,`//input[@name='version' and @value='${this.ruleVersion}']`)
+        return Elements.getElement(this.page,`//input[@name='version' and @value='${this.createdRuleVersion}']`)
     }
     /**
      * Field with name of the created prolicense
@@ -155,14 +155,14 @@ export class ConstructorNewPage extends ConstructorPage {
             await this.criteriaGroupCheckbox.first().click();
         }
         await this.selectButton.click();
-        await expect(this.ruleVersionValue(String(this.ruleVersion))).toBeVisible();
+        await expect(this.ruleVersionValue(String(this.createdRuleVersion))).toBeVisible();
     }
     /**
      * Copy a prolicense
      */
     public async cloneProlicense(): Promise<void> {
-        await this.actionButton.click();
-        await this.actionsList.filter({hasText: ProlicenseActions.clone}).click();
+        await this.prolicenseActionButton.click();
+        await this.prolicenseActionsList.filter({hasText: ProlicenseActions.clone}).click();
         await this.name.fill(this.clonedProlicName);
         await this.saveButton.click();
         await expect(this.prolicNameField(this.clonedProlicName)).toBeVisible();
@@ -176,8 +176,8 @@ export class ConstructorNewPage extends ConstructorPage {
             await this.waitForColumnFilter();
             await this.tableRow.click({clickCount: 2,delay: 500});
         }
-        await this.actionButton.click();
-        await this.actionsList.filter({hasText: ProlicenseActions.publish}).click();
+        await this.prolicenseActionButton.click();
+        await this.prolicenseActionsList.filter({hasText: ProlicenseActions.publish}).click();
         await this.publishButton.click();
         if(scenario == "prolic") {
             await this.filterByColumn(this.filterButtonByEnum(TableColumn.licName),this.prolicName);
@@ -190,8 +190,8 @@ export class ConstructorNewPage extends ConstructorPage {
      * Unpublish of a prolicense
      */
     public async unpublishProlicense(): Promise<void> {
-        await this.actionButton.click();
-        await this.actionsList.filter({hasText: ProlicenseActions.unpublish}).click();
+        await this.prolicenseActionButton.click();
+        await this.prolicenseActionsList.filter({hasText: ProlicenseActions.unpublish}).click();
         await this.unpublishButton.click();
         await expect(this.prolicenseStatus(ProlicStatus.onEditing)).toBeVisible();
     }
@@ -199,8 +199,8 @@ export class ConstructorNewPage extends ConstructorPage {
      * Remove a prolicense
      */
     public async deleteProlicense(): Promise<void> {
-        await this.actionButton.click();
-        await this.actionsList.filter({hasText: ProlicenseActions.delete}).click();
+        await this.prolicenseActionButton.click();
+        await this.prolicenseActionsList.filter({hasText: ProlicenseActions.delete}).click();
         await this.deleteButton.click();
         await expect(this.notification(Notifications.prolicenseRemoved)).toBeVisible()
     }
@@ -216,17 +216,15 @@ export class ConstructorNewPage extends ConstructorPage {
      * Create a rule for testing scenario with prolicense
      */
     public async createRuleForProlicense(): Promise<void> {
-        const ruleClassifier = new RulesClassifierPage(this.page);
-        await ruleClassifier.addRule();
-        await ruleClassifier.addCriteriaGroups();
-        await ruleClassifier.addCriterias();
-        await ruleClassifier.publishRule();
-        this.ruleVersion = ruleClassifier.createdRuleVersion;
+        await this.addRule();
+        await this.addCriteriaGroups();
+        await this.addCriterias();
+        await this.publishRule();
     }
     /**
      * Add experts for criteria groups
      */
-    public async addExperts(): Promise<void> {
+    public async addExpertsInProlicense(): Promise<void> {
         const criteriaGroupCount: number = await this.criteriaGroupName.count();
         for(let i=0; i<criteriaGroupCount; i++) {
             await this.criteriaGroupName.nth(i).click();
@@ -251,10 +249,9 @@ export class ConstructorNewPage extends ConstructorPage {
             catch (error) {
                 await this.criteriaWarningEditButton.first().click();
             }
-            const randomMinCountValue: string = String(randomInt(1,10000));
-            await this.minimumCount.fill(randomMinCountValue);
+            await this.minimumCount.fill(String(this.minCountValue));
             await this.saveButton.click();
-            await expect(this.minimumCountValue(randomMinCountValue)).toBeVisible();
+            await expect(this.minimumCountValue(String(this.minCountValue))).toBeVisible();
         }
     }
 }

@@ -23,7 +23,7 @@ test.describe("Пролицензии", () => {
         );
         await test.step(
             "Добавление экспертов для групп критериев",
-            async () => await constructor.addExperts()
+            async () => await constructor.addExpertsInProlicense()
         );
         await test.step(
             "Заполнение поля 'Минимальное количество' критерия",

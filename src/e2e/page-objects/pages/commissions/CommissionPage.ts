@@ -1,4 +1,3 @@
-import {MainPage} from "../MainPage.js";
 import {expect, Locator, Page} from "@playwright/test";
 import {Elements} from "../../../framework/elements/Elements.js";
 import {Date} from "../../../framework/elements/Dates.js";
@@ -9,8 +8,9 @@ import {TableColumn} from "../../helpers/enums/TableColumn.js";
 import {ProlicType} from "../../helpers/types/ProlicType.js";
 import {CommissionTypes} from "../../helpers/enums/CommissionTypes.js";
 import {LicStates} from "../../helpers/enums/LicStates.js";
+import {ConstructorNewPage} from "../constructor/ConstructorNewPage.js";
 
-export class CommissionPage extends MainPage {
+export class CommissionPage extends ConstructorNewPage {
     constructor(page: Page) {
         super(page);
     }
