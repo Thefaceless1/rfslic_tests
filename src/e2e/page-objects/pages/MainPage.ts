@@ -3,7 +3,6 @@ import {Elements} from "../../framework/elements/Elements.js";
 import {MainMenuOptions} from "../helpers/enums/MainMenuOptions.js";
 import {AdminOptions} from "../helpers/enums/AdminOptions";
 import {AuthPage} from "./AuthPage.js";
-import {InputData} from "../helpers/InputData.js";
 
 export class MainPage extends AuthPage {
     constructor(page: Page) {
