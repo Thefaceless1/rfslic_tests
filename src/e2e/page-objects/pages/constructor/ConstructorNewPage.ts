@@ -5,7 +5,6 @@ import {Input} from "../../../framework/elements/Input.js";
 import {ProlicenseActions} from "../../helpers/enums/ProlicenseActions.js";
 import {InputData} from "../../helpers/InputData.js";
 import {ConstructorPage} from "./ConstructorPage.js";
-import {TableColumn} from "../../helpers/enums/TableColumn.js";
 import {Notifications} from "../../helpers/enums/Notifications.js";
 import {ProlicStatus} from "../../helpers/enums/ProlicStatus.js";
 import {ProlicType} from "../../helpers/types/ProlicType";
@@ -143,6 +142,7 @@ export class ConstructorNewPage extends ConstructorPage {
         await this.fillDocs();
         await this.saveButton.click();
         await expect(this.prolicNameField(this.prolicName)).toBeVisible();
+        this.prolicUrl = this.page.url();
     }
     /**
      * Add rule version for prolicense
@@ -172,17 +172,15 @@ export class ConstructorNewPage extends ConstructorPage {
      */
     public async publishProlicense(scenario: ScenarioType): Promise<void> {
         if(scenario == "prolic") {
-            await this.filterByColumn(this.filterButtonByEnum(TableColumn.licName),this.prolicName);
-            await this.waitForColumnFilter();
-            await this.tableRow.click({clickCount: 2,delay: 500});
+            await this.page.goto(this.prolicUrl);
+            await this.page.waitForLoadState("domcontentloaded");
         }
         await this.prolicenseActionButton.click();
         await this.prolicenseActionsList.filter({hasText: ProlicenseActions.publish}).click();
         await this.publishButton.click();
         if(scenario == "prolic") {
-            await this.filterByColumn(this.filterButtonByEnum(TableColumn.licName),this.prolicName);
-            await this.waitForColumnFilter();
-            await this.tableRow.click({clickCount: 2,delay: 500});
+            await this.page.goto(this.prolicUrl);
+            await this.page.waitForLoadState("domcontentloaded");
             await expect(this.prolicenseStatus(ProlicStatus.published)).toBeVisible();
         }
     }
@@ -203,14 +201,6 @@ export class ConstructorNewPage extends ConstructorPage {
         await this.prolicenseActionsList.filter({hasText: ProlicenseActions.delete}).click();
         await this.deleteButton.click();
         await expect(this.notification(Notifications.prolicenseRemoved)).toBeVisible()
-    }
-    /**
-     * waiting for the filtered record to be displayed
-     */
-    private async waitForColumnFilter(): Promise<void> {
-        const rowCount: number = await this.tableRow.count();
-        if(rowCount > 1) await this.waitForColumnFilter();
-        return;
     }
     /**
      * Create a rule for testing scenario with prolicense

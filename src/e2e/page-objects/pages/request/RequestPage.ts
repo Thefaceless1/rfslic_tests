@@ -784,6 +784,7 @@ export class RequestPage extends CommissionPage {
             await this.performButton.click();
         }
         await expect(this.notification(Notifications.requestAdded)).toBeVisible();
+        this.licUrl = this.page.url();
     }
     /**
      * Add files and comments for license documents
@@ -907,8 +908,9 @@ export class RequestPage extends CommissionPage {
      */
     private async viewApprovedSanctions(isAfterAcceptChangeRequest: boolean): Promise<void> {
         (isAfterAcceptChangeRequest) ?
-            await this.acceptedDecisionByName(LicStates.accepted).click({clickCount: 2}) :
-            await this.acceptedDecisionByName(LicStates.issued).click({clickCount: 2});
+            await this.page.goto(this.changeLicUrl):
+            await this.page.goto(this.licUrl);
+        await this.page.waitForLoadState("domcontentloaded");
         await this.sectionByEnum(RequestSections.commissions).click();
         await Elements.waitForVisible(this.addedSanction.first());
         (isAfterAcceptChangeRequest) ?
@@ -973,6 +975,7 @@ export class RequestPage extends CommissionPage {
         await this.addRequestForChangeButton.last().click();
         await this.submitButton.click();
         await expect(this.requestForChangeTitle).toBeVisible();
+        this.changeLicUrl = this.page.url();
     }
     /**
      * Check imported sanctions

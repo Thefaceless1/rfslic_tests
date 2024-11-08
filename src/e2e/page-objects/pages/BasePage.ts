@@ -6,7 +6,10 @@ import {Notifications} from "../helpers/enums/Notifications.js";
 import {DbHelper} from "../../../db/db-helper.js";
 import {ProlicTypes} from "../helpers/enums/ProlicTypes.js";
 
-export class BasePage extends PlaywrightDevPage{
+export class BasePage extends PlaywrightDevPage {
+    protected prolicUrl: string
+    protected licUrl: string
+    protected changeLicUrl: string
     constructor(page: Page) {
         super(page)
     }

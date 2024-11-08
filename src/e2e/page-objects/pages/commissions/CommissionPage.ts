@@ -136,8 +136,9 @@ export class CommissionPage extends ConstructorNewPage {
         else await expect(this.acceptedDecisionByName(LicStates.issued)).toBeVisible();
         if(prolicType == "cert")
             (isChangeRequest) ?
-            await this.acceptedDecisionByName(LicStates.accepted).click({clickCount: 2}) :
-            await this.acceptedDecisionByName(LicStates.issued).click({clickCount: 2});
+            await this.page.goto(this.changeLicUrl):
+            await this.page.goto(this.licUrl);
+        await this.page.waitForLoadState("domcontentloaded");
     }
     /**
      * Edit fine amount
